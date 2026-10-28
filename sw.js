@@ -1,5 +1,5 @@
 /* Bonnet Up: keeps a copy of the game on the phone so it opens instantly and plays offline. */
-const VERSION = 'bonnet-up-v20';
+const VERSION = 'bonnet-up-v21';
 const EXT = 'bonnet-up-ext';
 const CORE = ['./', './index.html', './game.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-192.png', './icon-maskable-512.png', './apple-touch-icon.png', './favicon-48.png', './privacy.html'];
 const LIB = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
