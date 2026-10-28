@@ -458,6 +458,8 @@ body.immersive #toast{bottom:auto;top:calc(var(--hud-h,64px) + 64px)}
 .stage-ui .nav>*,.stage-ui .nav .nav-row>*{pointer-events:auto}
 .nav-snap{width:36px;height:36px;padding:0;border-radius:999px;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);display:grid;place-items:center;cursor:pointer}
 .nav-snap svg{width:18px;height:18px}
+.photo21{display:block;width:100%;height:auto;max-height:52vh;object-fit:contain;border-radius:12px;background:#0F1412;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.photo21-acts{display:flex;gap:8px;flex-wrap:wrap}
 @media (max-width:440px){.hud-in{column-gap:10px}.brand{font-size:23px}.hud-btn{padding:0 9px;gap:5px}.hud-btn.snd{width:34px}}
 @media (max-width:370px){.brand{font-size:20px}.hud-tools{gap:5px}}
 @media (max-width:440px){.stats{grid-template-columns:repeat(4,auto);justify-content:space-between}.stat .k{letter-spacing:.08em}.xp{min-width:56px}}
@@ -12934,11 +12936,43 @@ function renameYes() {
   if (Car3D.ok && Car3D.redrawText) Car3D.redrawText();
   render(); toast(`Welcome to ${garageName21()}.`);
 }
-/* photo mode: save a picture of the workshop as it looks right now */
+/* photo mode: take a picture of the workshop as it looks right now, show it, and save it if you want it.
+   Inside the Claude viewer the save goes through its downloads capability (it asks first); elsewhere it's a normal download. */
+let PHOTO21 = null, DL21 = null;
+const FRAMED21 = (() => { try { return !!(window.claude && typeof window.claude.use === 'function'); } catch (e) { return false; } })();
+if (FRAMED21) { try { window.claude.use('downloads').then(d => { DL21 = d || null; }, () => { DL21 = null; }); } catch (e) { /* no viewer */ } }
+const photoName21 = () => `${garageName21().replace(/\W+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'bonnet-up'}-day-${S.day}.jpg`;
+function photoBlob21(url) {
+  const i = url.indexOf(','), bin = atob(url.slice(i + 1)), u8 = new Uint8Array(bin.length);
+  for (let k = 0; k < bin.length; k++) u8[k] = bin.charCodeAt(k);
+  return new Blob([u8], { type: 'image/jpeg' });
+}
 function takePhoto() {
   if (!Car3D.ok || !Car3D.snapshot) return;
   const url = Car3D.snapshot(); if (!url) { toast('The camera didn’t work this time.'); return; }
-  try { const a = document.createElement('a'); a.href = url; a.download = `${garageName21().replace(/\W+/g, '-').toLowerCase()}-day-${S.day}.jpg`; document.body.appendChild(a); a.click(); a.remove(); Sfx.flash(); toast('Photo saved.'); } catch (e) { toast('Your browser wouldn’t save the photo.'); }
+  PHOTO21 = url; Sfx.flash(); buzz(20);
+  const canSave = !FRAMED21 || DL21;
+  showModal(`<div><span class="label">Photo mode</span><h2 class="sheet-title">Say cheese</h2></div>
+    <img class="photo21" src="${url}" alt="A photo of your workshop">
+    <p class="muted">${canSave ? 'Happy with it? Save it to your device.' : 'Press and hold the picture (or right-click it) to save it.'}</p>
+    <div class="photo21-acts">${canSave ? '<button class="btn primary" data-a="photo-save">Save photo</button>' : ''}<button class="btn" data-a="close-modal">Close</button></div>`);
+}
+async function savePhoto21() {
+  const url = PHOTO21; if (!url) return;
+  const name = photoName21();
+  if (DL21) {
+    try {
+      const r = await DL21.save({ filename: name, data: photoBlob21(url) });
+      if (r && r.status === 'saved') toast('Photo saved.');
+      closeModal(); return;
+    } catch (e) {
+      const c = e && e.code;
+      if (c === 'declined') { toast('Not saved. It’s still here if you change your mind.'); return; }
+      if (c === 'rate_limited') { toast('One moment, then try again.'); return; }
+      toast('Saving isn’t available here. Press and hold the picture to keep it.'); return;
+    }
+  }
+  try { const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); toast('Photo saved.'); closeModal(); } catch (e) { toast('Your browser wouldn’t save it. Press and hold the picture instead.'); }
 }
 /* ---------- build 21: much more to spend money on ---------- */
 /* what a job gets from the specialist kit you own: labour bonus, and why */
@@ -15962,6 +15996,7 @@ document.addEventListener('click', e => {
     case 'sellup': askSellUp(); break;
     case 'sellup-yes': sellUp(); break;
     case 'photo': takePhoto(); break;
+    case 'photo-save': savePhoto21(); break;
     case 'savemove': showSaveMove(); break;
     case 'save-copy': saveCopy(); break;
     case 'save-paste': savePaste(); break;
