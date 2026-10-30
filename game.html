@@ -1153,6 +1153,10 @@ body.tool22 .bolt.seized .hex{box-shadow:0 0 10px var(--tool22)}
 .disp-ico.t-fuel{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16zM5 11h10M15 8l3 3v7a2 2 0 0 0 2 0V9l-3-3' stroke='black' stroke-width='2' fill='none'/%3E%3C/svg%3E")}
 .dv-togo-m{font-family:var(--font-display);font-weight:900;font-size:24px;line-height:1;color:#F2B705;font-variant-numeric:tabular-nums;min-width:74px;text-align:center}
 .dv-togo{border-color:rgba(242,183,5,.5)}
+.fx-where{margin-top:8px;font-size:14px}
+.gate22 .gate-car{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.gate22 .gate-car small{display:block;color:var(--muted);font-size:12.5px}
+.gate22 .gate-car .row{flex-wrap:wrap;justify-content:flex-end;gap:6px}
 .step.mini .st-sub,.step.mini .st-why,.step.mini .st-note{display:none}.step.mini h3{font-size:19px}.st-mini{margin-left:2px}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 /* Landscape phones: slim top bar, tab rail on the left, step panel on the right, camera controls along the bottom */
@@ -16699,7 +16703,7 @@ function renderJobs() {
       </dl>
       <button class="btn primary wide" data-a="auction" data-id="${l.no}"${(free || unitFree('s')) && S.money >= Math.round(l.price * 0.45 / 50) * 50 ? '' : ' disabled'}>${!(free || unitFree('s')) ? 'Ramps and unit full' : S.money < Math.round(l.price * 0.45 / 50) * 50 ? `You need ${money(Math.round(l.price * 0.45 / 50) * 50)} to bid` : `Bid at auction · guide ${money(l.price)}`}</button>
     </article>`).join('')}</div>`;
-  h += docksHtml22() + '</div><div data-sub="yard">';
+  h += docksHtml22() + '</div><div data-sub="yard">' + gateHtml22();
   if (L >= 2 || (S.yard || []).length) { const yl = S.yard || [], yo = yl.filter(j => j.offer).length; h += `<h2 class="sh">Your yard</h2><div class="closeup"><p><b>${yl.length ? `${yl.length} car${yl.length > 1 ? 's' : ''} for sale` : 'Nothing for sale yet'}</b> <span class="muted">${yo ? `${yo} offer${yo > 1 ? 's' : ''} waiting. ` : ''}Park finished project cars on the yard and buyers come to you.</span></p><button class="btn" data-a="yard">Walk out to the yard</button></div>`; }
   if (L >= 2 || (S.unit || []).length) {
     const ul = S.unit || [], uo = ul.filter(j => j.offer).length;
@@ -18019,14 +18023,14 @@ function applySubs(page) {
 }
 act22('sub', b => { S.sub[b.dataset.p] = b.dataset.v; render(); toTop(); });
 act22('upcat', b => { S.sub.upcat = b.dataset.v; render(); });
-act22('goto', b => { S.view = b.dataset.v; if (b.dataset.s) S.sub[b.dataset.v] = b.dataset.s; UI.drawer = null; render(); toTop(); });
+act22('goto', b => { if (b.closest('#sheet')) closeModal(); S.view = b.dataset.v; if (b.dataset.s) S.sub[b.dataset.v] = b.dataset.s; UI.drawer = null; render(); toTop(); });
 function upgCatChips22() {
   const c = (S.sub && S.sub.upcat) || 'all';
   return `<div class="chips2 upcats">${[['all', 'All']].concat(UPG_CATS.map(x => [x[0], x[1]])).map(([k, l]) => `<button class="zchip" aria-selected="${k === c}" data-b="upcat" data-v="${k}">${esc(l)}</button>`).join('')}</div>`;
 }
 /* the counts on the tabs and sub-tabs */
 function jobsCounts22() {
-  return { customers: S.board.length + (S.complaints || []).length, callouts: dispatchCount22() + (S.callout ? 1 : 0), auctions: docksReady22(), fixoff: S.rival && S.rival.offer && S.rival.lastDay !== S.day ? 1 : 0, yard: (S.yard || []).filter(j => j.offer).length + (S.unit || []).filter(j => j.offer).length };
+  return { customers: S.board.length + (S.complaints || []).length, callouts: dispatchCount22() + (S.callout ? 1 : 0), auctions: docksReady22(), fixoff: S.rival && S.rival.offer && S.rival.lastDay !== S.day ? 1 : 0, yard: (S.gate22 || []).length + (S.yard || []).filter(j => j.offer).length + (S.unit || []).filter(j => j.offer).length };
 }
 function dailyCount22() {
   let n = loginReady() ? 1 : 0;
@@ -19341,8 +19345,7 @@ function fixDone(R, M) {
     const lot = genLot(); lot.car = makeCar(base); lot.car.items = { [ITEMS[R.item].type]: R.item }; if (ITEMS[R.item].type === 'rim') lot.car.rimColor = ITEMS[R.item].rc;
     Object.values(lot.parts).forEach(p => { if (!p.noWear) p.cond = Math.max(p.cond, 60); }); lot.faulty = lot.faulty.slice(0, 2); lot.faulty.forEach(id => { lot.parts[id].cond = 18; });
     lot.value = marketValue(lot.car); lot.paid = 0; lot.price = 0; lot.due = 99999; lot.accepted = S.day; lot.title = 'Pink slip'; lot.text = `Won off ${C.name} in a Fix-Off. They’re still sulking.`;
-    const bay = S.bays.findIndex(b => b === null);
-    if (bay >= 0) S.bays[bay] = lot; else if (!unitAdd(lot)) { S.money += Math.round(lot.value * 0.6); toast(`No room for the ${lot.car.model}, so you sold it on for ${money(Math.round(lot.value * 0.6))}.`); }
+    M.st.won22 = carArrive22(lot);
     goldAdd(15 + 10 * FIX_RIVALS.indexOf(R), null, true); fameAdd22(150 + 120 * FIX_RIVALS.indexOf(R));
     S.stats.fixwins = (S.stats.fixwins || 0) + 1;
   } else {
@@ -19352,8 +19355,9 @@ function fixDone(R, M) {
   render();
   showModal(`<div class="fxres ${win ? 'win' : 'lose'}"><span class="label">Fix-Off result</span><h2 class="sheet-title">${win ? 'You won!' : `${esc(C.name)} won`}</h2>
     <div class="fx-vs"><div><b>You</b><span class="fx-big">${me.c}%</span><small>done · quality ${me.q}%</small></div><span>vs</span><div>${portrait22(R.id, 48)}<span class="fx-big">${them.c}%</span><small>done · quality ${them.q}%</small></div></div>
-    <p>${win ? `The pink slip for the <b>${esc(R.car)}</b> is yours, with the ${esc(ITEMS[R.item].name)} still on it. +${15 + 10 * FIX_RIVALS.indexOf(R)} Gold Bolts.` : `You hand over ${money(fixStake(R))}. ${esc(pick(R.trash))}`}</p></div>
-    <button class="btn primary wide" data-a="close-modal">${win ? 'Brilliant' : 'Next time'}</button>`);
+    <p>${win ? `The pink slip for the <b>${esc(R.car)}</b> is yours, with the ${esc(ITEMS[R.item].name)} still on it. +${15 + 10 * FIX_RIVALS.indexOf(R)} Gold Bolts.` : `You hand over ${money(fixStake(R))}. ${esc(pick(R.trash))}`}</p>
+    ${win ? `<p class="fx-where"><b>Where it is:</b> ${carWhereText22(M.st.won22)}</p>` : ''}</div>
+    ${win ? carGoBtn22(M.st.won22, 'Brilliant') : '<button class="btn primary wide" data-a="close-modal">Next time</button>'}`);
   if (win) { Sfx.perfect(); confetti(); } else Sfx.bad();
 }
 act22('fx-go', () => fixGo());
@@ -19476,6 +19480,41 @@ MINIS.fixoff = {
 };
 /* test hook: pick a fault without a 3D tap */
 window.__fixPick = i => { if (MG && MG.kind === 'fixoff' && !MG.st.tdone[i]) { const s = MG.st; s.cur = i; s.step = 0; s.taps = 0; s.started = true; miniSay(MG.def.how(MG, s)); miniFoot(); } };
+
+/* ---- cars that become yours (a Fix-Off pink slip): onto a free ramp, else into the unit next door, else parked
+   outside until there's room. Never sold off behind your back. ---- */
+function carArrive22(lot) {
+  const bay = S.bays.findIndex(b => b === null);
+  if (bay >= 0) { S.bays[bay] = lot; return { where: 'bay', bay, no: lot.no }; }
+  if (unitAdd(lot)) return { where: 'unit', no: lot.no };
+  S.gate22 = (S.gate22 || []).concat(lot); return { where: 'gate', no: lot.no };
+}
+const carWhereText22 = w => !w ? '' : w.where === 'bay' ? `on ramp ${w.bay + 1} in your workshop, ready to fix up and sell.` : w.where === 'unit' ? 'in storage at your unit next door. Find it under Jobs, then Yard & unit, and bring it onto a ramp when one’s free.' : 'your ramps and the unit are full, so it’s parked outside. Find it under Jobs, then Yard & unit, and bring it in when there’s room.';
+const carGoBtn22 = (w, label) => w && w.where === 'bay' ? `<button class="btn primary wide" data-b="car-go" data-bay="${w.bay}">Go to it</button>` : `<button class="btn primary wide" data-b="goto" data-v="jobs" data-s="yard">See where it is</button>`;
+act22('car-go', b => { closeModal(); S.activeBay = +b.dataset.bay; S.view = 'workshop'; UI.sel = null; UI.bolt = null; UI.drawer = null; render(); toTop(); });
+/* the cars waiting outside, on the Yard & unit page */
+function gateHtml22() {
+  const g = S.gate22 || []; if (!g.length) return '';
+  const bay = S.bays.findIndex(b => b === null), slot = unitFree('s');
+  return `<section class="card22 gate22"><div class="c22-h"><div><span class="label">Parked outside</span><h3>Waiting for a space</h3></div></div>
+    <p class="muted">These are yours, but your ramps and the unit were full when they arrived.</p>
+    ${g.map(j => `<div class="gate-car"><div><b>${esc(j.car.model)}</b><small>${esc(j.title || 'Your car')} · worth about ${money(Math.round(j.value * 0.9 / 10) * 10)} fixed up</small></div><div class="row"><button class="btn primary sm" data-b="gate-in" data-no="${j.no}" data-to="bay"${bay >= 0 ? '' : ' disabled'}>Onto a ramp</button><button class="btn sm" data-b="gate-in" data-no="${j.no}" data-to="unit"${slot ? '' : ' disabled'}>Into the unit</button></div></div>`).join('')}
+    ${bay < 0 && !slot ? '<p class="muted sm">Finish or sell a car to make room.</p>' : ''}</section>`;
+}
+act22('gate-in', b => {
+  const i = (S.gate22 || []).findIndex(j => j.no === +b.dataset.no); if (i < 0) return;
+  const lot = S.gate22[i];
+  if (b.dataset.to === 'bay') {
+    const bay = S.bays.findIndex(x => x === null); if (bay < 0) { toast('Every ramp’s busy.'); return; }
+    S.gate22.splice(i, 1); S.bays[bay] = lot; S.activeBay = bay; S.view = 'workshop'; UI.sel = null; UI.bolt = null; UI.drawer = null; toast(`The ${lot.car.model} is on ramp ${bay + 1}.`); render(); toTop();
+  } else {
+    if (!unitAdd(lot, `The ${lot.car.model} is in storage at the unit.`)) { toast('The unit’s full.'); return; }
+    S.gate22.splice(i, 1); render();
+  }
+});
+/* when a space in the unit comes free, cars waiting outside go into storage by themselves (never onto a ramp, so
+   they don't take a customer's place) */
+hookOn('ensure', () => { if (!S.gate22) S.gate22 = []; while (S.gate22.length && unitFree('s')) { const lot = S.gate22.shift(); unitAdd(lot); } });
 
 /* ======================= build 22: emergency dispatch =======================
    Breakdown calls come in over the radio in real time. Take one, drive the service van out to the stranded driver on
