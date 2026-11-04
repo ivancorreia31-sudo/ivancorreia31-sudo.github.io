@@ -1158,6 +1158,195 @@ body.tool22 .bolt.seized .hex{box-shadow:0 0 10px var(--tool22)}
 .gate22 .gate-car small{display:block;color:var(--muted);font-size:12.5px}
 .gate22 .gate-car .row{flex-wrap:wrap;justify-content:flex-end;gap:6px}
 .step.mini .st-sub,.step.mini .st-why,.step.mini .st-note{display:none}.step.mini h3{font-size:19px}.st-mini{margin-left:2px}
+/* ===== build 23: skip time ===== */
+.clk23{display:flex;align-items:center;gap:6px;min-width:0}
+.h-skip{width:26px;height:22px;flex:0 0 auto;border-radius:7px;border:1.5px solid rgba(242,183,5,.6);background:rgba(242,183,5,.12);color:#F7D35A;display:inline-grid;place-items:center;padding:0;cursor:pointer}
+.h-skip svg{width:14px;height:14px}
+.h-skip:hover,.h-skip:focus-visible{background:rgba(242,183,5,.28)}
+body.skipping23 .h-skip{opacity:.35}
+.k-short{display:none}
+@media (max-width:440px){#h-cash.mid{font-size:20px;padding-top:2px}#h-cash.long{font-size:17.5px;padding-top:4px}}
+@media (max-width:370px){#h-cash.mid{font-size:17px!important}#h-cash.long{font-size:15px!important}}
+@media (max-width:440px){.stats{grid-template-columns:1.25fr 1.3fr 1fr .8fr!important}.h-skip{width:23px;height:21px}}
+@media (max-width:400px){.k-long{display:none}.k-short{display:inline}}
+@media (max-width:370px){.stats{grid-template-columns:1.32fr 1.36fr .9fr .72fr!important;gap:4px!important}.stat .v{font-size:19px}.clk23{gap:4px}.h-skip{width:21px;height:20px}.h-skip svg{width:12px;height:12px}}
+.sk23-btn{display:inline-flex;align-items:center;gap:7px}
+.sk23-btn svg{width:15px;height:15px;flex:0 0 auto}
+.sk23-list{display:grid;gap:8px}
+.sk23-opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--panel-2);color:var(--ink);font:inherit;cursor:pointer}
+.sk23-opt:hover,.sk23-opt:focus-visible{border-color:var(--hazard)}
+.sk23-opt i{font-style:normal;font-size:20px;width:28px;text-align:center;flex:0 0 auto}
+.sk23-opt span{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.sk23-opt b{font-weight:800;font-size:15px}
+.sk23-opt small{color:var(--muted);font-size:12.5px;line-height:1.3}
+.sk23-opt em{font-style:normal;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:14px;padding:3px 8px;border-radius:999px;background:var(--panel);border:1px solid var(--line)}
+.sk23-opt.close{border-style:dashed}
+.sk23-opt.off{opacity:.62;cursor:default}
+.sk23-warn{background:color-mix(in srgb,var(--hazard) 16%,var(--panel));border:1.5px solid var(--hazard);border-radius:12px;padding:6px 12px}
+.sk23-warn p{margin:5px 0;font-size:13.5px}
+.sk23-foot{font-size:12.5px;margin:0}
+.sk23{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 96px);transform:translateX(-50%);z-index:48;display:flex;align-items:center;gap:10px;padding:7px 7px 9px 14px;border-radius:999px;background:var(--hud-bg);color:var(--hud-fg);box-shadow:0 10px 28px rgba(0,0,0,.38);overflow:hidden;white-space:nowrap}
+.sk23[hidden]{display:none}
+.sk23-ico{display:grid;place-items:center;color:var(--hazard)}
+.sk23-ico svg{width:20px;height:20px;animation:sk23p .42s ease-in-out infinite alternate}
+.sk23-clock{font-family:var(--font-display);font-size:26px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.sk23-to{font-size:13px;color:var(--hud-muted)}
+.sk23-stop{border:0;border-radius:999px;background:var(--hazard);color:var(--hazard-ink);font:inherit;font-weight:800;padding:7px 15px;cursor:pointer}
+.sk23-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.12)}
+.sk23-bar i{display:block;height:100%;width:0;background:var(--hazard);transition:width .09s linear}
+@keyframes sk23p{from{transform:translateX(-2px)}to{transform:translateX(2px)}}
+@media (min-width:760px){.sk23{top:calc(env(safe-area-inset-top,0px) + 74px)}}
+/* ===== build 23: crates ===== */
+.sh-ico,.gb-ico{width:1em;height:1em;vertical-align:-.12em;margin-right:4px;flex:0 0 auto}
+.gb-sh{display:flex;align-items:center;font-family:var(--font-display);font-weight:900;font-size:24px;line-height:1;color:#CFEFFF}
+.gb-sh small{font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-left:6px;color:#9CC7DD}
+.gb23{flex-wrap:nowrap;gap:12px;padding:10px 14px}
+.gb23 .gb-big{font-size:28px}
+.gb23 .btn{margin-left:auto;flex:0 0 auto}
+@media (max-width:400px){.gb23 .gb-big{font-size:24px}.gb23 .gb-big small,.gb23 .gb-sh small{display:none}.gb23 .gb-sh{font-size:22px}}
+.ph23{padding-bottom:4px}
+.qo23{display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer}
+.qo23 input{width:18px;height:18px;accent-color:var(--hazard)}
+.pity23{display:grid;gap:5px;font-size:13px}
+.pity23 .gauge{height:6px}
+.deal23,.wb23{display:grid;grid-template-columns:auto 1fr auto;gap:10px 12px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--panel-2);box-shadow:inset 0 0 0 2px var(--c,var(--hazard))}
+.deal23 .label{color:var(--c)}
+.deal23 s{opacity:.6;margin-right:3px;font-weight:600}
+.deal23.used{box-shadow:none;opacity:.7}
+.wb23{grid-template-columns:1fr auto;box-shadow:inset 0 0 0 1.5px #4FB8E8;background:color-mix(in srgb,#4FB8E8 9%,var(--panel-2))}
+.wb23 b{display:flex;align-items:center;font-size:17px}
+.crate-c .cc23{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.crate-c .cc23 .btn{min-width:0;padding-left:6px;padding-right:6px;justify-content:center;white-space:nowrap;font-size:13px}
+.crate-c .cc23 .tok23{grid-column:1/-1}
+.cc-art.mini{display:inline-block;width:30px;height:24px;vertical-align:middle}
+.cc-art.mini::before{height:7px;top:-2px}
+.ct23{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));max-height:none}
+.ct23 .itc{min-height:112px}
+.craft23{padding:4px 8px;min-height:30px;font-size:13px;display:inline-flex;align-items:center;gap:2px;margin-top:2px}
+.craft23 .sh-ico{width:14px;height:14px}
+.cr-card.multi23{gap:10px;max-height:calc(100% - 40px);overflow:auto}
+.mo23{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.mo23-it{position:relative;display:grid;justify-items:center;gap:3px;padding:6px 3px;border-radius:10px;background:rgba(255,255,255,.06);border:1.5px solid var(--c);box-shadow:0 0 10px color-mix(in srgb,var(--c) 45%,transparent);animation:mo23in .45s cubic-bezier(.2,1.5,.4,1) both;animation-delay:calc(var(--i) * 110ms + .1s)}
+.mo23-it b{font-size:10.5px;line-height:1.1;color:#EEF2EE;font-weight:700;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.mo23-it i{position:absolute;top:-6px;right:-4px;font-style:normal;font-weight:900;font-size:9px;background:var(--hazard);color:#15130B;border-radius:6px;padding:1px 4px}
+.mo23-it.best{transform:scale(1.04);border-width:2.5px}
+.mo23-it .it-ico{background:rgba(255,255,255,.88);border-radius:8px;padding:2px}
+@keyframes mo23in{from{opacity:0;transform:rotateY(90deg) scale(.6)}to{opacity:1;transform:none}}
+@media (max-width:370px){.mo23{grid-template-columns:repeat(4,1fr)}}
+/* ===== build 23: the Garage Pass ===== */
+.ps23{box-shadow:inset 0 3px 0 var(--pc),0 1px 0 var(--line)}
+.ps23 h3{color:var(--pc)}
+.ps23-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.ps23-tier{display:grid;justify-items:center;width:62px;height:62px;border-radius:50%;place-content:center;background:var(--pc);color:#fff;box-shadow:0 0 0 4px color-mix(in srgb,var(--pc) 30%,transparent)}
+.ps23-tier b{font-family:var(--font-display);font-size:26px;font-weight:900;line-height:1}
+.ps23-tier small{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.ps23-bar{display:grid;gap:4px}
+.ps23-bar .gauge{height:10px}
+.ps23-bar .gauge i{background:var(--pc)}
+.ps23-bar small{color:var(--muted);font-size:12.5px}
+.ps23-ex{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ps23-ex>div{display:flex;gap:8px;align-items:center;padding:8px;border-radius:12px;background:var(--panel-2);border:2px solid #8F9996}
+.ps23-ex span{display:grid;gap:2px;min-width:0}
+.ps23-ex b{font-size:13.5px;line-height:1.15}
+.ps23-ex small{font-size:11.5px;color:var(--muted)}
+.ps23-track{list-style:none;margin:0;padding:2px 2px 8px;display:grid;grid-auto-flow:column;grid-auto-columns:112px;gap:8px;overflow-x:auto;scroll-snap-type:x proximity}
+.ps23-t{position:relative;scroll-snap-align:start;display:grid;justify-items:center;align-content:start;gap:5px;padding:22px 6px 8px;border-radius:12px;background:var(--panel-2);border:1.5px solid var(--line);text-align:center;min-height:150px}
+.ps23-t.big{border-color:var(--pc);background:color-mix(in srgb,var(--pc) 10%,var(--panel-2))}
+.ps23-t.can{box-shadow:0 0 0 2px var(--hazard)}
+.ps23-t.got{opacity:.55}
+.ps23-t small{font-size:11.5px;line-height:1.25;color:var(--ink)}
+.ps-n{position:absolute;top:4px;left:7px;font-family:var(--font-display);font-weight:900;font-size:16px;color:var(--muted)}
+.ps-ico{height:36px;display:grid;place-items:center;font-size:28px}
+.ps-ico .gb-ico,.ps-ico .sh-ico{width:30px;height:30px;margin:0}
+.ps-xp,.ps-cash{font-family:var(--font-display);font-weight:900;font-size:22px;color:var(--pc)}
+.ps23-t em{font-style:normal;font-weight:900;color:var(--good)}
+.ps23-t .btn{padding:4px 10px;min-height:30px}
+.ps23-how summary{cursor:pointer;font-weight:700;font-size:13.5px}
+/* ===== build 23: the league ===== */
+.lg23{box-shadow:inset 0 3px 0 var(--lc),0 1px 0 var(--line)}
+.lg23 h3{color:color-mix(in srgb,var(--lc) 75%,var(--ink))}
+.lg23-res{display:grid;gap:6px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--hazard) 14%,var(--panel-2));border:1.5px solid var(--hazard)}
+.lg23-res p{margin:0}
+.lg23-me{display:flex;gap:12px;align-items:center}
+.lg23-me>div:last-child{display:grid;gap:2px}
+.lg23-badge{display:grid;place-content:center;justify-items:center;width:60px;height:60px;border-radius:14px;background:var(--lc);color:#fff}
+.lg23-badge b{font-family:var(--font-display);font-size:24px;font-weight:900;line-height:1}
+.lg23-badge small{font-size:10px;font-weight:700}
+.lg23-tab{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.lg23-tab li{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;padding:7px 10px;border-radius:9px;background:var(--panel-2);font-size:14px}
+.lg23-tab li.up{border-left:4px solid var(--good)}
+.lg23-tab li.down{border-left:4px solid var(--bad)}
+.lg23-tab li.me{background:color-mix(in srgb,var(--hazard) 22%,var(--panel-2));font-weight:800}
+.lg-r{font-family:var(--font-display);font-weight:900;color:var(--muted)}
+.lg-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lg-p{font-family:var(--font-mono);font-weight:700}
+/* ===== build 23: the lucky wheel ===== */
+.whc23{grid-template-columns:auto 1fr auto;display:grid;align-items:center;gap:12px}
+.whc23.on{box-shadow:inset 0 0 0 2px var(--hazard),0 1px 0 var(--line)}
+.whc23-art{width:58px;height:58px}
+.whc23-art svg{width:100%;height:100%;display:block}
+.whc23.on .whc23-art svg{animation:wh23idle 6s linear infinite}
+@keyframes wh23idle{to{transform:rotate(360deg)}}
+.wh23{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:4px auto 0}
+.wh23-disc{width:100%;height:100%}
+.wh23-disc svg{width:100%;height:100%;display:block;filter:drop-shadow(0 8px 18px rgba(0,0,0,.3))}
+.wh23-ptr{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid var(--hazard);z-index:2;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+.wh23-out{text-align:center;margin:0;min-height:1.4em}
+/* ===== build 23: sets ===== */
+.sets23{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.set23{display:grid;gap:8px;padding:12px;border-radius:14px;background:var(--panel);box-shadow:0 1px 0 var(--line)}
+.set23.ready{box-shadow:inset 0 0 0 2px var(--hazard)}
+.set23.got{opacity:.8;box-shadow:inset 0 0 0 1.5px var(--good)}
+.set23-h{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.set23-h b{font-family:var(--font-display);font-weight:800;font-size:20px;text-transform:uppercase}
+.set23-h span{font-weight:800;font-size:13px;color:var(--muted)}
+.set23.got .set23-h span{color:var(--good)}
+.set23-icons{display:flex;flex-wrap:wrap;gap:6px}
+.set23-icons>span{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;border:2px solid #8F9996;background:var(--panel-2)}
+.set23-icons>span.lock{border-style:dashed;font-family:var(--font-display);font-weight:900;font-size:20px;color:var(--muted)}
+.set23 p{margin:0}
+.set23 .gauge{height:6px}
+.got22 .set23-icons{justify-content:center}
+/* ===== build 23: combos ===== */
+.cbc23{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.cbc23.on{box-shadow:inset 0 0 0 2px #FF6A1A,0 1px 0 var(--line)}
+.cbc23-n{display:grid;justify-items:center;place-content:center;width:58px;height:58px;border-radius:50%;background:var(--panel-2);border:2px solid var(--line)}
+.cbc23.on .cbc23-n{background:#FF6A1A;border-color:#FF6A1A;color:#fff}
+.cbc23-n b{font-family:var(--font-display);font-weight:900;font-size:24px;line-height:1}
+.cbc23-n small{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+.cb23{position:fixed;left:50%;top:38%;z-index:58;transform:translate(-50%,-50%) scale(.4);opacity:0;pointer-events:none;display:grid;justify-items:center;padding:14px 26px;border-radius:20px;background:linear-gradient(135deg,#FF6A1A,#E5386D);color:#fff;box-shadow:0 14px 40px rgba(229,56,109,.45);transition:transform .3s cubic-bezier(.2,1.6,.4,1),opacity .25s}
+.cb23.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.cb23 small{font-weight:800;letter-spacing:.2em;text-transform:uppercase;font-size:12px}
+.cb23 b{font-family:var(--font-display);font-weight:900;font-size:64px;line-height:.95}
+.cb23 em{font-style:normal;font-weight:800;font-size:15px}
+.cb23.warm{background:linear-gradient(135deg,#F2A900,#FF6A1A)}
+.cb23.hot{background:linear-gradient(135deg,#9B4FD6,#E5386D);box-shadow:0 0 0 4px #FFF3,0 14px 50px rgba(155,79,214,.6)}
+.cb23.broke{background:#3A403D;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+
+/* ===== build 23: glitches ===== */
+.ov-bays{max-width:calc(100vw - 92px);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.ov-bays::-webkit-scrollbar{display:none}
+.ov-bays .ov-bay{flex:0 0 auto;white-space:nowrap;display:grid;align-content:center;justify-items:center;line-height:1.05;gap:1px;position:relative;overflow:hidden;padding:0 10px;border-radius:8px;background:var(--panel);flex-wrap:nowrap}
+.ov-bays .ov-bay[aria-pressed="true"]{background:var(--ink)}
+.ov-bay b{font-weight:800}
+.ov-bay small{font-size:10.5px;font-weight:700;opacity:.85}
+.ov-bay.stf::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:var(--p,0%);background:#2E9E5B}
+.mk.hudhid{opacity:0!important;pointer-events:none}
+.mk.nolab .mk-label{display:none!important}
+/* ===== build 23: phones on their side ===== */
+@media (orientation: landscape) and (max-height: 560px){
+  .stat{flex:0 0 auto}
+  .k-long{display:none}.k-short{display:inline}
+  .clk23{gap:5px}.h-skip{width:24px;height:20px}
+  .wh23{width:min(300px,78vw,max(150px,calc(100vh - 235px)))}
+  .sk23{top:calc(env(safe-area-inset-top,0px) + 54px)}
+  .cb23{top:45%}
+}
+.stf-card .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stf-card .row .btn{justify-content:center;min-width:0}
+.stf-card .row .sk23-btn{grid-column:1/-1;order:-1}
+@media (max-width:400px){.stf-card .muted{display:none}}
+
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 /* Landscape phones: slim top bar, tab rail on the left, step panel on the right, camera controls along the bottom */
 @media (orientation: landscape) and (max-height: 560px) {
@@ -1495,9 +1684,9 @@ body.mg-on{overflow:hidden}
   <div class="hud-in">
     <div class="brand">Bonnet <span>Up</span></div>
     <div class="stats">
-      <div class="stat"><span class="k" id="h-day">Day 1</span><span class="v" id="h-clock">08:00</span></div>
+      <div class="stat"><span class="k" id="h-day">Day 1</span><span class="clk23"><span class="v" id="h-clock">08:00</span><button class="h-skip" id="h-skip" data-b="skip" aria-label="Skip time" title="Skip time"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5v13l8.2-6.5zM12 5.5v13l8.2-6.5z"/><rect x="20.4" y="5.5" width="1.9" height="13" rx=".6"/></svg></button></span></div>
       <div class="stat"><span class="k">Cash</span><span class="v" id="h-cash">£400</span></div>
-      <div class="stat"><span class="k">Reputation</span><span class="v" id="h-rep">★ 3.0</span></div>
+      <div class="stat"><span class="k"><span class="k-long">Reputation</span><span class="k-short">Rep</span></span><span class="v" id="h-rep">★ 3.0</span></div>
       <div class="stat"><span class="k">Level</span><span class="v" id="h-lvl">1</span><span class="xp"><i id="h-xp"></i></span></div>
     </div>
     <div class="hud-tools">
@@ -2256,7 +2445,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -4226,7 +4415,7 @@ function confetti() {
 let cashShown = null, cashAnim = 0;
 function rollCash(to) {
   const el = $('#h-cash');
-  el.classList.toggle('neg', to < 0);
+  el.classList.toggle('neg', to < 0); el.classList.toggle('long', Math.abs(to) >= 1e6); el.classList.toggle('mid', Math.abs(to) >= 1e5 && Math.abs(to) < 1e6);
   if (cashShown === null || reduced || cashShown === to) { cashShown = to; el.textContent = money(to); return; }
   const from = cashShown, t0 = performance.now(), dur = 650;
   cancelAnimationFrame(cashAnim);
@@ -8833,7 +9022,12 @@ if ( uFx > 0.5 ) {
       }
       if (vis) {
         el.style.transform = `translate(${px.toFixed(1)}px,${py.toFixed(1)}px)`;
-        const flip = px > w * 0.62; if (flip !== s.flip) { el.classList.toggle('flip', flip); s.flip = flip; }
+        let flip = px > w * 0.62;
+        const hu = hudHit23(canvas, px, py, flip);
+        if (hu.lab && !hu.other) flip = !flip;
+        if (flip !== s.flip) { el.classList.toggle('flip', flip); s.flip = flip; }
+        if (hu.dot !== s.hud) { el.classList.toggle('hudhid', hu.dot); s.hud = hu.dot; }
+        const nl = hu.lab && hu.other; if (nl !== s.nl) { el.classList.toggle('nolab', nl); s.nl = nl; }
       }
       if (vis !== s.vis) { el.classList.toggle('off', !vis); el.tabIndex = vis ? 0 : -1; s.vis = vis; }
     }
@@ -8969,32 +9163,67 @@ if ( uFx > 0.5 ) {
       /* overalls: the same colour top and bottom, long sleeves, work boots */
       const p = person(Object.assign({}, w.look, { topDo: 'overalls', bottom: 'trousers', shoes: '#1E2120', legs: w.look.top }));
       const u = { p, id: w.id, ph: i * 1.7, mode: 'idle' };
-      if (w.active) { p.position.set(1.45, 0, 1.5); p.rotation.y = PI / 2; u.mode = 'work'; }
-      else if (w.side >= 0 && w.side < SIDE_X.length) { p.position.set(SIDE_X[w.side] + 1.45, 0, 1.5); p.rotation.y = PI / 2; u.mode = 'work'; }
+      if (w.active) { p.position.set(1.45, 0, 1.5); p.rotation.y = PI / 2; u.mode = 'work'; u.bx = 0; u.side = -1; }
+      else if (w.side >= 0 && w.side < SIDE_X.length) { p.position.set(SIDE_X[w.side] + 1.45, 0, 1.5); p.rotation.y = PI / 2; u.mode = 'work'; u.bx = SIDE_X[w.side]; u.side = w.side; }
       else { const s = IDLE_SPOTS[idle++ % IDLE_SPOTS.length]; p.position.set(s[0], 0, s[1]); p.rotation.y = s[2]; posePerson(p, idle % 2 ? 'fold' : 'phone'); }
       p.traverse(o => { if (o.isMesh) { o.castShadow = true; o.userData.fpStaff = w.id; } });
       workerG.add(p); workers.push(u);
     });
     kick();
   }
-  /* a spanner on the go: bent over the bay, then down at the wheel, swapping every few seconds */
+  /* build 23: a mechanic works where the car is. On the ground they lean into the bay or crouch at the wheel; with the car
+     at waist or chest height they stand (or squat) at the hub; at head height they reach up to it; and with it right up
+     on the lift they walk underneath and work overhead, moving between the sump and the exhaust. They walk between spots
+     and every joint eases into the new pose, so raising the lift never leaves anyone working on thin air. */
+  function liftOfWorker(u) {
+    if (u.side >= 0) { const g = sideG && sideG.children[u.side]; return g ? (g.userData.lift || 0) : 0; }
+    return st.lift || 0;
+  }
+  const POSE_KEYS = ['hips', 'chestY', 'chestZ', 'legL', 'legR', 'kneeL', 'kneeR', 'armL', 'elbowL', 'armR', 'elbowR', 'head'];
+  function workPose(L, t, u) {
+    const ratchet = Math.sin(t * 6.5), bx = u.bx || 0;
+    const stand = { hips: 0.952, chestY: 1.022, legL: 0.12, legR: -0.08, kneeL: -0.05, kneeR: 0 };
+    if (L < 0.35) {
+      const crouch = Math.sin(t * 0.39) > 0.35;
+      return crouch
+        ? { x: bx + 1.45, z: 1.5, ry: PI / 2, hips: 0.56, chestY: 0.63, chestZ: -0.3, legL: 1.45, legR: 1.2, kneeL: -2.25, kneeR: -2.0, armL: 0.95, elbowL: 0.35, armR: 1.1 + 0.22 * ratchet, elbowR: 0.5, head: -0.2 }
+        : Object.assign({ x: bx + 1.45, z: 1.5, ry: PI / 2, chestZ: -0.42, armL: 0.8 + 0.05 * Math.sin(t * 1.3), elbowL: 0.55, armR: 0.95 + 0.25 * ratchet, elbowR: 0.7, head: -0.35 }, stand);
+    }
+    const hub = L + 0.31;
+    if (hub < 0.95) return { x: bx + 1.4, z: 1.36, ry: PI / 2, hips: 0.74, chestY: 0.81, chestZ: -0.22, legL: 1.0, legR: 0.8, kneeL: -1.55, kneeR: -1.3, armL: 1.05, elbowL: 0.45, armR: 1.15 + 0.2 * ratchet, elbowR: 0.5, head: -0.12 };
+    if (L < 1.25) { const a = Math.min(1.9, 0.9 + (hub - 0.66) * 1.15); return Object.assign({ x: bx + 1.38, z: 1.32, ry: PI / 2, chestZ: -0.1, armL: a - 0.12, elbowL: 0.45, armR: a + 0.18 * ratchet, elbowR: 0.4, head: Math.max(-0.3, Math.min(0.35, (hub - 1.45) * 0.7)) }, stand); }
+    if (L < 1.6) return Object.assign({ x: bx + 1.4, z: 1.4, ry: PI / 2, chestZ: 0.06, armL: 2.15, elbowL: 0.4, armR: 2.3 + 0.14 * ratchet, elbowR: 0.35, head: 0.38 }, stand);
+    /* right up: underneath it, working overhead; every eight seconds or so they move between the sump and the exhaust */
+    const spot = Math.sin(t * 0.13 + u.ph) > 0 ? 0.95 : -0.75;
+    return Object.assign({ x: bx + spot, z: 0.42, ry: PI / 2, chestZ: 0.1, armL: 2.6, elbowL: 0.38, armR: 2.75 + 0.12 * ratchet, elbowR: 0.32, head: 0.55 }, stand);
+  }
   function stepWorkers(now) {
     if (!workers.length) return false;
     const dt = workerLast ? Math.min(0.1, (now - workerLast) / 1000) : 0.016; workerLast = now; workerT += dt;
+    const k = 1 - Math.exp(-dt * 7);
     for (const u of workers) {
       if (u.mode !== 'work') continue;
       const r = u.p.userData.rig; if (!r) continue;
-      const t = workerT + u.ph, crouch = Math.sin(t * 0.39) > 0.35, ratchet = Math.sin(t * 6.5);
-      if (crouch) {
-        r.hips.position.y = 0.56; r.chest.position.y = 0.63; r.chest.rotation.z = -0.3;
-        r.legL.rotation.z = 1.45; r.legR.rotation.z = 1.2; r.kneeL.rotation.z = -2.25; r.kneeR.rotation.z = -2.0;
-        r.armL.rotation.z = 0.95; r.elbowL.rotation.z = 0.35; r.armR.rotation.z = 1.1 + 0.22 * ratchet; r.elbowR.rotation.z = 0.5;
+      const t = workerT + u.ph, L = liftOfWorker(u), tg = workPose(L, t, u), p = u.p;
+      if (!u.cur) { u.cur = {}; POSE_KEYS.forEach(q => { u.cur[q] = tg[q]; }); p.position.set(tg.x, 0, tg.z); p.rotation.y = tg.ry; }
+      /* walk to the spot first */
+      const dx = tg.x - p.position.x, dz = tg.z - p.position.z, d = Math.hypot(dx, dz);
+      let pose = tg;
+      if (d > 0.04) {
+        const step = Math.min(d, 1.1 * dt); p.position.x += dx / d * step; p.position.z += dz / d * step;
+        u.walk = (u.walk || 0) + dt * 7.5;
+        const ryW = Math.atan2(-dz, dx); let dr = ryW - p.rotation.y; dr = Math.atan2(Math.sin(dr), Math.cos(dr)); p.rotation.y += dr * Math.min(1, dt * 10);
+        const s = Math.sin(u.walk);
+        pose = { hips: 0.95 + Math.abs(Math.cos(u.walk)) * 0.02, chestY: 1.022, chestZ: -0.06, legL: 0.42 * s, legR: -0.42 * s, kneeL: -0.25 - 0.35 * Math.max(0, -s), kneeR: -0.25 - 0.35 * Math.max(0, s), armL: -0.3 * s + 0.08, elbowL: 0.35, armR: 0.3 * s + 0.08, elbowR: 0.35, head: 0 };
       } else {
-        r.hips.position.y = 0.952; r.chest.position.y = 1.022; r.chest.rotation.z = -0.42;
-        r.legL.rotation.z = 0.12; r.legR.rotation.z = -0.08; r.kneeL.rotation.z = -0.05; r.kneeR.rotation.z = 0;
-        r.armL.rotation.z = 0.8 + 0.05 * Math.sin(t * 1.3); r.elbowL.rotation.z = 0.55; r.armR.rotation.z = 0.95 + 0.25 * ratchet; r.elbowR.rotation.z = 0.7;
+        let dr = tg.ry - p.rotation.y; dr = Math.atan2(Math.sin(dr), Math.cos(dr)); p.rotation.y += dr * k;
       }
-      r.head.rotation.z = crouch ? -0.2 : -0.35;
+      POSE_KEYS.forEach(q => { u.cur[q] += (pose[q] - u.cur[q]) * (d > 0.04 ? Math.min(1, k * 1.6) : k); });
+      const c = u.cur;
+      r.hips.position.y = c.hips; r.chest.position.y = c.chestY; r.chest.rotation.z = c.chestZ;
+      r.legL.rotation.z = c.legL; r.legR.rotation.z = c.legR; r.kneeL.rotation.z = c.kneeL; r.kneeR.rotation.z = c.kneeR;
+      r.armL.rotation.z = c.armL; r.elbowL.rotation.z = c.elbowL; r.armR.rotation.z = c.armR; r.elbowR.rotation.z = c.elbowR;
+      r.head.rotation.z = c.head;
       flatFeet(r);
     }
     return true;
@@ -12946,7 +13175,9 @@ function welcomeOverlay() {
       <li><b>Pick your parts.</b> Budget, value, genuine and premium boxes look different under the bonnet, with the maker’s name on them. Customers notice.</li>
       <li><b>Build an empire.</b> Side businesses pay every night, then more garages, your own race team, the freehold. Or sell up and start again with a legacy bonus.</li>
       <li><b>Put the radio on</b> with the radio button at the top: three stations. It fades out while you’re on the road.</li>
-      <li><b>Check Daily</b> for your login reward, three challenges, the week’s event and your free crates.</li>
+      <li><b>Check Daily</b> for your login reward, the lucky wheel, three challenges, the week’s event, crates, the free Garage Pass and the weekly league.</li>
+      <li><b>Skip time</b> with the ⏩ button by the clock: to the next customer, until a mechanic’s done, an hour or two, or closing time.</li>
+      <li><b>Combos.</b> Score 90% or more on hands-on jobs one after another for bonus cash, Gold Bolts and crates.</li>
       <li><b>Collect.</b> Crates and shipping containers hold tools, paints, wraps, rims, tyres, spoilers, turbos and rare engines, from Common to Mythic. Fit them from the Customise sheet.</li>
       <li><b>Call-outs and Fix-Offs</b> are under Jobs: drive the van out to stranded drivers, or race a rival mechanic for their car.</li>
     </ol>
@@ -12958,11 +13189,11 @@ function emptyOverlay() {
   const n = S.board.length;
   return `<div class="ov-card"><h2>Bay ${S.activeBay + 1} is empty</h2>
     <p>${n ? `${n} customer${n > 1 ? 's' : ''} waiting on the job board.` : (S.clock < walkins()[walkins().length - 1] ? `Nobody waiting. Walk-ins turn up at ${walkinText()}.` : 'Nobody else is coming in today.')}</p>
-    <div class="row">${n ? '<button class="btn primary" data-a="tab" data-v="jobs">Open the job board</button>' : ''}<button class="btn" data-a="closeday">Close up for the day</button></div></div>`;
+    <div class="row">${n ? '<button class="btn primary" data-a="tab" data-v="jobs">Open the job board</button>' : ''}${skipBtn23(n ? '' : (S.board.length < 5 && walkins().some(t => t > S.clock && t < dayEnd()) ? 'walkin' : ''), n ? 'Skip time' : 'Wait for a customer')}<button class="btn" data-a="closeday">Close up for the day</button></div></div>`;
 }
 function overlayHtml(job) {
   let h = '<div class="ov-top">';
-  if (S.bays.length > 1) h += `<div class="ov-bays">${S.bays.map((b, i) => { const st = b && b.staff ? staffById(b.staff) : null; return `<button class="ov-bay${st ? ' stf' : ''}" aria-pressed="${i === S.activeBay}" data-a="bay" data-id="${i}">Bay ${i + 1}${st ? ` · ${esc(st.name.split(' ')[0])} ${Math.min(99, Math.round((b.sprog || 0) / bookOf(b) * 100))}%` : ''}</button>`; }).join('')}</div>`;
+  if (S.bays.length > 1) h += `<div class="ov-bays">${S.bays.map((b, i) => { const st = b && b.staff ? staffById(b.staff) : null; const pc = st ? Math.min(99, Math.round((b.sprog || 0) / bookOf(b) * 100)) : 0; return `<button class="ov-bay${st ? ' stf' : ''}" aria-pressed="${i === S.activeBay}" data-a="bay" data-id="${i}"${st ? ` style="--p:${pc}%"` : ''}><b>Bay ${i + 1}</b>${st ? `<small>${esc(st.name.split(' ')[0])} ${pc}%</small>` : ''}</button>`; }).join('')}</div>`;
   { const free = (S.staff || []).filter(s => !s.away && !staffBusyJob(s)); if (job && !job.staff && free.length && !BT) h += `<button class="ov-hand" data-a="stf-hand" data-id="${free[0].id}" aria-label="Hand this car to ${esc(free[0].name)}">Hand to ${esc(free[0].name.split(' ')[0])}</button>`; }
   if ((S.complaints || []).length) h += `<button class="ov-cmp" data-a="tab" data-v="jobs">⚠ ${S.complaints.length} complaint${S.complaints.length > 1 ? 's' : ''}</button>`;
   if (levelOf(S.xp) >= 2 || (S.yard || []).length) { const yo = (S.yard || []).filter(j => j.offer).length; h += `<button class="ov-yard" data-a="yard" aria-label="Walk out to the yard">Yard <b>${(S.yard || []).length}</b>${yo ? ` · ${yo} offer${yo > 1 ? 's' : ''}` : ''}</button>`; }
@@ -14527,7 +14758,7 @@ function staffCardHtml(job) {
     <p>${esc(job.title)} on the ${esc(job.car.model)}: <b>${pct}%</b> done, about ${bookText(Math.max(5, left))} on the clock to go.</p>
     <div class="gauge" aria-hidden="true"><i class="good" style="width:${pct}%"></i></div>
     <p class="muted">${esc(traitOf(st).text)} They’ll hand it back to the customer themselves.</p>
-    <div class="row"><button class="btn" data-a="stf-take" data-id="${S.activeBay}">Take over</button><button class="btn primary" data-a="tab" data-v="jobs">Job board</button></div></div>`;
+    <div class="row"><button class="btn" data-a="stf-take" data-id="${S.activeBay}">Take over</button>${skipBtn23('staff:' + st.id, 'Skip till done')}<button class="btn primary" data-a="tab" data-v="jobs">Job board</button></div></div>`;
 }
 function staffBoardButtons(j, free) {
   const avail = (S.staff || []).filter(st => !st.away && !staffBusyJob(st));
@@ -16512,6 +16743,7 @@ function welcomeHtml() {
       <li><span><b>Choose your parts carefully.</b>Every quality and every maker looks different under the bonnet. Premium parts earn a bonus; cheap ones save money but customers notice.</span></li>
       <li><span><b>Spend it.</b>Specialist kit, side businesses, promotions, more garages and a race team. When you’re rich enough you can sell up and start again with a legacy bonus.</span></li>
       <li><span><b>Come back every day.</b>Daily rewards, challenges and events, the showroom’s takings and your Bonnetgram fans keep going while you’re away.</span></li>
+      <li><span><b>Climb.</b>Thirty Garage Pass tiers a season, a weekly league from Bronze to Champion, and collection sets with bonuses that last for good.</span></li>
     </ol>
     <div class="row"><button class="btn primary" data-a="story-start">Play the story</button><button class="btn" data-a="dismiss-intro">Got it</button></div>
   </section>`;
@@ -16630,7 +16862,7 @@ function emptyBayHtml() {
   return `<section class="bay bay-empty"><span class="bay-mark" aria-hidden="true">Bay ${S.activeBay + 1}</span><div class="empty-in">
     <h2>Bay ${S.activeBay + 1} is empty</h2>
     <p>${n ? `${n} customer${n > 1 ? 's' : ''} waiting on the job board.` : (S.clock < walkins()[walkins().length - 1] ? `Nobody waiting. Walk-ins turn up at ${walkinText()}.` : 'Nobody else is coming in today.')}</p>
-    <div class="row">${n ? '<button class="btn primary" data-a="tab" data-v="jobs">Open the job board</button>' : ''}<button class="btn" data-a="closeday">Close up for the day</button></div>
+    <div class="row">${n ? '<button class="btn primary" data-a="tab" data-v="jobs">Open the job board</button>' : ''}${skipBtn23(n ? '' : (S.board.length < 5 && walkins().some(t => t > S.clock && t < dayEnd()) ? 'walkin' : ''), n ? 'Skip time' : 'Wait for a customer')}<button class="btn" data-a="closeday">Close up for the day</button></div>
   </div></section>`;
 }
 function renderWorkshopFlat() {
@@ -16775,7 +17007,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<span class="build-tag">Build 22</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<span class="build-tag">Build 23</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -16951,7 +17183,7 @@ function askReset() {
 /* ---------- render ---------- */
 function renderHud() {
   $('#h-day').innerHTML = 'Day ' + S.day + '<span class="wkd"> · ' + weekdayOf(S.day) + '</span>' + (S.weather === 'rain' ? ' · rain' : '');
-  const clock = $('#h-clock'); clock.textContent = hhmm(Math.min(S.clock, 24 * 60 - 1)); clock.classList.toggle('warn', S.clock >= 17 * 60);
+  const clock = $('#h-clock'); clock.textContent = hhmm(Math.min(S.clock, 24 * 60 - 1)); { const hs = $('#h-skip'); if (hs) hs.hidden = !!S.over; } clock.classList.toggle('warn', S.clock >= 17 * 60);
   rollCash(S.money);
   const sk = $('#h-streak'); sk.hidden = (S.streak || 0) < 2; sk.textContent = 'Streak ×' + (S.streak || 0);
   { const sb = $('#h-story'); if (sb) { const on = storyOn(); sb.hidden = !on; if (on) { const C = STORY[S.story.ch], dn = C.goals.filter(g => storyProg(g).done).length; sb.innerHTML = `Ch ${S.story.ch + 1} <span class="pips">${C.goals.map(g => `<i class="${storyProg(g).done ? 'on' : ''}"></i>`).join('')}</span>`; sb.setAttribute('aria-label', `Story chapter ${S.story.ch + 1}, ${dn} of ${C.goals.length} goals done`); } } }
@@ -17256,7 +17488,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 22;
+const BUILD = 23;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -17325,7 +17557,7 @@ const nowMs = () => Date.now();
 const dayKey = (t) => { const d = new Date(t == null ? nowMs() : t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const weekKey = () => { const d = new Date(); const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return t.getUTCFullYear() * 100 + Math.ceil(((t - y0) / 86400000 + 1) / 7); };
 const msLeftToday = () => { const d = new Date(); const m = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1); return m - d; };
-const durText = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); if (s < 60) return s + 's'; const m = Math.floor(s / 60), r = s % 60; if (m < 60) return m + 'm ' + String(r).padStart(2, '0') + 's'; const h = Math.floor(m / 60); return h + 'h ' + String(m % 60).padStart(2, '0') + 'm'; };
+const durText = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); if (s < 60) return s + 's'; const m = Math.floor(s / 60), r = s % 60; if (m < 60) return m + 'm ' + String(r).padStart(2, '0') + 's'; const h = Math.floor(m / 60); if (h >= 48) return Math.floor(h / 24) + 'd ' + (h % 24) + 'h'; return h + 'h ' + String(m % 60).padStart(2, '0') + 'm'; };
 function timerAdd(kind, label, mins, data) {
   const t = { id: kind + '-' + nowMs().toString(36) + '-' + Math.floor(Math.random() * 1e4).toString(36), kind, label, start: nowMs(), end: nowMs() + mins * 60000, data: data || {} };
   (S.timers = S.timers || []).push(t); save(); return t;
@@ -17520,14 +17752,14 @@ function rollRarity(minR, luck) {
   for (let i = 0; i < w.length; i++) { x -= w[i]; if (x <= 0) return RARITY[i]; }
   return RARITY[lo];
 }
-function rollItem(types, minR, luck) {
+function rollItem_b22(types, minR, luck) {
   for (let k = 0; k < 6; k++) {
     const r = rollRarity(minR, luck);
-    const pool = Object.values(ITEMS).filter(it => types.includes(it.type) && it.rarity === r);
+    const pool = Object.values(ITEMS).filter(it => types.includes(it.type) && it.rarity === r && !it.noCrate);
     if (pool.length) return pick(pool).id;
     if (minR && rarIdx(r) > rarIdx(minR)) continue;
   }
-  const any = Object.values(ITEMS).filter(it => types.includes(it.type)); return pick(any).id;
+  const any = Object.values(ITEMS).filter(it => types.includes(it.type) && !it.noCrate); return pick(any).id;
 }
 /* what a fitted item adds to a car's value and to its prestige in the showroom */
 function carItemsOf(car) { return Object.values(car.items || {}).filter(id => ITEMS[id]); }
@@ -17757,28 +17989,23 @@ const crateTokens = k => (S.crates.tokens && S.crates.tokens[k]) || 0;
 /* the free crate: one every four hours, up to two waiting */
 function crateFreeTick() {
   const C = S.crates; if (!C) return;
-  while ((C.free || 0) < 2 && nowMs() >= (C.freeAt || 0)) { C.free = (C.free || 0) + 1; C.freeAt = (C.freeAt || nowMs()) + 4 * 3600e3; if (C.free >= 2) C.freeAt = nowMs() + 4 * 3600e3; }
+  while ((C.free || 0) < 2 && nowMs() >= (C.freeAt || 0)) { C.free = (C.free || 0) + 1; C.freeAt = (C.freeAt || nowMs()) + crateFreeMs23(); if (C.free >= 2) C.freeAt = nowMs() + crateFreeMs23(); }
 }
-function crateOdds(k) {
+function crateOdds_b22(k) {
   const C = CRATES[k], lo = rarIdx(C.min || 'common'), w = RARITY.map((r, i) => (i < lo ? 0 : RAR[r].w * (i >= 3 ? 1 + (C.luck || 0) : 1))), tot = w.reduce((a, b) => a + b, 0);
   return RARITY.map((r, i) => [r, w[i] / tot]).filter(x => x[1] > 0);
 }
 function crateOpen(k, how) {
   const C = CRATES[k]; if (!C) return;
-  if (how === 'free') { crateFreeTick(); if ((S.crates.free || 0) < 1) return; S.crates.free--; if (S.crates.free < 2 && S.crates.freeAt < nowMs()) S.crates.freeAt = nowMs() + 4 * 3600e3; }
+  if (how === 'free') { crateFreeTick(); if ((S.crates.free || 0) < 1) return; S.crates.free--; if (S.crates.free < 2 && S.crates.freeAt < nowMs()) S.crates.freeAt = nowMs() + crateFreeMs23(); }
   else if (how === 'token') { if (crateTokens(k) < 1) return; S.crates.tokens[k]--; }
-  else if (!goldSpend(C.cost, 'crate')) return;
-  const pity = (S.crates.pity || 0) >= 9;
-  const id = rollItem(C.types, pity ? 'epic' : C.min, C.luck);
-  const it = ITEMS[id];
-  S.crates.pity = rarIdx(it.rarity) >= 3 ? 0 : (S.crates.pity || 0) + 1;
+  else if (how === 'deal') { const d = dealToday23(); if (d.k !== k || d.used) return; if (!goldSpend(d.cost, 'crate')) return; crates23().deal.used = true; }
+  else if (!goldSpend(crateCost23(k), 'crate')) return;
+  const g = crateGive23(crateRoll23(k)), id = g.id;
   S.crates.opened = (S.crates.opened || 0) + 1; S.stats.crates = (S.stats.crates || 0) + 1;
-  const dupeTool = it.type === 'tool' && invCount(id) > 0;
-  const first = invAdd(id);
-  if (dupeTool) goldAdd(RAR[it.rarity].dupe, null, true);
   hookFire('crate', { k, id });
   save();
-  crateShow(k, id, { first, dupe: dupeTool });
+  crateShow(k, id, { first: g.first, dupe: g.dupe, shards: g.shards, quick: !!S.crates.quick });
 }
 /* ---- the reveal ---- */
 let CRV = null;
@@ -17787,18 +18014,18 @@ function crateShow(k, id, info) {
   const el = document.createElement('div'); el.className = 'crate22 r-' + it.rarity; el.id = 'crate22';
   el.innerHTML = `<div class="cr-host"></div><div class="cr-flash"></div><div class="cr-2d"><div class="cr-box" style="--c:${R.col}"><i></i></div></div>
     <div class="cr-card" hidden><span class="cr-rar" style="--c:${R.col}">${R.name}${info.first ? ' · NEW!' : ''}</span><h2>${esc(it.name)}</h2><p>${esc(it.blurb || '')}</p>
-      <p class="muted sm">${ITEM_TYPES.find(t => t[0] === it.type)[1]}${it.type === 'tool' ? ` · ${esc(TOOL_SLOTS[it.slot])} slot` : ` · worth about ${money(itemValue(id))} on a car`}${info.dupe ? ` · already had one: +${R.dupe} Gold Bolts` : ''}${!info.dupe && invCount(id) > 1 ? ` · you’ve got ${invCount(id)}` : ''}</p>
-      <div class="cr-acts">${it.type === 'tool' && !info.dupe ? `<button class="btn primary" data-b="cr-equip" data-id="${id}">Put it in my toolbox</button>` : ''}<button class="btn${it.type === 'tool' && !info.dupe ? '' : ' primary'}" data-b="cr-close">Lovely</button>${(S.gold || 0) >= CRATES[k].cost ? `<button class="btn" data-b="cr-again" data-k="${k}">Another · ${goldTxt(CRATES[k].cost)}</button>` : ''}</div></div>
+      <p class="muted sm">${ITEM_TYPES.find(t => t[0] === it.type)[1]}${it.type === 'tool' ? ` · ${esc(TOOL_SLOTS[it.slot])} slot` : ` · worth about ${money(itemValue(id))} on a car`}${info.dupe ? ` · already had one: +${R.dupe} Gold Bolts` : ''}${info.shards ? ` · +${info.shards} shards` : ''}${!info.dupe && invCount(id) > 1 ? ` · you’ve got ${invCount(id)}` : ''}</p>
+      <div class="cr-acts">${it.type === 'tool' && !info.dupe ? `<button class="btn primary" data-b="cr-equip" data-id="${id}">Put it in my toolbox</button>` : ''}<button class="btn${it.type === 'tool' && !info.dupe ? '' : ' primary'}" data-b="cr-close">Lovely</button>${(S.gold || 0) >= crateCost23(k) ? `<button class="btn" data-b="cr-again" data-k="${k}">Another · ${goldTxt(crateCost23(k))}</button>` : ''}</div></div>
     <button class="cr-skip" data-b="cr-skip">Tap to open</button>`;
   document.body.appendChild(el); document.body.classList.add('mg-on');
-  CRV = { el, k, id, t: 0, shown: false, three: false };
+  CRV = { el, k, id, t: 0, shown: false, three: false, quick: !!info.quick };
   Sfx.pop();
   const host = el.querySelector('.cr-host');
-  if (Car3D.ok && Car3D.extOpen) {
+  if (Car3D.ok && Car3D.extOpen && !info.quick) {
     const E = Car3D.extOpen(host, L => crateScene(L, id));
     if (E) { CRV.three = true; CRV.E = E; el.classList.add('three'); }
   }
-  if (!CRV.three) { setTimeout(() => crateBurst(), 1500); }
+  if (!CRV.three) { setTimeout(() => crateBurst(), info.quick ? 90 : 1500); }
 }
 function crateBurst() {
   if (!CRV || CRV.burst) return;
@@ -17808,15 +18035,15 @@ function crateBurst() {
   setTimeout(() => fl.classList.remove('on'), 380);
   if (r >= 4) { Sfx.perfect(); confetti(); } else if (r >= 2) Sfx.good(); else Sfx.cash();
   buzz(r >= 3 ? [40, 30, 60] : 25);
-  setTimeout(() => { if (!CRV) return; const c = CRV.el.querySelector('.cr-card'); c.hidden = false; CRV.el.querySelector('.cr-skip').hidden = true; }, CRV.three ? 1200 : 500);
+  setTimeout(() => { if (!CRV) return; const c = CRV.el.querySelector('.cr-card'); c.hidden = false; CRV.el.querySelector('.cr-skip').hidden = true; }, CRV.three ? 1200 : CRV.quick ? 140 : 500);
 }
 function crateClose(again) {
   if (!CRV) return;
-  const k = CRV.k;
+  const k = CRV.k, n = CRV.multiN || 0;
   if (CRV.three && Car3D.extClose) Car3D.extClose();
   CRV.el.remove(); document.body.classList.remove('mg-on'); CRV = null;
   render();
-  if (again) setTimeout(() => crateOpen(k), 60);
+  if (again) setTimeout(() => (n ? crateOpenMulti23(k, n) : crateOpen(k)), 60);
 }
 /* a generic "you got something" moment, for prizes that don't come out of a crate */
 function showItemGot(id, why) {
@@ -17968,7 +18195,7 @@ function crateScene(L, id) {
     },
   };
 }
-function cratesHtml() {
+function cratesHtml_b22() {
   crateFreeTick();
   const C = S.crates, free = C.free || 0;
   const card = k => { const D = CRATES[k], tok = crateTokens(k); return `<li class="crate-c" style="--c:${D.col}"><div class="cc-art"><i></i></div><div><b>${esc(D.name)}</b><p class="muted sm">${esc(D.blurb)}</p><button class="linkish sm" data-b="odds" data-k="${k}">See the odds</button></div><div class="cc-acts">${tok ? `<button class="btn primary sm" data-b="crate" data-k="${k}" data-how="token">Open free (${tok})</button>` : ''}<button class="btn${tok ? '' : ' primary'} sm" data-b="crate" data-k="${k}"${(S.gold || 0) >= D.cost ? '' : ' disabled'}>Open · ${goldTxt(D.cost)}</button></div></li>`; };
@@ -17976,7 +18203,7 @@ function cratesHtml() {
     <div class="freecrate${free ? ' on' : ''}"><div class="cc-art"><i></i></div><div><b>${free ? `Free crate ready${free > 1 ? ` (${free})` : ''}` : 'Free crate'}</b><p class="muted sm">${free ? 'A Style crate, on the house.' : `Next one in <span data-until="${C.freeAt}">${durText(C.freeAt - nowMs())}</span>.`} One every four hours; two can wait.</p></div>${free ? '<button class="btn primary" data-b="crate" data-k="style" data-how="free">Open it</button>' : ''}</div>
     <ul class="crates">${Object.keys(CRATES).map(card).join('')}</ul></section>`;
 }
-function oddsShow(k) {
+function oddsShow_b22(k) {
   const D = CRATES[k];
   showModal(`<div><span class="label">The odds</span><h2 class="sheet-title">${esc(D.name)}</h2></div><table class="odds"><tbody>${crateOdds(k).map(([r, p]) => `<tr><td>${rarTag(r)}</td><td class="n">${(p * 100).toFixed(p < 0.01 ? 2 : 1)}%</td></tr>`).join('')}</tbody></table><p class="muted sm">Inside: ${esc(D.types.map(t => ITEM_TYPES.find(x => x[0] === t)[1]).join(', '))}. Every tenth crate in a row without an Epic or better is guaranteed Epic or better. Gold Bolts are only ever earned in the game, never bought.</p><button class="btn primary wide" data-a="close-modal">OK</button>`);
 }
@@ -17992,7 +18219,7 @@ document.addEventListener('click', e => {
   if (!S) return;
   const k = b.dataset.b, fn = ACT22[k]; if (!fn) return;
   if (S.over && !['cr-close', 'cr-skip'].includes(k)) return;
-  if (busy && !['cr-close', 'cr-skip', 'cr-equip', 'cr-again', 'show-close', 'ba-close', 'sub'].includes(k)) return;
+  if (busy && !['cr-close', 'cr-skip', 'cr-equip', 'cr-again', 'show-close', 'ba-close', 'sub', 'skip-stop'].includes(k)) return;
   e.preventDefault();
   try { fn(b, e); } catch (err) { /* keep the game running */ console.error(err); }
 });
@@ -18032,7 +18259,7 @@ function upgCatChips22() {
 function jobsCounts22() {
   return { customers: S.board.length + (S.complaints || []).length, callouts: dispatchCount22() + (S.callout ? 1 : 0), auctions: docksReady22(), fixoff: S.rival && S.rival.offer && S.rival.lastDay !== S.day ? 1 : 0, yard: (S.gate22 || []).length + (S.yard || []).filter(j => j.offer).length + (S.unit || []).filter(j => j.offer).length };
 }
-function dailyCount22() {
+function dailyCount22_b22() {
   let n = loginReady() ? 1 : 0;
   if (S.daily && S.daily.key === dayKey()) n += S.daily.list.filter(c => c.done && !c.claimed).length;
   crateFreeTick(); n += S.crates.free || 0; n += Object.values(S.crates.tokens || {}).reduce((a, b) => a + b, 0);
@@ -18040,7 +18267,7 @@ function dailyCount22() {
   n += (S.timers || []).filter(t => t.ready).length;
   return n;
 }
-function collCount22() { return Object.keys(S.inv.items).filter(id => !S.inv.looked || !S.inv.looked[id]).length + (showBank22() >= 50 ? 1 : 0); }
+function collCount22() { return Object.keys(S.inv.items).filter(id => !S.inv.looked || !S.inv.looked[id]).length + (showBank22() >= 50 ? 1 : 0) + setsReady23(); }
 function badges22() {
   if (!S || !$('#tab-daily')) return;
   const set = (id, n, alert) => { const b = $(id); if (!b) return; b.textContent = n > 99 ? '99+' : n; b.hidden = !n; b.classList.toggle('alert', !!alert); };
@@ -18048,7 +18275,7 @@ function badges22() {
   set('#coll-badge', collCount22());
 }
 /* the Daily page: login, challenges, timers, the week's event, crates */
-function renderDaily22() {
+function renderDaily22_b22() {
   let h = `<header class="ph"><span class="label">Come back every day</span><h1>Daily</h1><p>Claim your login reward, finish today’s challenges, and spend Gold Bolts on crates. Gold Bolts are earned in the game only: never bought.</p></header>`;
   h += `<div class="goldbar"><span class="gb-big">${goldTxt(S.gold || 0)}<small>Gold Bolts</small></span><button class="btn sm ghost" data-b="goldhow">How to earn more</button></div>`;
   h += loginHtml();
@@ -18088,9 +18315,10 @@ act22('tskip-ad', b => timerSkip(b.dataset.id, 'ad'));
 function renderCollection22() {
   S.inv.looked = S.inv.looked || {};
   let h = `<header class="ph"><span class="label">Everything you’ve found</span><h1>Collection</h1><p>Your prestige showroom, every part and paint you’ve collected, your toolbox, and Bonnetgram.</p></header>`;
-  h += subTabsHtml('collection', { showroom: showBank22() >= 50 ? '£' : 0, parts: Object.keys(S.inv.items).filter(id => !S.inv.looked[id]).length });
+  h += subTabsHtml('collection', { showroom: showBank22() >= 50 ? '£' : 0, parts: Object.keys(S.inv.items).filter(id => !S.inv.looked[id]).length, sets: setsReady23() });
   h += `<div data-sub="showroom">${showroomHtml22()}</div>`;
   h += `<div data-sub="parts">${partsHtml22()}</div>`;
+  h += `<div data-sub="sets">${setsHtml23()}</div>`;
   h += `<div data-sub="tools">${toolboxHtml22()}</div>`;
   h += `<div data-sub="feed">${feedHtml22()}</div>`;
   h += `<p class="build">Bonnet Up · build ${BUILD}</p>`;
@@ -18101,7 +18329,7 @@ function renderCollection22() {
 function partsHtml22() {
   const f = (S.sub && S.sub.ptype) || 'all', all = Object.keys(ITEMS), seen = all.filter(id => S.inv.seen[id]).length;
   const list = all.filter(id => f === 'all' || ITEMS[id].type === f).sort((a, b) => rarIdx(ITEMS[a].rarity) - rarIdx(ITEMS[b].rarity));
-  return `<div class="coll-h"><div><b>${seen} of ${all.length}</b> found <span class="bar22 wide"><i style="width:${Math.round(seen / all.length * 100)}%"></i></span></div><button class="btn sm" data-b="goto" data-v="daily">Get more</button></div>
+  return `<div class="coll-h"><div><b>${seen} of ${all.length}</b> found <span class="bar22 wide"><i style="width:${Math.round(seen / all.length * 100)}%"></i></span></div><button class="btn sm" data-b="goto" data-v="daily" data-s="crates">Get more</button></div>
     <div class="chips2 ptypes">${[['all', 'All']].concat(ITEM_TYPES).map(([k, l]) => `<button class="zchip" aria-selected="${k === f}" data-b="ptype" data-v="${k}">${esc(l)}</button>`).join('')}</div>
     <p class="muted sm">Fit parts, paints and engines from the Customise sheet on one of your project cars. Each one fitted goes with the car when it’s sold, and adds to its value.</p>
     <div class="itgrid">${list.map(id => `<button class="itbtn" data-b="item" data-id="${id}">${itemCard(id)}</button>`).join('')}</div>`;
@@ -19490,7 +19718,7 @@ function carArrive22(lot) {
   S.gate22 = (S.gate22 || []).concat(lot); return { where: 'gate', no: lot.no };
 }
 const carWhereText22 = w => !w ? '' : w.where === 'bay' ? `on ramp ${w.bay + 1} in your workshop, ready to fix up and sell.` : w.where === 'unit' ? 'in storage at your unit next door. Find it under Jobs, then Yard & unit, and bring it onto a ramp when one’s free.' : 'your ramps and the unit are full, so it’s parked outside. Find it under Jobs, then Yard & unit, and bring it in when there’s room.';
-const carGoBtn22 = (w, label) => w && w.where === 'bay' ? `<button class="btn primary wide" data-b="car-go" data-bay="${w.bay}">Go to it</button>` : `<button class="btn primary wide" data-b="goto" data-v="jobs" data-s="yard">See where it is</button>`;
+const carGoBtn22 = (w, label) => (w && w.where === 'bay' ? `<button class="btn primary wide" data-b="car-go" data-bay="${w.bay}">Go to it</button>` : `<button class="btn primary wide" data-b="goto" data-v="jobs" data-s="yard">See where it is</button>`) + `<button class="btn wide" data-a="close-modal">${esc(label || 'Later')}</button>`;
 act22('car-go', b => { closeModal(); S.activeBay = +b.dataset.bay; S.view = 'workshop'; UI.sel = null; UI.bolt = null; UI.drawer = null; render(); toTop(); });
 /* the cars waiting outside, on the Yard & unit page */
 function gateHtml22() {
@@ -21036,6 +21264,837 @@ function showWhatsNew22() {
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
 act22('stepmin', () => { S.ui22min = !S.ui22min; save(); render(); });
+/* ======================= build 23: skip time =======================
+   A fast-forward button by the clock (and on the empty bay and the staff card). Pick how far: the next walk-in, until
+   a mechanic's done, half an hour, an hour or two, or closing time. The clock runs quickly through the gap, so whatever
+   should happen still happens (walk-ins, tow call-outs, staff finishing, closing up), and it stops early when
+   something needs you. Real-time timers (deliveries, shipping, engine builds) aren't game time, so they're unaffected. */
+const SKIP23 = { t: 0, o: null };
+const SKIP_ICO = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5v13l8.2-6.5zM12 5.5v13l8.2-6.5z"/><rect x="20.4" y="5.5" width="1.9" height="13" rx=".6"/></svg>';
+const skipBtn23 = (v, label) => `<button class="btn sk23-btn" data-b="skip"${v ? ` data-v="${v}"` : ''}>${SKIP_ICO}<span>${label || 'Skip time'}</span></button>`;
+function skipBlocked23() {
+  if (!S || S.over) return 'The game’s over.';
+  if (busy || SKIP23.o) return 'Hang on, something’s already happening.';
+  if (document.body.classList.contains('driving')) return 'Finish the drive first.';
+  if (document.body.classList.contains('mg-on')) return 'Finish the job in hand first.';
+  return '';
+}
+const staffFirst23 = st => st.name.split(' ')[0];
+/* where can the clock go from here? */
+function skipTargets23() {
+  const now = S.clock, end = dayEnd(), out = [];
+  const add = o => { if (o.to > now && (o.to < end || o.close)) out.push(o); };
+  const nextWalk = walkins().find(t => t > now && t < end);
+  if (nextWalk != null && S.board.length < 5) add({ id: 'walkin', to: nextWalk, kind: 'walk', title: 'Until the next walk-in', sub: `Customers turn up around ${hhmm(nextWalk)}`, stop: 'any' });
+  if (own('tow') && !S.callout) {
+    const t = CALLOUT_AT.find(t => t > now && t < end - 60);
+    if (t != null) add({ id: 'tow', to: t, kind: 'tow', title: 'Until the next breakdown call', sub: `The phone usually rings about ${hhmm(t)}`, stop: 'any' });
+  }
+  for (const st of S.staff || []) {
+    if (st.away) continue;
+    const j = staffBusyJob(st); if (!j) continue;
+    const m = Math.max(5, Math.ceil(staffLeft(st, j) / 5) * 5);
+    if (now + m < end) add({ id: 'staff:' + st.id, to: Math.min(end - 5, now + m + 30), est: now + m, staff: st.id, job: j, kind: 'staff', title: `Until ${staffFirst23(st)}’s finished`, sub: `The ${j.car.model}, about ${bookText(m)} (${hhmm(now + m)})`, stop: 'staff' });
+    else out.push({ id: 'staff:' + st.id, off: true, kind: 'staff', title: `${staffFirst23(st)} won’t finish today`, sub: `The ${j.car.model} needs about ${bookText(m)}. They’ll carry on in the morning.` });
+  }
+  [30, 60, 120].forEach(m => add({ id: 'm' + m, to: now + m, kind: 'time', title: m < 60 ? '30 minutes' : m === 60 ? 'An hour' : 'Two hours', sub: `On to ${hhmm(now + m)}`, stop: 'any' }));
+  add({ id: 'close', to: end, close: true, kind: 'close', title: 'Skip to closing time', sub: `${hhmm(end)}: everyone works till then, then you close up and pay ${money(rentNow())} rent`, stop: 'none' });
+  return out;
+}
+/* honest warnings: what you'll miss if you look away */
+function skipWarn23(close) {
+  const w = [], mine = S.bays[S.activeBay];
+  if (mine && !mine.staff && !mine.project) {
+    w.push(`Nobody’s working on the ${esc(mine.car.model)} on your ramp while you skip.`);
+    if (close && mine.due != null && mine.due <= S.day) w.push(`<b>${esc(mine.customer || 'The customer')}’s car is due today</b>: skip to closing and it’ll be late.`);
+  }
+  S.bays.forEach((j, i) => { if (j && i !== S.activeBay && !j.staff && !j.project && j.due != null && j.due <= S.day && close) w.push(`The ${esc(j.car.model)} in bay ${i + 1} is due today and nobody’s on it.`); });
+  return w;
+}
+function skipOpen23(pre) {
+  const why = skipBlocked23(); if (why) { toast(why); return; }
+  const list = skipTargets23();
+  if (pre) { const o = list.find(o => o.id === pre && !o.off); if (o) { skipConfirm23(o); return; } }
+  const ico = { walk: '🚶', tow: '📞', staff: '🔧', time: '⏱️', close: '🌙' };
+  const warn = skipWarn23(false);
+  showModal(`<div><span class="label">Day ${S.day} · ${hhmm(S.clock)}</span><h2 class="sheet-title">Skip time</h2></div>
+    <p class="muted">The clock runs fast and stops early if a customer walks in or one of your mechanics finishes.</p>
+    ${warn.length ? `<div class="sk23-warn">${warn.map(x => `<p>${x}</p>`).join('')}</div>` : ''}
+    <div class="sk23-list">${list.map(o => o.off
+      ? `<div class="sk23-opt off"><i aria-hidden="true">${ico[o.kind]}</i><span><b>${esc(o.title)}</b><small>${esc(o.sub)}</small></span></div>`
+      : `<button class="sk23-opt${o.close ? ' close' : ''}" data-b="skip-go" data-v="${o.id}"><i aria-hidden="true">${ico[o.kind]}</i><span><b>${esc(o.title)}</b><small>${esc(o.sub)}</small></span><em>${o.close ? hhmm(o.to) : '+' + bookText((o.est || o.to) - S.clock)}</em></button>`).join('')}</div>
+    <p class="muted sk23-foot">Deliveries, shipping and engine builds run on real time, so skipping doesn’t hurry them.</p>
+    <button class="btn wide" data-a="close-modal">Keep working</button>`);
+}
+function skipConfirm23(o) {
+  const warn = skipWarn23(o.close);
+  if (!warn.length || !o.close) { skipGo23(o); return; }
+  showModal(`<div><span class="label">Day ${S.day} · ${hhmm(S.clock)}</span><h2 class="sheet-title">Skip to ${hhmm(o.to)}?</h2></div>
+    <div class="sk23-warn">${warn.map(x => `<p>${x}</p>`).join('')}</div>
+    <div class="row"><button class="btn primary" data-b="skip-go" data-v="${o.id}" data-sure="1">Skip anyway</button><button class="btn" data-a="close-modal">Keep working</button></div>`);
+}
+function skipEl23() {
+  let el = document.getElementById('sk23');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'sk23'; el.className = 'sk23'; el.setAttribute('role', 'status');
+    el.innerHTML = `<span class="sk23-ico">${SKIP_ICO}</span><b class="sk23-clock">08:00</b><span class="sk23-to"></span><button class="sk23-stop" data-b="skip-stop">Stop</button><i class="sk23-bar"><i></i></i>`;
+    document.body.appendChild(el);
+  }
+  return el;
+}
+function skipGo23(o) {
+  if (skipBlocked23()) { toast(skipBlocked23()); return; }
+  closeModal();
+  const day = S.day, from = S.clock, to = o.to, total = to - from; if (total <= 0) return;
+  const mine = S.bays[S.activeBay], keep = mine ? mine.worked : undefined;
+  const jobsOf = () => new Map((S.staff || []).map(st => [st.id, staffBusyJob(st)]));
+  const startJobs = jobsOf(), board0 = S.board.length, call0 = !!S.callout;
+  const chunk = Math.max(5, Math.min(15, Math.round(total / 24 / 5) * 5));
+  const el = skipEl23(); el.hidden = false; el.classList.add('on');
+  el.querySelector('.sk23-to').textContent = o.close ? 'to closing' : 'to ' + hhmm(to);
+  document.body.classList.add('skipping23');
+  SKIP23.o = { o, day, from, to, why: '' };
+  busy = true;
+  const finish = msg => {
+    clearTimeout(SKIP23.t); SKIP23.t = 0; SKIP23.o = null; busy = false;
+    el.classList.remove('on'); el.hidden = true; document.body.classList.remove('skipping23');
+    S.stats.skipped = (S.stats.skipped || 0) + Math.max(0, (S.day === day ? S.clock : dayEnd()) - from);
+    if (msg) toast(msg);
+    try { render(); } catch (e) { /* mid-modal */ }
+  };
+  SKIP23.stop = () => finish(`Stopped at ${hhmm(S.clock)}.`);
+  const step = () => {
+    if (!SKIP23.o) return;
+    const n = Math.min(chunk, to - S.clock);
+    busy = false;               /* the day might end inside advance(): let its summary work normally */
+    advance(n);
+    if (mine && S.bays.includes(mine) && !mine.staff) mine.worked = keep;   /* time passing isn't time you spent on the car */
+    if (S.day !== day || S.over) { finish(''); hookFire('skip', { min: total, close: true }); return; }
+    busy = true;
+    el.querySelector('.sk23-clock').textContent = hhmm(S.clock);
+    el.querySelector('.sk23-bar i').style.width = Math.round((S.clock - from) / total * 100) + '%';
+    let why = '';
+    if (o.stop !== 'none') {
+      const now = jobsOf();
+      for (const [id, j] of startJobs) if (j && now.get(id) !== j) { const st = staffById(id); why = `${st ? staffFirst23(st) : 'Your mechanic'} finished the ${j.car.model}.`; break; }
+      if (!why && o.stop === 'any' && S.board.length > board0) why = 'A customer just walked in.';
+      if (!why && o.stop === 'any' && S.callout && !call0) why = 'The phone’s ringing: a breakdown call-out.';
+    }
+    if (why) { finish(`${hhmm(S.clock)}: ${why}`); hookFire('skip', { min: S.clock - from }); return; }
+    if (S.clock >= to) { finish(o.staff ? `${hhmm(S.clock)}: still not quite done. Nearly there.` : `Skipped to ${hhmm(S.clock)}.`); hookFire('skip', { min: total }); return; }
+    SKIP23.t = setTimeout(step, reduced ? 16 : 95);
+  };
+  Sfx.pop();
+  SKIP23.t = setTimeout(step, reduced ? 16 : 140);
+}
+act22('skip', b => skipOpen23(b.dataset.v || ''));
+act22('skip-go', b => {
+  const o = skipTargets23().find(x => x.id === b.dataset.v && !x.off);
+  if (!o) { closeModal(); toast('That’s moved on. Have another look.'); return; }
+  if (b.dataset.sure) skipGo23(o); else skipConfirm23(o);
+});
+act22('skip-stop', () => { if (SKIP23.o && SKIP23.stop) SKIP23.stop(); });
+window.__skip = id => { const o = skipTargets23().find(x => x.id === id && !x.off); if (o) skipGo23(o); return !!o; };
+window.__skipTargets = () => skipTargets23().map(o => ({ id: o.id, to: o.to, off: !!o.off }));
+
+/* ======================= build 23: more ways to open crates =======================
+   Four new crates (paint, wheels, engines, and the Mythic vault), opening five or ten at once for less (ten always
+   holds something Epic or better), a quick-open switch that skips the show, shards from every item that you spend at
+   the workbench on exactly the thing you want, scrapping spares for shards, a contents list that shows what you've
+   found and what you haven't, and a deal of the day. Gold Bolts are still only ever earned. */
+Object.assign(CRATES, {
+  paint: { name: 'Paint & Wrap crate', cost: 45, types: ['paint'], col: '#1FA7A0', blurb: 'Only paints and wraps: chameleons, chrome and the glowing ones.' },
+  wheel: { name: 'Wheel & Tyre crate', cost: 45, types: ['rim', 'tyre'], col: '#3FA34D', blurb: 'Only rims and tyres, from deep dish to plasma.' },
+  engine: { name: 'Engine crate', cost: 160, types: ['engine', 'turbo'], col: '#F06A1E', min: 'rare', luck: 0.5, blurb: 'Rare or better: turbos and whole engines.' },
+  vault: { name: 'Mythic vault', cost: 650, types: ['paint', 'rim', 'tyre', 'spoiler', 'turbo', 'engine', 'tool'], col: '#E5386D', min: 'legendary', blurb: 'Legendary or better, and one in ten is Mythic.' },
+});
+const CRATE_ORDER = ['style', 'paint', 'wheel', 'tool', 'power', 'engine', 'legend', 'vault'];
+/* rolls only ever land on a rarity the crate actually holds something of, so the printed odds are the real odds
+   (a paint crate has no common paints, so its odds are shared out over the rarities it does have) */
+function rarWeights23(types, minR, luck) {
+  const lo = rarIdx(minR || 'common');
+  const pools = RARITY.map((r, i) => (i < lo ? [] : Object.values(ITEMS).filter(it => types.includes(it.type) && it.rarity === r && !it.noCrate)));
+  return { pools, w: RARITY.map((r, i) => (pools[i].length ? RAR[r].w * (i >= 3 ? 1 + (luck || 0) : 1) : 0)) };
+}
+function rollItem(types, minR, luck) {
+  let { pools, w } = rarWeights23(types, minR, luck), tot = w.reduce((a, b) => a + b, 0);
+  if (!tot) { ({ pools, w } = rarWeights23(types, null, luck)); tot = w.reduce((a, b) => a + b, 0); }
+  if (!tot) return pick(Object.values(ITEMS).filter(it => !it.noCrate)).id;
+  let x = Math.random() * tot;
+  for (let i = 0; i < w.length; i++) { x -= w[i]; if (x <= 0 && pools[i].length) return pick(pools[i]).id; }
+  return pick(pools[w.findIndex(v => v > 0)]).id;
+}
+function crateOdds(k) {
+  const C = CRATES[k], { w } = rarWeights23(C.types, C.min, C.luck), tot = w.reduce((a, b) => a + b, 0);
+  return RARITY.map((r, i) => [r, w[i] / tot]).filter(x => x[1] > 0);
+}
+const MULTI23 = { 5: 0.9, 10: 0.85 };
+const SHARD = { common: 2, uncommon: 4, rare: 8, epic: 16, legendary: 40, mythic: 100 };
+const CRAFT = { common: 20, uncommon: 40, rare: 100, epic: 250, legendary: 700, mythic: 2000 };
+const SHARD_ICO = '<svg class="sh-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 19 9 15 22H9L5 9z" fill="#7FD3FF" stroke="#2E6E95" stroke-width="1.3"/><path d="M12 2v20M5 9h14" stroke="#2E6E95" stroke-width=".9" opacity=".6"/></svg>';
+const shardTxt = n => `${SHARD_ICO}<b>${Math.round(n).toLocaleString('en-GB')}</b>`;
+function crates23() {
+  const C = S.crates;
+  if (C.shards == null) C.shards = 0;
+  if (!C.deal) C.deal = { day: '', used: false };
+  return C;
+}
+/* the deal of the day: one crate a day at 30% off, the same for everyone on the same date */
+function dealToday23() {
+  const d = dayKey(); let h = 7; for (const ch of d) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const pool = CRATE_ORDER.filter(k => k !== 'vault' && (k !== 'engine' || levelOf(S.xp) >= 3));
+  const k = pool[h % pool.length], C = crates23();
+  if (C.deal.day !== d) { C.deal.day = d; C.deal.used = false; }
+  return { k, cost: Math.max(5, Math.round(CRATES[k].cost * 0.7 / 5) * 5), used: C.deal.used };
+}
+/* what a crate costs you: 5% off with the Mirror Finish set */
+const crateCost23 = (k, n) => { const base = CRATES[k].cost * (n || 1) * (n > 1 ? MULTI23[n] : 1) * (perk23('crate5') ? 0.95 : 1); return Math.max(5, Math.round(base / 5) * 5); };
+function shardGain23(id, first) {
+  const r = ITEMS[id].rarity; let n = SHARD[r] * (first ? 1 : 2);
+  if (perk23('shards')) n *= 1.15;
+  if (perk23('mythic')) n *= 1.5;
+  return Math.round(n);
+}
+/* one roll, with the pity counter (every tenth without Epic+ is Epic+) */
+function crateRoll23(k, floorR) {
+  const C = CRATES[k], pity = (S.crates.pity || 0) >= 9;
+  let min = C.min || null;
+  if (pity && rarIdx(min || 'common') < 3) min = 'epic';
+  if (floorR && rarIdx(min || 'common') < rarIdx(floorR)) min = floorR;
+  const id = rollItem(C.types, min, C.luck);
+  S.crates.pity = rarIdx(ITEMS[id].rarity) >= 3 ? 0 : (S.crates.pity || 0) + 1;
+  return id;
+}
+function crateGive23(id) {
+  const it = ITEMS[id], dupeTool = it.type === 'tool' && invCount(id) > 0;
+  const first = invAdd(id), sh = shardGain23(id, first);
+  crates23().shards += sh; S.stats.shards = (S.stats.shards || 0) + sh;
+  if (dupeTool) goldAdd(RAR[it.rarity].dupe, null, true);
+  return { id, first, dupe: dupeTool, shards: sh };
+}
+/* open five or ten in one go */
+function crateOpenMulti23(k, n) {
+  const C = CRATES[k]; if (!C || !MULTI23[n]) return;
+  if (!goldSpend(crateCost23(k, n), 'crate')) return;
+  const got = [];
+  for (let i = 0; i < n; i++) {
+    const last = i === n - 1 && n >= 10 && !got.some(g => rarIdx(ITEMS[g.id].rarity) >= 3);
+    got.push(crateGive23(crateRoll23(k, last ? 'epic' : null)));
+  }
+  S.crates.opened = (S.crates.opened || 0) + n; S.stats.crates = (S.stats.crates || 0) + n; S.stats.multi = (S.stats.multi || 0) + 1;
+  got.forEach(g => hookFire('crate', { k, id: g.id, multi: n }));
+  save();
+  crateReveal23(got.map(g => Object.assign(g, { k })), { k, n });
+}
+/* every free crate token at once (from the pass, the wheel, the league, the login calendar...) */
+function crateOpenTokens23() {
+  const T = S.crates.tokens || {}, list = [];
+  for (const k of CRATE_ORDER) for (let i = 0; i < (T[k] || 0); i++) list.push(k);
+  if (list.length < 2) { if (list.length) crateOpen(list[0], 'token'); return; }
+  const got = list.slice(0, 20).map(k => { T[k]--; return Object.assign(crateGive23(crateRoll23(k)), { k }); });
+  S.crates.opened = (S.crates.opened || 0) + got.length; S.stats.crates = (S.stats.crates || 0) + got.length;
+  got.forEach(g => hookFire('crate', { k: g.k, id: g.id, multi: got.length }));
+  save();
+  crateReveal23(got, null);
+}
+/* the reveal for several at once: the best one rises out of the crate in 3D, then the whole haul flips in */
+function crateReveal23(got, again) {
+  const best = got.reduce((a, b) => (rarIdx(ITEMS[b.id].rarity) > rarIdx(ITEMS[a.id].rarity) ? b : a)), k = best.k;
+  crateShow(k, best.id, { first: best.first, dupe: best.dupe, shards: got.reduce((s, g) => s + g.shards, 0), quick: !!S.crates.quick, multi: got });
+  if (!CRV) return;
+  CRV.multiN = again ? again.n : 0;
+  const card = CRV.el.querySelector('.cr-card'), R = RAR[ITEMS[best.id].rarity], n = got.length;
+  const news = got.filter(g => g.first).length, gold = got.filter(g => g.dupe).reduce((s, g) => s + RAR[ITEMS[g.id].rarity].dupe, 0);
+  card.classList.add('multi23');
+  card.innerHTML = `<span class="cr-rar" style="--c:${R.col}">×${n} · best ${R.name}</span><h2>${n} crates opened</h2>
+    <div class="mo23">${got.map((g, i) => { const it = ITEMS[g.id]; return `<div class="mo23-it rar-b-${it.rarity}${g.first ? ' new' : ''}${g === best ? ' best' : ''}" style="--i:${i};--c:${RAR[it.rarity].col}">${itemIcon(g.id, 38)}<b>${esc(it.name)}</b>${g.first ? '<i>NEW</i>' : ''}</div>`; }).join('')}</div>
+    <p class="muted sm">+${got.reduce((s, g) => s + g.shards, 0)} shards${news ? ` · ${news} new for your collection` : ''}${gold ? ` · tools you had already: +${gold} Gold Bolts` : ''}</p>
+    <div class="cr-acts"><button class="btn primary" data-b="cr-close">Lovely</button>${again && (S.gold || 0) >= crateCost23(again.k, again.n) ? `<button class="btn" data-b="cr-again" data-k="${again.k}">Another ×${again.n} · ${goldTxt(crateCost23(again.k, again.n))}</button>` : ''}</div>`;
+}
+/* ---- the contents: odds, and every item it can hold, found or not ---- */
+function crateHolds23(k) {
+  const C = CRATES[k], lo = rarIdx(C.min || 'common');
+  return Object.values(ITEMS).filter(it => C.types.includes(it.type) && !it.noCrate && rarIdx(it.rarity) >= lo).sort((a, b) => rarIdx(a.rarity) - rarIdx(b.rarity) || a.name.localeCompare(b.name));
+}
+function oddsShow(k) {
+  const D = CRATES[k], holds = crateHolds23(k), found = holds.filter(it => S.inv.seen[it.id]).length;
+  showModal(`<div><span class="label">What’s inside</span><h2 class="sheet-title">${esc(D.name)}</h2></div>
+    <table class="odds"><tbody>${crateOdds(k).map(([r, p]) => `<tr><td>${rarTag(r)}</td><td class="n">${(p * 100).toFixed(p < 0.01 ? 2 : 1)}%</td></tr>`).join('')}</tbody></table>
+    <div class="c22-h"><b>You’ve found ${found} of ${holds.length}</b><span class="muted sm">${D.types.map(t => ITEM_TYPES.find(x => x[0] === t)[1]).join(', ')}</span></div>
+    <div class="gauge" aria-hidden="true"><i class="good" style="width:${Math.round(found / Math.max(1, holds.length) * 100)}%"></i></div>
+    <div class="itgrid ct23">${holds.map(it => itemCard(it.id)).join('')}</div>
+    <p class="muted sm">Every tenth crate in a row without an Epic or better is guaranteed Epic or better, and ten at once always has one. Every item comes with shards for the workbench (double for repeats). Gold Bolts are only ever earned in the game, never bought.</p>
+    <button class="btn primary wide" data-a="close-modal">OK</button>`);
+}
+/* ---- the workbench: shards into exactly what you want ---- */
+function craftShow23(type) {
+  const C = crates23(); type = type || C.craftType || 'paint'; C.craftType = type;
+  const list = Object.values(ITEMS).filter(it => it.type === type && !it.noCrate).sort((a, b) => rarIdx(a.rarity) - rarIdx(b.rarity) || a.name.localeCompare(b.name));
+  showModal(`<div><span class="label">The workbench</span><h2 class="sheet-title">Make it yourself</h2></div>
+    <div class="c22-h"><span class="gb-big sh-big">${shardTxt(C.shards)}<small>shards</small></span><button class="btn sm" data-b="scrap"${scrapList23().length ? '' : ' disabled'}>Scrap spares</button></div>
+    <p class="muted sm">Every item from a crate comes with shards (double for something you’ve had before). Spend them on the exact item you’re after.</p>
+    <div class="chips2">${ITEM_TYPES.map(([k, l]) => `<button class="zchip" aria-selected="${k === type}" data-b="craft-type" data-v="${k}">${esc(l)}</button>`).join('')}</div>
+    <div class="itgrid ct23">${list.map(it => { const c = CRAFT[it.rarity], n = invCount(it.id); return itemCard(it.id, { reveal: true, act: `${n === 1 ? '<i class="itc-n">×1</i>' : ''}<button class="btn sm craft23" data-b="craft" data-id="${it.id}"${C.shards >= c ? '' : ' disabled'}>${shardTxt(c)}</button>` }); }).join('')}</div>
+    <button class="btn wide" data-a="close-modal">Done</button>`);
+}
+function craftItem23(id) {
+  const it = ITEMS[id], c = CRAFT[it.rarity], C = crates23(); if (!it || C.shards < c) return;
+  C.shards -= c; S.stats.crafted = (S.stats.crafted || 0) + 1;
+  const first = invAdd(id); save();
+  hookFire('craft', { id });
+  showItemGot(id, first ? 'Made at the workbench · new!' : 'Made at the workbench');
+}
+/* spares: everything you've got more than one of (keeping one), as shards at the plain rate */
+function scrapList23() { return Object.keys(S.inv.items).filter(id => ITEMS[id] && invCount(id) > 1).map(id => ({ id, n: invCount(id) - 1 })); }
+function scrapShow23() {
+  const L = scrapList23(); if (!L.length) { toast('No spares. Everything you’ve got is one of a kind.'); return; }
+  const tot = L.reduce((s, x) => s + x.n * SHARD[ITEMS[x.id].rarity], 0), cnt = L.reduce((s, x) => s + x.n, 0);
+  showModal(`<div><span class="label">Scrap spares</span><h2 class="sheet-title">${cnt} spare${cnt > 1 ? 's' : ''} into ${tot} shards?</h2></div>
+    <p>You keep one of everything. Spares you might want to fit to more cars go too, so have a look first.</p>
+    <ul class="news">${L.map(x => `<li>${itemIcon(x.id, 24)} <b>${esc(ITEMS[x.id].name)}</b> ×${x.n} · ${x.n * SHARD[ITEMS[x.id].rarity]} shards</li>`).join('')}</ul>
+    <div class="row"><button class="btn primary" data-b="scrap-go">Scrap them</button><button class="btn" data-b="craft-open">Back</button></div>`);
+}
+function scrapGo23() {
+  const L = scrapList23(); let tot = 0;
+  for (const x of L) { S.inv.items[x.id] = 1; tot += x.n * SHARD[ITEMS[x.id].rarity]; }
+  crates23().shards += tot; save(); Sfx.cash(); toast(`+${tot} shards from the scrap pile.`);
+  craftShow23();
+}
+/* ---- the crates section of the Daily page ---- */
+function cratesHtml() {
+  crateFreeTick();
+  const C = crates23(), free = C.free || 0, deal = dealToday23(), g = S.gold || 0;
+  const buy = (k, n) => { const c = crateCost23(k, n); return `<button class="btn sm${n === 1 ? ' primary' : ''}" data-b="${n === 1 ? 'crate' : 'crate-n'}" data-k="${k}"${n > 1 ? ` data-n="${n}"` : ''}${g >= c ? '' : ' disabled'}>${n > 1 ? `×${n} · ` : ''}${goldTxt(c)}</button>`; };
+  const card = k => { const D = CRATES[k], tok = crateTokens(k), holds = crateHolds23(k), found = holds.filter(it => S.inv.seen[it.id]).length; return `<li class="crate-c" style="--c:${D.col}"><div class="cc-art"><i></i></div><div><b>${esc(D.name)}</b><p class="muted sm">${esc(D.blurb)}</p><button class="linkish sm" data-b="odds" data-k="${k}">What’s inside · ${found}/${holds.length} found</button></div><div class="cc-acts cc23">${tok ? `<button class="btn primary sm tok23" data-b="crate" data-k="${k}" data-how="token">Open free (${tok} waiting)</button>` : ''}${buy(k, 1)}${buy(k, 5)}${buy(k, 10)}</div></li>`; };
+  const pity = S.crates.pity || 0, toks = CRATE_ORDER.reduce((n, k) => n + crateTokens(k), 0);
+  return `<section class="card22 crates23"><div class="c22-h"><div><span class="label">Crates</span><h3>Open something shiny</h3></div>
+      <label class="qo23"><input type="checkbox" data-b="quickopen"${C.quick ? ' checked' : ''}><span>Quick open</span></label></div>
+    ${toks >= 2 ? `<button class="btn primary wide tokall23" data-b="crate-toks">Open all ${toks} free crates</button>` : ''}
+    <div class="pity23"><span>Guaranteed Epic or better in <b>${10 - pity}</b></span><div class="gauge" aria-hidden="true"><i class="good" style="width:${pity * 10}%"></i></div></div>
+    <div class="freecrate${free ? ' on' : ''}"><div class="cc-art"><i></i></div><div><b>${free ? `Free crate ready${free > 1 ? ` (${free})` : ''}` : 'Free crate'}</b><p class="muted sm">${free ? 'A Style crate, on the house.' : `Next one in <span data-until="${C.freeAt}">${durText(C.freeAt - nowMs())}</span>.`} One every ${perk23('free3') ? 'three' : 'four'} hours; two can wait.</p></div>${free ? '<button class="btn primary" data-b="crate" data-k="style" data-how="free">Open it</button>' : ''}</div>
+    <div class="deal23${deal.used ? ' used' : ''}" style="--c:${CRATES[deal.k].col}"><div class="cc-art"><i></i></div><div><span class="label">Deal of the day · 30% off</span><b>${esc(CRATES[deal.k].name)}</b><p class="muted sm">${deal.used ? 'Bought. A new deal at midnight' : 'One at this price today. A new deal at midnight'}: <span data-until="${nowMs() + msLeftToday()}">${durText(msLeftToday())}</span></p></div>${deal.used ? '' : `<button class="btn primary sm" data-b="crate" data-k="${deal.k}" data-how="deal"${g >= deal.cost ? '' : ' disabled'}><s>${CRATES[deal.k].cost}</s> ${goldTxt(deal.cost)}</button>`}</div>
+    <ul class="crates">${CRATE_ORDER.map(card).join('')}</ul>
+    <div class="wb23"><div><span class="label">The workbench</span><b>${shardTxt(C.shards)} shards</b><p class="muted sm">Every item gives shards. Make the exact thing you want.</p></div><button class="btn" data-b="craft-open">Open the workbench</button></div></section>`;
+}
+act22('crate-n', b => crateOpenMulti23(b.dataset.k, +b.dataset.n));
+act22('crate-toks', () => crateOpenTokens23());
+act22('craft-open', () => craftShow23());
+act22('craft-type', b => craftShow23(b.dataset.v));
+act22('craft', b => craftItem23(b.dataset.id));
+act22('scrap', () => scrapShow23());
+act22('scrap-go', () => scrapGo23());
+document.addEventListener('change', e => { const t = e.target; if (t && t.matches && t.matches('[data-b="quickopen"]') && S) { crates23().quick = !!t.checked; save(); toast(t.checked ? 'Quick open on: straight to the prize.' : 'Quick open off: the full show.'); } });
+ACH.push(
+  ['crate10x', 'Bulk buyer', 'Open ten crates at once', () => (S.stats.multi || 0) >= 1 && (S.stats.crates || 0) >= 10, 400],
+  ['crafter', 'Made it myself', 'Make something at the workbench', () => (S.stats.crafted || 0) >= 1, 300],
+  ['crates100', 'Crate expectations', 'Open 100 crates', () => (S.stats.crates || 0) >= 100, 2500],
+);
+window.__crateMulti = (k, n) => crateOpenMulti23(k, n);
+window.__deal = () => dealToday23();
+
+/* ======================= build 23: the Garage Pass =======================
+   A free season pass. Everything you do in the garage earns Pass XP (jobs, five-star reviews, hands-on scores,
+   challenges, logging in, call-outs, Fix-Offs, sales). Thirty tiers over a 28-day season pay cash, Gold Bolts, crate
+   tokens, shards, XP, and two items you can't get anywhere else that season. Past tier 30 every bonus tier pays again.
+   Anything you reached but didn't claim is handed over automatically when the season ends. No paid track. */
+const PASS_DAYS = 28, PASS_TIERS = 30, PASS_STEP = 180, PASS_BONUS = 300;
+const PASS_EPOCH = Date.UTC(2026, 10, 2);   /* season 1 starts Monday 2 November 2026 */
+const PASS_THEMES = [
+  { name: 'Neon Nights', col: '#FF2E88' }, { name: 'Chrome Summer', col: '#4FB8E8' }, { name: 'Track Day', col: '#2C9A5A' },
+  { name: 'Barn Find', col: '#B5743A' }, { name: 'Street Heat', col: '#FF6A1A' }, { name: 'Midnight Run', col: '#4A5BD8' },
+];
+/* the season exclusives: never in crates, containers or anywhere else */
+item('p_px_neonflip', 'paint', 'epic', 'Neon Flip', { col: '#FF2E88', col2: '#2EE6FF', fx: 'cham', noCrate: true, pass: 0, blurb: 'Hot pink that flips to electric blue. Neon Nights season only.' });
+item('r_px_lime', 'rim', 'legendary', 'Lime Halo Rims', { rim: 'split', rc: '#16191A', fx: 'neon', glow: '#C6FF3D', noCrate: true, pass: 0, blurb: 'Black split-spokes ringed in acid green. Neon Nights season only.' });
+item('p_px_coral', 'paint', 'epic', 'Coral Pearl', { col: '#FFD1C2', col2: '#BDEBFF', fx: 'pearl', noCrate: true, pass: 1, blurb: 'Soft coral that turns sky blue in the light. Chrome Summer season only.' });
+item('p_px_ice', 'paint', 'legendary', 'Ice Chrome', { col: '#9FD8FF', fx: 'chrome', noCrate: true, pass: 1, blurb: 'A mirror with a cold blue tint. Chrome Summer season only.' });
+item('p_px_racegreen', 'paint', 'epic', 'Race Green Flake', { col: '#0F5C3A', fx: 'flake', noCrate: true, pass: 2, blurb: 'Deep green with a glittering flake. Track Day season only.' });
+item('p_px_titanium', 'paint', 'legendary', 'Burnt Titanium', { col: '#8C93A8', fx: 'chrome', noCrate: true, pass: 2, blurb: 'Polished titanium, blued by the heat. Track Day season only.' });
+item('p_px_patina', 'paint', 'epic', 'Patina Satin', { col: '#5E7F6E', fx: 'satin', noCrate: true, pass: 3, blurb: 'The soft green of an old barn find, done on purpose. Barn Find season only.' });
+item('r_px_copper', 'rim', 'legendary', 'Copper Wire Wheels', { rim: 'wire', rc: '#C87533', noCrate: true, pass: 3, blurb: 'Dozens of copper spokes. Barn Find season only.' });
+item('p_px_sunset', 'paint', 'epic', 'Sunset Flip', { col: '#FF6A1A', col2: '#7A1FA8', fx: 'cham', noCrate: true, pass: 4, blurb: 'Orange melting into purple. Street Heat season only.' });
+item('p_px_rose', 'paint', 'legendary', 'Rose Chrome', { col: '#E8A0B4', fx: 'chrome', noCrate: true, pass: 4, blurb: 'A pink mirror. Street Heat season only.' });
+item('p_px_ink', 'paint', 'epic', 'Midnight Ink', { col: '#101B4A', col2: '#16A37A', fx: 'cham', noCrate: true, pass: 5, blurb: 'Ink blue with a green flash. Midnight Run season only.' });
+item('r_px_blackgold', 'rim', 'legendary', 'Black & Gold Multi-Spokes', { rim: 'multi', rc: '#E2B33E', noCrate: true, pass: 5, blurb: 'Gold multi-spokes for a black car. Midnight Run season only.' });
+const PASS_EX = [['p_px_neonflip', 'r_px_lime'], ['p_px_coral', 'p_px_ice'], ['p_px_racegreen', 'p_px_titanium'], ['p_px_patina', 'r_px_copper'], ['p_px_sunset', 'p_px_rose'], ['p_px_ink', 'r_px_blackgold']];
+const PASS_R = [null,
+  { cash: 1 }, { gold: 10 }, { shards: 20 }, { cash: 1.5 }, { token: 'style' },
+  { xp: 120 }, { gold: 10 }, { shards: 30 }, { cash: 2 }, { token: 'power' },
+  { gold: 15 }, { xp: 160 }, { shards: 40 }, { cash: 2.5 }, { ex: 0, gold: 20 },
+  { token: 'paint' }, { gold: 15 }, { shards: 50 }, { cash: 3 }, { token: 'legend' },
+  { xp: 220 }, { gold: 20 }, { token: 'wheel' }, { cash: 4 }, { shards: 150 },
+  { gold: 25 }, { token: 'engine' }, { shards: 80 }, { cash: 5 }, { ex: 1, gold: 50 }];
+const PASS_XP = { job: 20, five: 10, mini90: 10, mini: 4, chal: 30, login: 25, crate: 3, dispatch: 25, fixoff: 40, sale: 15, charjob: 15, container: 15, post: 10, show: 5, craft: 10, league: 0 };
+const localDayNo = (t) => { const d = new Date(t == null ? nowMs() : t); return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - PASS_EPOCH) / 86400e3); };
+const passSeasonNo = () => Math.floor(localDayNo() / PASS_DAYS);
+const passTheme = s => PASS_THEMES[((s % PASS_THEMES.length) + PASS_THEMES.length) % PASS_THEMES.length];
+const passExOf = s => PASS_EX[((s % PASS_EX.length) + PASS_EX.length) % PASS_EX.length];
+function passEndsAt(s) { const d = new Date(PASS_EPOCH + (s + 1) * PASS_DAYS * 86400e3); return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()).getTime(); }
+const passCash = m => Math.round((200 + 40 * levelOf(S.xp)) * m / 50) * 50;
+function pass23() {
+  const s = passSeasonNo();
+  if (!S.pass) S.pass = { season: s, xp: 0, claimed: [], bonus: 0 };
+  if (S.pass.season !== s) passRollover23(s);
+  return S.pass;
+}
+const passTier = P => Math.min(PASS_TIERS, Math.floor(P.xp / PASS_STEP));
+const passBonusReady = P => (P.xp > PASS_TIERS * PASS_STEP ? Math.floor((P.xp - PASS_TIERS * PASS_STEP) / PASS_BONUS) : 0) - (P.bonus || 0);
+const passClaimable = P => { let n = 0; for (let t = 1; t <= passTier(P); t++) if (!P.claimed.includes(t)) n++; return n + Math.max(0, passBonusReady(P)); };
+function passRewardText(t, s) {
+  const R = PASS_R[t], out = [];
+  if (R.cash) out.push(money(passCash(R.cash)));
+  if (R.gold) out.push(`${R.gold} Gold Bolts`);
+  if (R.shards) out.push(`${R.shards} shards`);
+  if (R.xp) out.push(`${R.xp} XP`);
+  if (R.token) out.push(CRATES[R.token].name);
+  if (R.ex != null) out.unshift(ITEMS[passExOf(s)[R.ex]].name);
+  return out.join(' + ');
+}
+function passGive23(t, s, quiet) {
+  const R = PASS_R[t];
+  if (R.cash) { S.money += passCash(R.cash); rollCash(S.money); }
+  if (R.gold) goldAdd(R.gold, null, true);
+  if (R.shards) crates23().shards += R.shards;
+  if (R.xp) gainXP(R.xp, quiet);
+  if (R.token) { S.crates.tokens = S.crates.tokens || {}; S.crates.tokens[R.token] = (S.crates.tokens[R.token] || 0) + 1; }
+  if (R.ex != null) invAdd(passExOf(s)[R.ex]);
+}
+function passClaim23(t) {
+  const P = pass23(); if (t > passTier(P) || P.claimed.includes(t)) return;
+  P.claimed.push(t); passGive23(t, P.season, false); save();
+  const R = PASS_R[t];
+  if (R.ex != null) showItemGot(passExOf(P.season)[R.ex], `Garage Pass tier ${t} · ${passTheme(P.season).name} exclusive`);
+  else { Sfx.cash(); toast(`Tier ${t}: ${passRewardText(t, P.season)}.`); }
+  hookFire('passclaim', { t }); render();
+}
+function passClaimAll23() {
+  const P = pass23(); let n = 0, ex = null;
+  for (let t = 1; t <= passTier(P); t++) if (!P.claimed.includes(t)) { P.claimed.push(t); passGive23(t, P.season, true); n++; if (PASS_R[t].ex != null) ex = passExOf(P.season)[PASS_R[t].ex]; }
+  const b = Math.max(0, passBonusReady(P)); for (let i = 0; i < b; i++) passBonus23(true);
+  if (!n && !b) return;
+  save(); confetti(); Sfx.perfect();
+  if (ex) showItemGot(ex, `Garage Pass · ${passTheme(P.season).name} exclusive`);
+  toast(`Claimed ${n + b} Garage Pass reward${n + b > 1 ? 's' : ''}.`); render();
+}
+function passBonus23(quiet) {
+  const P = pass23(); if (passBonusReady(P) < 1) return;
+  P.bonus = (P.bonus || 0) + 1; goldAdd(10, null, true); crates23().shards += 25;
+  if (!quiet) { save(); Sfx.cash(); toast('Bonus tier: +10 Gold Bolts and 25 shards.'); render(); }
+}
+/* a new season: hand over anything reached but not claimed, then start again */
+function passRollover23(s) {
+  const P = S.pass, got = [];
+  if (P && P.season != null) {
+    for (let t = 1; t <= passTier(P); t++) if (!P.claimed.includes(t)) { passGive23(t, P.season, true); got.push(t); }
+    const b = Math.max(0, passBonusReady(P)); for (let i = 0; i < b; i++) { goldAdd(10, null, true); crates23().shards += 25; }
+    if (got.length || b) setTimeout(() => toast(`The ${passTheme(P.season).name} season’s over: ${got.length + b} unclaimed reward${got.length + b > 1 ? 's were' : ' was'} added for you.`), 1200);
+    S.stats.passSeasons = (S.stats.passSeasons || 0) + (passTier(P) >= PASS_TIERS ? 1 : 0);
+  }
+  S.pass = { season: s, xp: 0, claimed: [], bonus: 0, last: P ? { season: P.season, tier: passTier(P) } : null };
+}
+function passXP23(n, why) {
+  if (!S || !n) return;
+  const P = pass23(), before = passTier(P), bb = passBonusReady(P);
+  P.xp += Math.round(n * (perk23('pass') ? 1.15 : 1));
+  const after = passTier(P);
+  if (after > before) { setTimeout(() => { toast(`Garage Pass tier ${after}! Claim it on the Daily page.`); Sfx.good(); }, 700); try { badges22(); } catch (e) { /* early */ } }
+  else if (passBonusReady(P) > bb) { setTimeout(() => toast('Garage Pass bonus tier reached!'), 700); try { badges22(); } catch (e) { /* early */ } }
+}
+hookOn('job', d => passXP23(PASS_XP.job + (d.stars === 5 ? PASS_XP.five : 0)));
+hookOn('mini', d => passXP23(d.score >= 90 ? PASS_XP.mini90 : PASS_XP.mini));
+hookOn('chal', () => passXP23(PASS_XP.chal));
+hookOn('login', () => passXP23(PASS_XP.login));
+hookOn('crate', () => passXP23(PASS_XP.crate));
+hookOn('dispatch', d => { if (d.ok) passXP23(PASS_XP.dispatch); });
+hookOn('fixoff', d => { if (d.win) passXP23(PASS_XP.fixoff); });
+hookOn('sale', d => { if (d.profit > 0) passXP23(PASS_XP.sale); });
+hookOn('charjob', () => passXP23(PASS_XP.charjob));
+hookOn('container', () => passXP23(PASS_XP.container));
+hookOn('post', () => passXP23(PASS_XP.post));
+hookOn('showcollect', () => passXP23(PASS_XP.show));
+hookOn('craft', () => passXP23(PASS_XP.craft));
+hookOn('ensure', () => { try { pass23(); } catch (e) { /* items not ready */ } });
+function passHtml23() {
+  const P = pass23(), s = P.season, th = passTheme(s), tier = passTier(P), ex = passExOf(s);
+  const into = tier >= PASS_TIERS ? (P.xp - PASS_TIERS * PASS_STEP) % PASS_BONUS : P.xp - tier * PASS_STEP, need = tier >= PASS_TIERS ? PASS_BONUS : PASS_STEP;
+  const can = passClaimable(P), bonusN = Math.max(0, passBonusReady(P));
+  const cell = t => { const R = PASS_R[t], got = P.claimed.includes(t), ok = t <= tier, big = R.ex != null || t % 5 === 0;
+    const ico = R.ex != null ? itemIcon(ex[R.ex], 34) : R.token ? `<span class="cc-art mini" style="--c:${CRATES[R.token].col}"><i></i></span>` : R.gold ? GOLD_ICON : R.shards ? SHARD_ICO : R.xp ? '<b class="ps-xp">XP</b>' : '<b class="ps-cash">£</b>';
+    return `<li class="ps23-t${got ? ' got' : ok ? ' can' : ''}${big ? ' big' : ''}" data-t="${t}"><span class="ps-n">${t}</span><span class="ps-ico">${ico}</span><small>${esc(passRewardText(t, s))}</small>${ok && !got ? `<button class="btn primary sm" data-b="pass-claim" data-t="${t}">Claim</button>` : got ? '<em>✓</em>' : ''}</li>`; };
+  return `<section class="card22 ps23" style="--pc:${th.col}"><div class="c22-h"><div><span class="label">Garage Pass · free · season ${s + 1}</span><h3>${esc(th.name)}</h3></div><span class="muted sm">Ends in <span data-until="${passEndsAt(s)}">${durText(passEndsAt(s) - nowMs())}</span></span></div>
+    <div class="ps23-top"><div class="ps23-tier"><b>${tier >= PASS_TIERS ? 'MAX' : tier}</b><small>tier</small></div><div class="ps23-bar"><div class="gauge"><i style="width:${Math.round(into / need * 100)}%"></i></div><small>${into} / ${need} Pass XP${tier >= PASS_TIERS ? ' to the next bonus tier' : ` to tier ${tier + 1}`}</small></div>${can ? `<button class="btn primary" data-b="pass-all">Claim ${can}</button>` : ''}</div>
+    <div class="ps23-ex">${ex.map((id, i) => `<div class="rar-b-${ITEMS[id].rarity}">${itemIcon(id, 40)}<span><b>${esc(ITEMS[id].name)}</b><small>${rarTag(ITEMS[id].rarity)} · tier ${i ? 30 : 15}${S.inv.seen[id] ? ' · yours' : ''}</small></span></div>`).join('')}</div>
+    <ol class="ps23-track">${Array.from({ length: PASS_TIERS }, (_, i) => cell(i + 1)).join('')}<li class="ps23-t bonus${bonusN ? ' can' : ''}"><span class="ps-n">31+</span><span class="ps-ico">${GOLD_ICON}</span><small>Every ${PASS_BONUS} XP after that: 10 Gold Bolts + 25 shards</small>${bonusN ? `<button class="btn primary sm" data-b="pass-bonus">Claim ${bonusN}</button>` : ''}</li></ol>
+    <details class="ps23-how"><summary>How to earn Pass XP</summary><ul class="news"><li>Hand back a car: ${PASS_XP.job} (five stars: +${PASS_XP.five})</li><li>Hands-on job at 90% or more: ${PASS_XP.mini90} (otherwise ${PASS_XP.mini})</li><li>Claim a daily challenge: ${PASS_XP.chal} · log in: ${PASS_XP.login}</li><li>Call-outs ${PASS_XP.dispatch}, Fix-Off wins ${PASS_XP.fixoff}, profitable sales ${PASS_XP.sale}, the regulars ${PASS_XP.charjob}, containers ${PASS_XP.container}, posts ${PASS_XP.post}, crates ${PASS_XP.crate} each</li></ul></details></section>`;
+}
+act22('pass-claim', b => passClaim23(+b.dataset.t));
+act22('pass-all', () => passClaimAll23());
+act22('pass-bonus', () => passBonus23(false));
+ACH.push(
+  ['pass15', 'Season ticket', 'Reach tier 15 of a Garage Pass', () => S.pass && passTier(S.pass) >= 15, 500],
+  ['pass30', 'Top of the pass', 'Reach tier 30 of a Garage Pass', () => S.pass && passTier(S.pass) >= 30, 2000],
+);
+window.__passXP = n => { passXP23(n); render(); };
+window.__passSeason = () => ({ season: passSeasonNo(), ends: passEndsAt(passSeasonNo()) });
+
+/* ======================= build 23: the weekly garage league =======================
+   Ten garages, one week (Monday to Sunday). League points come from the work: every car handed back (more for more
+   stars), hands-on jobs at 90%+, call-outs, Fix-Off wins, challenges and combos. The other nine garages are made-up
+   rivals whose scores grow through the week at their own pace (worked out from the date, so they're the same
+   whenever you look). The top three go up a division, the bottom three go down. Higher divisions pay more and the
+   rivals there are quicker. */
+const LEAGUES = [
+  { name: 'Bronze', col: '#B5743A', pace: 50, gold: [40, 30, 20], tok: 'style' },
+  { name: 'Silver', col: '#9AA3A8', pace: 80, gold: [60, 45, 30], tok: 'style' },
+  { name: 'Gold', col: '#E2B33E', pace: 120, gold: [90, 65, 45], tok: 'power' },
+  { name: 'Platinum', col: '#6FC3C9', pace: 170, gold: [130, 95, 65], tok: 'power' },
+  { name: 'Diamond', col: '#7FA8FF', pace: 230, gold: [180, 130, 90], tok: 'legend' },
+  { name: 'Champion', col: '#E5386D', pace: 300, gold: [260, 190, 130], tok: 'legend' },
+];
+const LG_NAMES = ['Spanner & Sons', 'Torque of the Town', 'Grease Lightning Motors', 'The Dipstick Depot', 'Piston Broke Garage', 'Clutch City Autos', 'Nuts & Bolts Bros', 'Rev Counter Repairs', 'The Oily Rag', 'Big End Motors', 'Sump Thing Garage', 'Tread Carefully Tyres', 'Wheely Good Repairs', 'Gasket Case Autos', 'Fan Belt Fixers', 'Crank It Up', 'Exhaust Pipe Dreams', 'Choke & Throttle', 'Brake Even Motors', 'Valve & Verve', 'Cam & Cog', 'The Jump Lead', 'Bodge & Co.', 'Wing & a Prayer', 'Dampers Unlimited'];
+const LG_PTS = { job: 10, star: 2, mini90: 5, dispatch: 15, fixoff: 20, chal: 10, combo: 3 };
+const lgHash = s => { let h = 2166136261; for (const ch of String(s)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h; };
+const lgRand = (seed, i) => ((lgHash(seed + ':' + i) % 100000) / 100000);
+/* the week runs Monday 00:00 to Monday 00:00, local time */
+function lgWeekStart(t) { const d = new Date(t == null ? nowMs() : t); const day = (d.getDay() + 6) % 7; return new Date(d.getFullYear(), d.getMonth(), d.getDate() - day).getTime(); }
+const lgWeekEnd = ws => new Date(new Date(ws).getFullYear(), new Date(ws).getMonth(), new Date(ws).getDate() + 7).getTime();
+function lgRivals(L) {
+  const seed = L.week + ':' + L.div, used = new Set(), out = [];
+  for (let i = 0; out.length < 9; i++) { const n = LG_NAMES[lgHash(seed + 'n' + i) % LG_NAMES.length]; if (used.has(n)) continue; used.add(n); out.push({ name: n, pace: LEAGUES[L.div].pace * (0.5 + lgRand(seed, out.length) * 1.0), ph: lgRand(seed, 'p' + out.length) * 6.28, lazy: lgRand(seed, 'l' + out.length) }); }
+  return out;
+}
+/* a rival's score at a moment: steady through the week with bursts, never going down */
+function lgRivalPts(r, ws, t, from) {
+  const st = Math.max(ws, from || ws), d = Math.max(0, Math.min(7 - (st - ws) / 86400e3, (t - st) / 86400e3));
+  const u = d + 0.32 * Math.sin(d * 2.4 + r.ph) - 0.32 * Math.sin(r.ph);
+  return Math.max(0, Math.round(r.pace * u * (r.lazy < 0.15 ? 0.55 : 1)));
+}
+function league23() {
+  const ws = lgWeekStart();
+  if (!S.league) S.league = { week: ws, joined: nowMs(), div: 0, pts: 0, best: 0, result: null };
+  if (S.league.week !== ws) lgRollover23(ws);
+  return S.league;
+}
+function lgTable(L, t) {
+  const R = lgRivals(L).map(r => ({ name: r.name, pts: lgRivalPts(r, L.week, t == null ? nowMs() : t, L.joined), me: false }));
+  R.push({ name: 'Your garage', pts: L.pts, me: true });
+  return R.sort((a, b) => b.pts - a.pts || (a.me ? -1 : 1));
+}
+/* the week's over: where did you finish? */
+function lgRollover23(ws) {
+  const L = S.league;
+  if (L && L.week != null && L.week < ws) {
+    const end = lgWeekEnd(L.week), tab = lgTable(L, end), rank = tab.findIndex(x => x.me) + 1, D = LEAGUES[L.div];
+    const played = L.pts > 0;
+    let div = L.div, move = 0;
+    if (played && rank <= 3 && div < LEAGUES.length - 1) { div++; move = 1; }
+    else if ((!played || rank >= 8) && div > 0) { div--; move = -1; }
+    const gold = played && rank <= 3 ? D.gold[rank - 1] : played ? Math.max(5, Math.round(D.gold[2] / 4)) : 0;
+    const tok = played && rank === 1 ? D.tok : null;
+    const skipped = Math.floor((ws - end) / (7 * 86400e3));   /* weeks missed altogether: slide down one per week */
+    div = Math.max(0, div - Math.max(0, skipped));
+    S.league = { week: ws, div, pts: 0, best: Math.max(L.best || 0, L.pts), result: played || move ? { rank, div: L.div, newDiv: div, move, gold, tok, pts: L.pts, claimed: false } : null, wins: (L.wins || 0) + (played && rank === 1 ? 1 : 0), top: Math.max(L.top || 0, div) };
+    if (move > 0) S.stats.promoted = (S.stats.promoted || 0) + 1;
+  } else S.league = { week: ws, div: (L && L.div) || 0, pts: 0, best: (L && L.best) || 0, result: null };
+}
+function lgClaim23() {
+  const L = league23(), r = L.result; if (!r || r.claimed) return;
+  r.claimed = true;
+  if (r.gold) goldAdd(r.gold, null, true);
+  if (r.tok) { S.crates.tokens = S.crates.tokens || {}; S.crates.tokens[r.tok] = (S.crates.tokens[r.tok] || 0) + 1; }
+  save();
+  if (r.gold || r.tok) { Sfx.cash(); if (r.rank === 1) confetti(); toast(`League prize: +${r.gold} Gold Bolts${r.tok ? ` and a ${CRATES[r.tok].name}` : ''}.`); }
+  render();
+}
+function lgAdd23(n) {
+  if (!S || !n) return;
+  const L = league23(), before = lgTable(L).findIndex(x => x.me);
+  L.pts += Math.round(n * (perk23('league') ? 1.15 : 1));
+  const after = lgTable(L).findIndex(x => x.me);
+  if (after < before) { const D = LEAGUES[L.div]; setTimeout(() => toast(`League: up to ${ordinal(after + 1)} in ${D.name}${after < 3 && L.div < LEAGUES.length - 1 ? ' (promotion zone!)' : ''}.`), 1500); }
+}
+const ordinal = n => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
+hookOn('job', d => lgAdd23(LG_PTS.job + LG_PTS.star * (d.stars || 0)));
+hookOn('mini', d => { if (d.score >= 90) lgAdd23(LG_PTS.mini90); });
+hookOn('dispatch', d => { if (d.ok) lgAdd23(LG_PTS.dispatch); });
+hookOn('fixoff', d => { if (d.win) lgAdd23(LG_PTS.fixoff); });
+hookOn('chal', () => lgAdd23(LG_PTS.chal));
+hookOn('ensure', () => { try { league23(); } catch (e) { /* early */ } });
+function leagueHtml23() {
+  const L = league23(), D = LEAGUES[L.div], tab = lgTable(L), me = tab.findIndex(x => x.me) + 1, r = L.result;
+  const zone = i => (i < 3 && L.div < LEAGUES.length - 1 ? 'up' : i >= 7 && L.div > 0 ? 'down' : '');
+  return `<section class="card22 lg23" style="--lc:${D.col}"><div class="c22-h"><div><span class="label">Weekly league · ${L.div + 1} of ${LEAGUES.length}</span><h3>${D.name} league</h3></div><span class="muted sm">Ends in <span data-until="${lgWeekEnd(L.week)}">${durText(lgWeekEnd(L.week) - nowMs())}</span></span></div>
+    ${r && !r.claimed ? `<div class="lg23-res"><b>Last week: ${ordinal(r.rank)} in ${LEAGUES[r.div].name}</b><p>${r.move > 0 ? `Promoted to ${LEAGUES[r.newDiv].name}!` : r.move < 0 ? `Down to ${LEAGUES[r.newDiv].name}. Win it back.` : `Staying in ${LEAGUES[r.newDiv].name}.`} ${r.pts} points.</p><button class="btn primary" data-b="lg-claim">${r.gold || r.tok ? `Collect ${goldTxt(r.gold)}${r.tok ? ` + ${esc(CRATES[r.tok].name)}` : ''}` : 'OK'}</button></div>` : ''}
+    <div class="lg23-me"><div class="lg23-badge"><b>${ordinal(me)}</b><small>of 10</small></div><div><b>${L.pts} points</b><small class="muted">${me <= 3 ? (L.div < LEAGUES.length - 1 ? 'In the promotion zone. Hold on!' : 'Champion of the champions.') : `${tab[2].pts - L.pts + 1} more to reach the top three.`}</small></div></div>
+    <ol class="lg23-tab">${tab.map((x, i) => `<li class="${x.me ? 'me ' : ''}${zone(i)}"><span class="lg-r">${i + 1}</span><span class="lg-n">${esc(x.name)}</span><span class="lg-p">${x.pts}</span></li>`).join('')}</ol>
+    <p class="muted sm">Top three go up, bottom three go down. First place pays ${goldTxt(D.gold[0])} and a ${esc(CRATES[D.tok].name)}. Points: car handed back ${LG_PTS.job} + ${LG_PTS.star} a star, hands-on 90%+ ${LG_PTS.mini90}, call-out ${LG_PTS.dispatch}, Fix-Off win ${LG_PTS.fixoff}, challenge ${LG_PTS.chal}, combo ${LG_PTS.combo} a step.</p></section>`;
+}
+act22('lg-claim', () => lgClaim23());
+ACH.push(
+  ['promoted', 'Going up', 'Get promoted in the weekly league', () => (S.stats.promoted || 0) >= 1, 400],
+  ['champion', 'Champions', 'Reach the Champion league', () => S.league && (S.league.top || S.league.div) >= 5, 3000],
+);
+window.__lgAdd = n => { lgAdd23(n); render(); };
+window.__lgTable = () => lgTable(league23());
+
+/* ======================= build 23: the lucky wheel =======================
+   One free spin a day (two with the Master Mechanic set), and on Playgama one more for watching an ad. Eight prizes
+   from cash to a jackpot of a Legend crate and 50 Gold Bolts; the odds are printed under the wheel. The prize is
+   decided and paid the moment you spin, so closing the sheet early never loses it. */
+const WHEEL = [
+  { k: 'cash', m: 1, w: 22, col: '#3FA34D', label: 'Cash' },
+  { k: 'gold', n: 10, w: 18, col: '#E2B33E', label: '10 Gold' },
+  { k: 'shards', n: 30, w: 16, col: '#4FB8E8', label: '30 shards' },
+  { k: 'token', t: 'style', w: 12, col: '#2F7BD8', label: 'Style crate' },
+  { k: 'cash', m: 3, w: 10, col: '#2C7A4B', label: 'Big cash' },
+  { k: 'gold', n: 25, w: 10, col: '#F2A900', label: '25 Gold' },
+  { k: 'pass', n: 150, w: 10, col: '#9B4FD6', label: 'Pass XP' },
+  { k: 'jackpot', w: 2, col: '#E5386D', label: 'JACKPOT' },
+];
+const wheelCash = m => Math.round((150 + 30 * levelOf(S.xp)) * m / 50) * 50;
+function wheel23() {
+  const d = dayKey();
+  if (!S.wheel || S.wheel.day !== d) S.wheel = { day: d, used: 0, ad: false, last: S.wheel ? S.wheel.last : null, spins: S.wheel ? S.wheel.spins || 0 : 0 };
+  return S.wheel;
+}
+const wheelFree = () => (perk23('spin2') ? 2 : 1);
+const wheelLeft = () => Math.max(0, wheelFree() - wheel23().used);
+function wheelPrizeText(p) {
+  return p.k === 'cash' ? money(wheelCash(p.m)) : p.k === 'gold' ? `${p.n} Gold Bolts` : p.k === 'shards' ? `${p.n} shards` : p.k === 'token' ? `a ${CRATES[p.t].name}` : p.k === 'pass' ? `${p.n} Garage Pass XP` : `a Legend crate and 50 Gold Bolts`;
+}
+function wheelPay(i) {
+  const p = WHEEL[i];
+  if (p.k === 'cash') { S.money += wheelCash(p.m); rollCash(S.money); }
+  else if (p.k === 'gold') goldAdd(p.n, null, true);
+  else if (p.k === 'shards') crates23().shards += p.n;
+  else if (p.k === 'token') { S.crates.tokens = S.crates.tokens || {}; S.crates.tokens[p.t] = (S.crates.tokens[p.t] || 0) + 1; }
+  else if (p.k === 'pass') passXP23(p.n);
+  else { S.crates.tokens = S.crates.tokens || {}; S.crates.tokens.legend = (S.crates.tokens.legend || 0) + 1; goldAdd(50, null, true); S.stats.jackpots = (S.stats.jackpots || 0) + 1; }
+}
+function wheelRoll() { const tot = WHEEL.reduce((s, p) => s + p.w, 0); let x = Math.random() * tot; for (let i = 0; i < WHEEL.length; i++) { x -= WHEEL[i].w; if (x <= 0) return i; } return 0; }
+function wheelSvg() {
+  const R = 140, c = 150, seg = 360 / WHEEL.length;
+  const pt = (a, r) => [c + Math.sin(a * Math.PI / 180) * r, c - Math.cos(a * Math.PI / 180) * r];
+  return `<svg viewBox="0 0 300 300" aria-hidden="true">${WHEEL.map((p, i) => {
+    const a0 = i * seg - seg / 2, a1 = a0 + seg, [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), [tx, ty] = pt(i * seg, R * 0.62);
+    return `<path d="M${c} ${c}L${x0.toFixed(1)} ${y0.toFixed(1)}A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}Z" fill="${p.col}" stroke="#151A17" stroke-width="2"/>
+      <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" transform="rotate(${i * seg + (i * seg > 90 && i * seg < 270 ? 180 : 0)} ${tx.toFixed(1)} ${ty.toFixed(1)})" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-family="Barlow,sans-serif" font-weight="800" font-size="${p.k === 'jackpot' ? 15 : 14}">${esc(p.label)}</text>`;
+  }).join('')}<circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="#F2B705" stroke-width="6"/>${Array.from({ length: 16 }, (_, i) => { const [x, y] = pt(i * 22.5, R); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.2" fill="#FFF6D0"/>`; }).join('')}<circle cx="${c}" cy="${c}" r="26" fill="#1D2521" stroke="#F2B705" stroke-width="4"/><path d="M${c} ${c - 13}l4 9h9l-7 6 3 9-9-5-9 5 3-9-7-6h9z" fill="#F2B705"/></svg>`;
+}
+let WHEEL_ROT = 0;
+function wheelOpen23() {
+  const W = wheel23(), left = wheelLeft(), ad = !W.ad && adsOk();
+  const tot = WHEEL.reduce((s, p) => s + p.w, 0);
+  showModal(`<div><span class="label">Once a day</span><h2 class="sheet-title">Lucky wheel</h2></div>
+    <div class="wh23"><div class="wh23-ptr" aria-hidden="true"></div><div class="wh23-disc" style="transform:rotate(${WHEEL_ROT}deg)">${wheelSvg()}</div></div>
+    <p class="wh23-out" aria-live="polite">${left ? `${left} free spin${left > 1 ? 's' : ''} today.` : ad ? 'Free spin used. One more for watching a short ad?' : 'That’s today’s spins. Back tomorrow!'}</p>
+    <div class="row">${left ? '<button class="btn primary" data-b="wh-spin">Spin it</button>' : ad ? '<button class="btn primary" data-b="wh-ad">Watch an ad to spin</button>' : ''}<button class="btn" data-a="close-modal">Close</button></div>
+    <details><summary class="sm">The odds</summary><table class="odds"><tbody>${WHEEL.map(p => `<tr><td>${esc(wheelPrizeText(p))}</td><td class="n">${(p.w / tot * 100).toFixed(0)}%</td></tr>`).join('')}</tbody></table></details>`);
+}
+function wheelSpin23(how) {
+  const W = wheel23();
+  if (how === 'ad') { if (W.ad) return; W.ad = true; } else { if (wheelLeft() < 1) return; W.used++; }
+  const i = wheelRoll(); W.last = i; W.spins = (W.spins || 0) + 1; S.stats.spins = (S.stats.spins || 0) + 1;
+  wheelPay(i); save(); hookFire('spin', { i });
+  const seg = 360 / WHEEL.length, jit = (Math.random() - 0.5) * seg * 0.6;
+  const target = WHEEL_ROT - (WHEEL_ROT % 360) + 360 * 6 + (360 - i * seg) + jit;
+  WHEEL_ROT = target;
+  const disc = document.querySelector('#sheet .wh23-disc'), out = document.querySelector('#sheet .wh23-out');
+  document.querySelectorAll('#sheet [data-b="wh-spin"],#sheet [data-b="wh-ad"]').forEach(b => { b.disabled = true; });
+  const done = () => {
+    const p = WHEEL[i];
+    if (out) out.innerHTML = `<b>${p.k === 'jackpot' ? 'JACKPOT! ' : ''}You won ${esc(wheelPrizeText(p))}.</b>`;
+    if (p.k === 'jackpot') { confetti(); Sfx.perfect(); } else Sfx.cash();
+    buzz(p.k === 'jackpot' ? [40, 30, 80] : 30);
+    const left = wheelLeft(), ad = !W.ad && adsOk(), row = document.querySelector('#sheet .row');
+    if (row) row.innerHTML = `${left ? '<button class="btn primary" data-b="wh-spin">Spin again</button>' : ad ? '<button class="btn primary" data-b="wh-ad">Watch an ad to spin again</button>' : ''}<button class="btn${left || ad ? '' : ' primary'}" data-a="close-modal">Lovely</button>`;
+    try { badges22(); } catch (e) { /* fine */ }
+  };
+  if (!disc || reduced) { if (disc) disc.style.transform = `rotate(${target}deg)`; done(); return; }
+  Sfx.pop();
+  disc.style.transition = 'transform 4.2s cubic-bezier(.12,.66,.08,1)';
+  requestAnimationFrame(() => { disc.style.transform = `rotate(${target}deg)`; });
+  let fired = false; const fin = () => { if (fired) return; fired = true; done(); };
+  disc.addEventListener('transitionend', fin, { once: true }); setTimeout(fin, 4500);
+}
+function wheelHtml23() {
+  const W = wheel23(), left = wheelLeft(), ad = !W.ad && adsOk();
+  return `<section class="card22 whc23${left ? ' on' : ''}"><div class="whc23-art" aria-hidden="true">${wheelSvg()}</div><div><span class="label">Lucky wheel</span><b>${left ? `${left} free spin${left > 1 ? 's' : ''} waiting` : 'Spun today'}</b><p class="muted sm">${left ? 'Cash, Gold Bolts, crates, shards, Pass XP, or the jackpot.' : W.last != null ? `You won ${esc(wheelPrizeText(WHEEL[W.last]))}. ` : ''}${left ? '' : `Next free spin in <span data-until="${nowMs() + msLeftToday()}">${durText(msLeftToday())}</span>.`}</p></div><button class="btn${left ? ' primary' : ''}" data-b="wh-open">${left ? 'Spin' : ad ? 'Ad spin' : 'Look'}</button></section>`;
+}
+act22('wh-open', () => wheelOpen23());
+act22('wh-spin', () => wheelSpin23('free'));
+act22('wh-ad', () => { const W = wheel23(); if (W.ad || !adsOk()) return; adsShow('wheel').then(ok => { if (ok) wheelSpin23('ad'); else toast('The ad didn’t finish, so no spin this time.'); }); });
+ACH.push(['jackpot', 'Jackpot!', 'Hit the jackpot on the lucky wheel', () => (S.stats.jackpots || 0) >= 1, 1000]);
+window.__wheelSpin = i => { const W = wheel23(); W.used = Math.max(0, W.used - 1); if (i != null) { const r = wheelRoll; wheelRoll = () => i; wheelSpin23('free'); wheelRoll = r; } else wheelSpin23('free'); };
+
+/* ======================= build 23: collection sets =======================
+   Groups of items to hunt down. Find every item in a set (finding it once is enough, even if you fit it to a car
+   later) and claim it for Gold Bolts and a bonus that lasts for good: more shards, cheaper crates, a second wheel
+   spin, a quicker free crate, extra pay, and so on. Lives in Collection, next to Items. */
+const SETS = [
+  { id: 'cham', name: 'Colour Shifters', items: ['p_cham_violet', 'p_cham_copper', 'p_cham_mid', 'p_pearl'], gold: 40, perk: 'shards', perkText: '15% more shards from every crate' },
+  { id: 'wraps', name: 'Wrapped Up', items: ['w_carbon', 'w_camo', 'w_tiger'], gold: 30, perk: 'gold5', perkText: '+1 Gold Bolt for every five-star job' },
+  { id: 'elem', name: 'The Elements', items: ['w_neon', 'w_lava', 'w_lightning', 'w_galaxy'], gold: 120, perk: 'pass', perkText: '15% more Garage Pass XP' },
+  { id: 'chrome', name: 'Mirror Finish', items: ['p_chrome', 'p_goldchrome', 'r_spinner'], gold: 150, perk: 'crate5', perkText: '5% off every crate' },
+  { id: 'rims', name: 'Wheel Deal', items: ['r_dish', 'r_aero', 'r_wire', 'r_forged', 'r_neon', 'r_carbon'], gold: 60, perk: 'jobcash', perkText: '+£40 on every car you hand back' },
+  { id: 'tyres', name: 'Sidewall Stories', items: ['tz_letters', 'tz_gold', 'tz_neon', 'tz_flame', 'tz_rainbow'], gold: 120, perk: 'league', perkText: '15% more league points' },
+  { id: 'boost', name: 'Full Boost', items: ['tb_t25', 'tb_35', 'tb_hurricane', 'tb_typhoon', 'tb_billet'], gold: 80, perk: 'chal2', perkText: '+3 Gold Bolts for every daily challenge' },
+  { id: 'wings', name: 'Downforce', items: ['sp_lip', 'sp_duck', 'sp_gt', 'sp_swan', 'sp_dragon'], gold: 80, perk: 'combo2', perkText: 'Double cash from hands-on combos' },
+  { id: 'engines', name: 'The Engine Room', items: ['e_flat6', 'e_v6tt', 'e_rotary', 'e_v8tt', 'e_v10', 'e_v12', 'e_ev'], gold: 200, perk: 'free3', perkText: 'A free crate every three hours instead of four' },
+  { id: 'tools', name: 'Master Mechanic', items: ['tl_chrome_ratchet', 'tl_steel_hammer', 'tl_click_torque', 'tl_pro_gun', 'tl_thunder', 'tl_gold_torque'], gold: 100, perk: 'spin2', perkText: 'A second free spin on the lucky wheel every day' },
+  { id: 'myth', name: 'Myth Hunter', items: ['w_galaxy', 'p_goldchrome', 'r_plasma', 'tz_rainbow', 'sp_hover', 'tb_quantum', 'e_w16', 'tl_plasma_impact', 'tl_omni'], gold: 1000, perk: 'mythic', perkText: '50% more shards from everything, for good' },
+].filter(s => s.items.every(id => ITEMS[id]));
+SUBS.collection.splice(2, 0, ['sets', 'Sets']);
+function perk23(k) { try { return !!(S && S.sets && S.sets.done && SETS.some(s => s.perk === k && S.sets.done[s.id])); } catch (e) { return false; } }
+function sets23() { if (!S.sets) S.sets = { done: {} }; if (!S.sets.done) S.sets.done = {}; return S.sets; }
+const setFound = s => s.items.filter(id => S.inv.seen[id]).length;
+const setReady = s => setFound(s) === s.items.length && !sets23().done[s.id];
+const setsReady23 = () => SETS.filter(setReady).length;
+function setClaim23(id) {
+  const s = SETS.find(x => x.id === id); if (!s || !setReady(s)) return;
+  sets23().done[s.id] = S.day; goldAdd(s.gold, null, true); save();
+  confetti(); Sfx.perfect();
+  showModal(`<div class="got22"><span class="label">Set complete</span><h2 class="sheet-title">${esc(s.name)}</h2><div class="set23-icons">${s.items.map(i => itemIcon(i, 40)).join('')}</div><p><b>+${s.gold} Gold Bolts</b>, and from now on: <b>${esc(s.perkText)}</b>.</p></div><button class="btn primary wide" data-a="close-modal">Brilliant</button>`);
+  hookFire('set', { id }); render();
+}
+function setsHtml23() {
+  const done = SETS.filter(s => sets23().done[s.id]).length;
+  return `<div class="coll-h"><div><b>${done} of ${SETS.length}</b> sets complete <span class="bar22 wide"><i style="width:${Math.round(done / SETS.length * 100)}%"></i></span></div><button class="btn sm" data-b="goto" data-v="daily" data-s="crates">Get more</button></div>
+    <p class="muted sm">Find every item in a set once (fitting it to a car later doesn’t matter) and claim it for Gold Bolts and a bonus that lasts for good.</p>
+    <ul class="sets23">${SETS.map(s => { const f = setFound(s), got = sets23().done[s.id], ready = setReady(s);
+      return `<li class="set23${got ? ' got' : ready ? ' ready' : ''}"><div class="set23-h"><b>${esc(s.name)}</b><span>${got ? '✓ Complete' : `${f} / ${s.items.length}`}</span></div>
+        <div class="set23-icons">${s.items.map(id => S.inv.seen[id] ? `<span class="rar-b-${ITEMS[id].rarity}" title="${esc(ITEMS[id].name)}">${itemIcon(id, 34)}</span>` : `<span class="lock rar-b-${ITEMS[id].rarity}" title="${RAR[ITEMS[id].rarity].name}">?</span>`).join('')}</div>
+        <div class="gauge" aria-hidden="true"><i class="good" style="width:${Math.round(f / s.items.length * 100)}%"></i></div>
+        <p class="sm"><b>Bonus:</b> ${esc(s.perkText)} · <b>${s.gold}</b> Gold Bolts</p>${ready ? `<button class="btn primary sm" data-b="set-claim" data-id="${s.id}">Claim the set</button>` : ''}</li>`; }).join('')}</ul>`;
+}
+act22('set-claim', b => setClaim23(b.dataset.id));
+/* the bonuses that live outside the crates, pass, league and wheel code */
+hookOn('job', d => {
+  if (perk23('gold5') && d.stars === 5) goldAdd(1, null, true);
+  if (perk23('jobcash')) { S.money += 40; S.stats.earned = (S.stats.earned || 0) + 40; try { popFrom('#h-cash', '+' + money(40)); } catch (e) { /* fine */ } }
+});
+hookOn('chal', () => { if (perk23('chal2')) goldAdd(3, null, true); });
+hookOn('item', d => { if (d.first) { const s = SETS.find(x => x.items.includes(d.id) && setReady(x)); if (s) setTimeout(() => toast(`Set complete: ${s.name}! Claim it in Collection → Sets.`), 2400); } });
+const crateFreeMs23 = () => (perk23('free3') ? 3 : 4) * 3600e3;
+ACH.push(
+  ['set1', 'Set collector', 'Complete a collection set', () => S.sets && Object.keys(S.sets.done || {}).length >= 1, 500],
+  ['set5', 'Completionist', 'Complete five collection sets', () => S.sets && Object.keys(S.sets.done || {}).length >= 5, 2500],
+);
+
+/* ======================= build 23: hands-on combos =======================
+   Score 90% or more on hands-on jobs one after another and the combo climbs: ×2, ×3, ×4... Every step pays a bit
+   of cash (more the higher it goes), every fifth step pays Gold Bolts and shards, ten in a row pays a crate. Anything
+   under 90% breaks it. Your best combo is kept. */
+function combo23() { if (!S.combo) S.combo = { n: 0, best: 0 }; return S.combo; }
+const comboCash = n => 25 * n * (perk23('combo2') ? 2 : 1);
+function comboFlash23(n, broke) {
+  let el = document.getElementById('cb23');
+  if (!el) { el = document.createElement('div'); el.id = 'cb23'; el.className = 'cb23'; el.setAttribute('aria-hidden', 'true'); document.body.appendChild(el); }
+  el.className = 'cb23' + (broke ? ' broke' : '') + (n >= 10 ? ' hot' : n >= 5 ? ' warm' : '');
+  el.innerHTML = broke ? `<small>Combo over</small><b>×${n}</b>` : `<small>Combo</small><b>×${n}</b><em>+${money(comboCash(n))}</em>`;
+  void el.offsetWidth; el.classList.add('on');
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), broke ? 1500 : 1900);
+}
+hookOn('mini', d => {
+  const C = combo23();
+  if (d.score >= 90) {
+    C.n++; C.best = Math.max(C.best, C.n); S.stats.comboBest = Math.max(S.stats.comboBest || 0, C.n);
+    if (C.n < 2) return;
+    const cash = comboCash(C.n); S.money += cash; S.stats.earned = (S.stats.earned || 0) + cash;
+    lgAdd23(LG_PTS.combo * C.n);
+    const extra = [];
+    if (C.n % 5 === 0) { goldAdd(5, null, true); crates23().shards += 20; extra.push('+5 Gold Bolts', '+20 shards'); }
+    if (C.n === 10) { S.crates.tokens = S.crates.tokens || {}; S.crates.tokens.power = (S.crates.tokens.power || 0) + 1; extra.push('a Performance crate'); }
+    setTimeout(() => { comboFlash23(C.n); if (C.n >= 5) Sfx.good(); if (extra.length) toast(`Combo ×${C.n}! ${extra.join(', ')}.`); }, 650);
+  } else {
+    if (C.n >= 3) { const was = C.n; setTimeout(() => comboFlash23(was, true), 650); }
+    C.n = 0;
+  }
+});
+function comboHtml23() {
+  const C = combo23(), nx = C.n < 5 ? 5 : C.n < 10 ? 10 : Math.ceil((C.n + 1) / 5) * 5;
+  return `<section class="card22 cbc23${C.n >= 2 ? ' on' : ''}"><div class="cbc23-n"><b>×${Math.max(1, C.n)}</b><small>combo</small></div><div><span class="label">Hands-on combo</span><b>${C.n >= 2 ? `On a roll: ${C.n} in a row at 90%+` : 'Score 90% or more on hands-on jobs in a row'}</b><p class="muted sm">Each step pays ${money(comboCash(Math.max(2, C.n + 1)))}${C.n >= 1 ? ' next' : ' from the second'}. Every fifth: Gold Bolts and shards. Ten in a row: a Performance crate. ${C.n ? `${nx - C.n} more to ×${nx}.` : ''} Best ever: ×${C.best || 0}.</p></div></section>`;
+}
+ACH.push(
+  ['combo5', 'In the zone', 'Reach a ×5 hands-on combo', () => (S.stats.comboBest || 0) >= 5, 500],
+  ['combo10', 'Untouchable', 'Reach a ×10 hands-on combo', () => (S.stats.comboBest || 0) >= 10, 1500],
+);
+window.__combo = () => combo23();
+
+/* ======================= build 23: the Daily page, in sections =======================
+   Today (login, the lucky wheel, the combo, deliveries, challenges, the weekly event), Crates, the Garage Pass and the
+   weekly league, each with its own count on the chip. */
+SUBS.daily = [['today', 'Today'], ['crates', 'Crates'], ['pass', 'Pass'], ['league', 'League']];
+function dailyCounts23() {
+  const today = (loginReady() ? 1 : 0) + (S.daily && S.daily.key === dayKey() ? S.daily.list.filter(c => c.done && !c.claimed).length : 0)
+    + (S.ev && S.ev.week === weekKey() ? EV_MILES.filter(([need], i) => S.ev.pts >= need && !S.ev.claimed.includes(i)).length : 0)
+    + (S.timers || []).filter(t => t.ready).length + wheelLeft();
+  crateFreeTick();
+  const crates = (S.crates.free || 0) + Object.values(S.crates.tokens || {}).reduce((a, b) => a + b, 0) + (dealToday23().used ? 0 : 0);
+  const L = league23();
+  return { today, crates, pass: passClaimable(pass23()), league: L.result && !L.result.claimed ? 1 : 0 };
+}
+function renderDaily22() {
+  let h = `<header class="ph ph23"><span class="label">Come back every day</span><h1>Daily</h1></header>`;
+  h += `<div class="goldbar gb23"><span class="gb-big">${goldTxt(S.gold || 0)}<small>Gold Bolts</small></span><span class="gb-sh">${shardTxt(crates23().shards)}<small>shards</small></span><button class="btn sm ghost" data-b="goldhow" aria-label="How to earn Gold Bolts">How to earn</button></div>`;
+  h += subTabsHtml('daily', dailyCounts23());
+  h += `<div data-sub="today">${loginHtml()}${wheelHtml23()}${comboHtml23()}${timersHtml22()}${chalHtml()}${evHtml()}</div>`;
+  h += `<div data-sub="crates">${cratesHtml()}</div>`;
+  h += `<div data-sub="pass">${passHtml23()}</div>`;
+  h += `<div data-sub="league">${leagueHtml23()}</div>`;
+  h += `<p class="build">Bonnet Up · build ${BUILD}</p>`;
+  $('#view-daily').innerHTML = h;
+  applySubs('daily');
+}
+function dailyCount22() {
+  const c = dailyCounts23(); return c.today + c.crates + c.pass + c.league;
+}
+/* the old "How to earn" list, with the new ways in it */
+act22('goldhow', () => showModal(`<div><span class="label">Gold Bolts</span><h2 class="sheet-title">How to earn them</h2></div><ul class="news">
+  <li><b>Log in every day.</b> 5 to 30 a day, more the longer your streak.</li><li><b>Daily challenges.</b> 10 to 15 each, and 20 more for doing all three.</li>
+  <li><b>The lucky wheel.</b> A free spin every day.</li><li><b>The Garage Pass.</b> Tiers pay Gold Bolts, crates and shards; it’s free.</li>
+  <li><b>The weekly league.</b> Finish in the top three for a prize.</li><li><b>The weekly event.</b> Milestones pay Gold Bolts, crates and an exclusive prize.</li>
+  <li><b>Levelling up</b> pays Gold Bolts, and so do achievements, collection sets and hands-on combos.</li>
+  <li><b>Fix-Offs, call-outs and the showroom</b> sometimes pay in Gold Bolts.</li>${adsOk() ? '<li><b>Watch a short ad</b> to skip a timer, double your login reward or spin the wheel again.</li>' : ''}</ul>
+  <p class="muted sm">Spend them on crates, or to skip a timer. You can’t buy them with real money.</p><button class="btn primary wide" data-a="close-modal">Got it</button>`));
+
+/* build 23: things on screen that shouldn't overlap */
+const HUD23 = { t: 0, r: [], c: null };
+function hudHit23(canvas, px, py, flip) {
+  const now = performance.now();
+  if (now - HUD23.t > 300 || HUD23.c !== canvas) {
+    HUD23.t = now; HUD23.c = canvas; const cr = canvas.getBoundingClientRect();
+    const stg = canvas.closest('.stage') || document;
+    HUD23.r = [...document.querySelectorAll('.ov-top > *, .ov-bottom > *'), ...stg.querySelectorAll('.nav > *, .nav-row > *')].filter(e => e.offsetParent && !e.closest('[hidden]')).map(e => { const b = e.getBoundingClientRect(); return [b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]; });
+  }
+  const hit = (l, t, r, b) => HUD23.r.some(q => l < q[2] && r > q[0] && t < q[3] && b > q[1]);
+  const LW = 118, right = () => hit(px + 19, py - 12, px + 19 + LW, py + 12), left = () => hit(px - 19 - LW, py - 12, px - 19, py + 12);
+  const edge = px < 13 || px > canvas.clientWidth - 13 || py < 13 || py > canvas.clientHeight - 13;
+  return { dot: edge || hit(px - 11, py - 11, px + 11, py + 11), lab: flip ? left() : right(), other: flip ? right() : left() };
+}
+/* build 23: test hooks */
+window.__zoom = f => { if (Car3D.ok && Car3D.zoom) Car3D.zoom(f); };
+window.__liftTo = h => { const j = cur(); if (j) { j.lift = h; render(); } };
+window.__hook = (e, d) => hookFire(e, d || {});
+window.__perk = k => perk23(k);
+
+/* build 23: what's new, once, for players coming back */
+function showWhatsNew23() {
+  goldAdd(40, null, true); try { crates23().shards += 50; } catch (e) { /* fine */ } save();
+  showModal(`<div><span class="label">Build 23</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Skip time.</b> The ⏩ button by the clock jumps to the next customer, until a mechanic’s finished, an hour or two ahead, or closing time. It stops early when someone walks in.</li>
+      <li><b>Mechanics who follow the lift.</b> Your staff crouch at the wheels with the car on the ground, stand and reach as it goes up, and work overhead once it’s right up.</li>
+      <li><b>More crates.</b> Paint & Wrap, Wheel & Tyre, Engine and the Mythic vault. Open five or ten at once for less, open every free crate in one go, or switch on quick open.</li>
+      <li><b>The workbench.</b> Every item gives shards. Spend them on exactly the thing you want, or scrap your spares.</li>
+      <li><b>The Garage Pass.</b> Free, thirty tiers a season, with two items you can’t get anywhere else.</li>
+      <li><b>The weekly league.</b> Ten garages, top three go up, bottom three go down. Bronze to Champion.</li>
+      <li><b>Lucky wheel, sets and combos.</b> A free spin every day, collection sets with bonuses that last for good, and combos for hands-on jobs at 90% or more.</li>
+      <li><b>Tidier.</b> Bay chips that don’t squash, labels that keep out from under the job card, a clock that fits on small phones, and Daily in sections.</li>
+    </ul>
+    <p class="muted">Here are 40 Gold Bolts and 50 shards to try it out.</p>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -21043,7 +22102,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
   if (S.over) showDaySummary({ day: S.day - 1, jobs: 0, earned: 0, rent: rentNow() });
