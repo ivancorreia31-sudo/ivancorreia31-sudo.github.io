@@ -2447,7 +2447,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5323,11 +5323,13 @@ const Car3D = (() => {
   setTimeout(() => envFromJpeg(typeof ENV_JPG !== 'undefined' ? ENV_JPG.park : null, t => { if (!t) return; ENVS.out = t; try { if (dW) { dW.scene.environment = t; } } catch (e) { /* the road isn't built yet */ } }), 1800);
   /* ---- build 20: car bodies with curved panels. The flat sides swell between the sill and the shoulder, the corners round
      off in plan, and the bonnet, roof, boot and screens crown in the middle the way pressed steel and glass do ---- */
-  const sideF = (x, y, rear, van) => {
+  const sideF = (x, y, rear, van, rx) => {
     const cx = (2.15 + rear) / 2, halfL = (2.15 - rear) / 2, t = Math.min(1, Math.abs(x - cx) / halfL);
-    let f = 1 - 0.15 * Math.pow(t, 4.2);
+    let f = 1 - 0.19 * Math.pow(t, 4.0);
     const u = (y - 0.28) / 0.66;
-    if (u > 0 && u < 1) f *= 1 + 0.03 * Math.sin(PI * u) * (1 - 0.7 * Math.pow(t, 3));
+    if (u > 0 && u < 1) f *= 1 + 0.04 * Math.sin(PI * u) * (1 - 0.7 * Math.pow(t, 3));
+    /* build 24: the wings swell over the wheels */
+    if (y < 0.98) { const ra = rx == null ? rear + 0.76 : rx, wy = y < 0.62 ? 0.75 + 0.25 * (y - 0.3) / 0.32 : Math.max(0, 1 - (y - 0.62) / 0.36), d1 = (x - 1.35) / 0.5, d2 = (x - ra) / 0.5; f *= 1 + 0.045 * wy * (Math.exp(-d1 * d1) + Math.exp(-d2 * d2)); }
     if (y > 0.72) f *= 1 - 0.06 * Math.min(1, (y - 0.72) / 0.3);
     if (y > 0.95) f *= 1 - (van ? 0.04 : 0.12) * Math.min(1, (y - 0.95) / 0.55);
     return f;
@@ -5447,7 +5449,7 @@ const Car3D = (() => {
     return g;
   }
   /* rounds the body in plan view, swells the sides and tucks them in towards the roof */
-  const bodyF = (x, y) => sideF(x, y, sty.rear, sty.van);
+  const bodyF = (x, y) => sideF(x, y, sty.rear, sty.van, sty.rx);
   /* how much of the crown a car's top surfaces take: none where the glass sits on the waist (or, on the ramp car, round
      the open engine bay), fading in over the bonnet and the boot */
   const cabinW = (s, bay) => {
@@ -5473,8 +5475,230 @@ const Car3D = (() => {
     }
     g.setAttribute('normal', new T.BufferAttribute(out, 3));
   }
+  /* ======================= build 24: car bodies as smooth lofted skins =======================
+     Until now a body was its side profile extruded straight across the car: slab sides, a flat wedge of a bonnet and a
+     block of glass on top. Now each body is lofted from cross-sections along its length. Every section has a crowned
+     roof or deck, a rounded roof edge, side glass that leans in towards the roof, a rounded shoulder, a barrelled flank
+     with flared wheel arches, a sill and a floor. The side profile's corners are rounded, the nose and tail close in a
+     soft ellipse and sweep back at the corners in plan. Glass, pillars, roof, wheel housings and the bonnet lid are all
+     cut from the same surface, so they meet exactly. One generator serves the workshop car (fine mesh, opening bonnet,
+     open engine bay) and the lighter cars in traffic, the yard, the showroom and the side bays (coarser mesh). */
+  const bow24 = (x, z, rear, rx, van) => {
+    const q = Math.pow(Math.min(1.15, Math.abs(z) / 0.9), 2.1); let d = 0;
+    if (x > 1.75) { const t = Math.min(1, (x - 1.75) / 0.42); d -= 0.20 * q * t * t * (3 - 2 * t); }
+    const rb = Math.min(rear + 0.5, rx - 0.42), tip = rear - 0.05;
+    if (x < rb) { const t = Math.min(1, (rb - x) / Math.max(0.05, rb - tip)); d += (van ? 0.05 : 0.13) * q * t * t * (3 - 2 * t); }
+    return d;
+  };
+  /* a polyline with its corners rounded off (x stays increasing) */
+  const chainRound = (pts, d, n) => {
+    const out = [pts[0].slice()];
+    for (let i = 1; i < pts.length - 1; i++) {
+      const A = pts[i - 1], V = pts[i], B = pts[i + 1];
+      const la = Math.hypot(V[0] - A[0], V[1] - A[1]) || 1e-6, lb = Math.hypot(B[0] - V[0], B[1] - V[1]) || 1e-6;
+      const ta = Math.min(d / la, 0.5), tb = Math.min(d / lb, 0.5);
+      const P0 = [V[0] + (A[0] - V[0]) * ta, V[1] + (A[1] - V[1]) * ta], P1 = [V[0] + (B[0] - V[0]) * tb, V[1] + (B[1] - V[1]) * tb];
+      for (let k = 0; k <= n; k++) { const t = k / n, a = (1 - t) * (1 - t), b = 2 * t * (1 - t), c = t * t; out.push([a * P0[0] + b * V[0] + c * P1[0], a * P0[1] + b * V[1] + c * P1[1]]); }
+    }
+    out.push(pts[pts.length - 1].slice());
+    return out;
+  };
+  const chainY = (ch, x) => {
+    const n = ch.length; if (x <= ch[0][0]) return ch[0][1]; if (x >= ch[n - 1][0]) return ch[n - 1][1];
+    let lo = 0, hi = n - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (ch[m][0] <= x) lo = m; else hi = m; }
+    const a = ch[lo], b = ch[hi]; return a[1] + (b[1] - a[1]) * (x - a[0]) / Math.max(1e-9, b[0] - a[0]);
+  };
+  let SK24 = null;
+  function skin24(s, o) {
+    o = o || {};
+    const lod = o.lod ? 1 : 0, R = s.rear, rx = s.rx, van = !!s.van, bay = !!o.bay, RA = 0.385;
+    const SF = (x, y) => sideF(x, y, R, van, rx);
+    /* the deck line: boot, waist under the cabin, bonnet */
+    const U = [[0.80, 0.93]].concat(s.upper);
+    let xmin = Infinity; for (const p of U) xmin = Math.min(xmin, p[0]);
+    let ti = U.findIndex((p, i) => i > 0 && p[0] <= xmin + 0.035); if (ti < 1) ti = U.length - 1;
+    const tipR = xmin - 0.04, eR = van ? 0.05 : 0.08, tipF = 2.17, eF = 0.10, x0R = tipR + eR, x0F = tipF - eF;
+    const dp = []; for (let i = ti; i >= 1; i--) dp.push([U[i][0], U[i][1] + 0.04]);
+    for (let i = 1; i < dp.length; i++) if (dp[i][0] <= dp[i - 1][0] + 0.002) dp[i][0] = dp[i - 1][0] + 0.002;
+    dp.push([0.80, 0.968], [1.40, 0.926], [1.96, 0.855], [2.07, 0.795], [2.20, 0.74]);
+    const deck = chainRound(dp, 0.14, lod ? 4 : 7), dY = x => chainY(deck, x);
+    /* the cabin line: rear screen, roof, windscreen (or a van's box) */
+    let cab = null, gxF = 0, gxR = 0, xWs = 0, xRr = 0;
+    if (!s.open) {
+      const G = van ? s.box : s.glass, n = G.length, lift = van ? 0.035 : 0.048;
+      gxR = G[n - 1][0] - 0.02; gxF = G[0][0] + 0.02; xWs = G[1][0]; xRr = G[n - 2][0];
+      const cp = [[gxR, dY(gxR)]]; for (let i = n - 2; i >= 1; i--) cp.push([G[i][0], G[i][1] + lift]); cp.push([gxF, dY(gxF)]);
+      cab = chainRound(cp, van ? 0.10 : 0.21, lod ? 4 : 8);
+    }
+    const cabTop = x => { let y = chainY(cab, x); if (!van && x > xRr && x < xWs) { const u = (x - xRr) / (xWs - xRr); y += 0.016 * 4 * u * (1 - u); } return y; };
+    const hgOf = x => (cab && x > gxR && x < gxF ? Math.max(0, cabTop(x) - dY(x)) : 0);
+    const bands = (s.pillars || []).filter(p => Math.abs(p[0] - p[2]) < 0.05).map(p => p[0]);
+    const archY = x => { let y = 0.30; for (const ax of [1.35, rx]) { const d = x - ax; if (Math.abs(d) < RA) y = Math.max(y, 0.30 + Math.sqrt(RA * RA - d * d)); } return y; };
+    /* stations along the car: even steps along the top line, plus the places that must be exact */
+    const must = [], auto = [];
+    { const ds = lod ? 0.15 : 0.075; let px = x0R, py = dY(px) + hgOf(px), acc = 0;
+      for (let x = x0R + 0.004; x < x0F; x += 0.004) { const y = dY(x) + hgOf(x); acc += Math.hypot(x - px, y - py); px = x; py = y; if (acc >= ds) { auto.push(x); acc = 0; } } }
+    must.push(x0R, x0F, 1.75);
+    const nc = lod ? 3 : 5; for (let k = 1; k <= nc; k++) { const u = Math.sin(k / nc * PI / 2); must.push(x0R - eR * u, x0F + eF * u); }
+    const na = lod ? 7 : 12; for (const ax of [1.35, rx]) for (let k = 0; k <= na; k++) must.push(ax + RA * Math.cos(PI * k / na));
+    if (cab) { must.push(gxF - 0.06, gxR + 0.06, van ? xWs + 0.02 : xWs - 0.02); if (!van) must.push(xRr + 0.02); for (const b of bands) must.push(b - 0.04, b + 0.04); if (van) must.push(-0.25, 0.72); if (s.blankRear) must.push(-0.40); }
+    if (bay) must.push(0.80, 0.83, 2.03, 2.045);
+    const xs = must.concat(auto.filter(a => must.every(m => Math.abs(m - a) > 0.014))).sort((a, b) => a - b).filter((x, i, arr) => i === 0 || x - arr[i - 1] > 1e-4);
+    /* one half cross-section: roof or deck, roof edge, side glass, shelf, shoulder, flank, sill, wheel housing, floor */
+    const fa = lod ? [0, 0.34, 0.68, 0.94, 1] : [0, 0.06, 0.24, 0.42, 0.6, 0.78, 0.94, 1];
+    const fc = lod ? [0, 0.07, 0.55, 1] : [0, 0.07, 0.3, 0.53, 0.77, 1];
+    const nA = fa.length, nB = lod ? 2 : 4, nC = fc.length - 1, nS = lod ? 3 : 5, nE = lod ? 4 : 8;
+    const iB = nA, iC = iB + nB, iSh = iC + nC, iS = iSh + 1, iE = iS + nS, iL = iE + nE, iG = iL + 1, iH = iG + 1, iI = iH + 1, N = iI + 1;
+    const rs = van ? 0.035 : 0.085, rsz = van ? 0.03 : 0.07, shelf = van ? 0 : 0.012, tumble = van ? 0.10 : 0.42, crown = 0.034;
+    const sect = x => {
+      const yd = dY(x), h = hgOf(x), ysh = yd - rs, zsT = 0.9 * SF(x, ysh), ze = zsT - rsz, zb = ze - shelf;
+      const dk = z => yd + crown * Math.max(0, 1 - (z / ze) * (z / ze));
+      const P = new Array(N);
+      if (h > 0.004) {
+        const re = Math.min(0.075, h * 0.45), rez = re * 0.9, rc = Math.min(0.03, h * 0.2), ytop = yd + h;
+        const zg1 = zb - tumble * h, zt = Math.max(0.06, zg1 - rez - 0.34 * zb * (1 - Math.min(1, h / 0.15)));
+        for (let k = 0; k < nA; k++) P[k] = [zt * fa[k], ytop - rc * fa[k] * fa[k]];
+        const yc = ytop - rc - re;
+        for (let k = 1; k <= nB; k++) { const a = k / nB * PI / 2; P[iB + k - 1] = [zt + rez * Math.sin(a), yc + re * Math.cos(a)]; }
+        const zB = zt + rez, yb = dk(zb);
+        for (let m = 0; m < nC; m++) { const u = fc[nC - 1 - m]; P[iC + m] = [zb - (zb - zB) * Math.pow(u, 1.25), yb + (yc - yb) * u]; }
+      } else {
+        const zt = 0.66 * zb;
+        for (let k = 0; k < nA; k++) { const z = zt * fa[k]; P[k] = [z, dk(z)]; }
+        for (let k = 0; k < nB; k++) P[iB + k] = [zt, dk(zt)];
+        for (let m = 0; m < nC; m++) { const u = fc[nC - 1 - m], z = zb - (zb - zt) * u; P[iC + m] = [z, dk(z)]; }
+      }
+      P[iSh] = [ze, yd];
+      for (let k = 1; k <= nS; k++) { const a = k / nS * PI / 2; P[iS + k - 1] = [ze + rsz * Math.sin(a), ysh + rs * Math.cos(a)]; }
+      const ylo = Math.min(archY(x), ysh - 0.05);
+      for (let k = 1; k <= nE; k++) { const y = ysh + (ylo - ysh) * k / nE; P[iE + k - 1] = [0.9 * SF(x, y), y]; }
+      const zE = P[iE + nE - 1][0], kk = Math.min(1, (ylo - 0.30) / 0.08), yin = ylo - 0.04 * (1 - kk), zi = Math.min(0.55, zE - 0.1);
+      P[iL] = [zE - 0.04, yin]; P[iG] = [zi, yin]; P[iH] = [zi, 0.26]; P[iI] = [0, 0.26];
+      return { P, h, yd, ze, zb };
+    };
+    /* the ends close in a soft ellipse; the corners sweep back in plan */
+    const S0F = sect(x0F), S0R = sect(x0R), midF = (S0F.yd + crown + 0.26) / 2, midR = (S0R.yd + crown + 0.26) / 2;
+    const tf = (x, y, z) => {
+      if (x > x0F) { const u = Math.min(1, (x - x0F) / eF), q = Math.sqrt(Math.max(0, 1 - u * u)); y = midF + (y - midF) * q; z *= 0.84 + 0.16 * q; }
+      else if (x < x0R) { const u = Math.min(1, (x0R - x) / eR), q = Math.sqrt(Math.max(0, 1 - u * u)); y = midR + (y - midR) * q; z *= 0.84 + 0.16 * q; }
+      return [x + bow24(x, z, R, rx, van), y, z];
+    };
+    const SEC = xs.map(x => (x > x0F ? S0F : x < x0R ? S0R : sect(x)));
+    const V = xs.map((x, i) => SEC[i].P.map(p => tf(x, p[1], p[0])));
+    const out = { paint: [], glass: [], dark: [], well: [], lid: [], sLid: [], sRoof: [] };
+    const tri = (k, a, b, c) => {
+      const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2], vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
+      const cx = uy * vz - uz * vy, cy = uz * vx - ux * vz, cz = ux * vy - uy * vx;
+      if (cx * cx + cy * cy + cz * cz < 1e-14) return;
+      out[k].push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
+    };
+    const mir = p => [p[0], p[1], -p[2]];
+    const quad = (k, a, b, c, d) => { tri(k, a, d, c); tri(k, a, c, b); const A = mir(a), B = mir(b), C = mir(c), D = mir(d); tri(k, A, C, D); tri(k, A, B, C); };
+    const boxTop = van ? s.box[s.box.length - 2][1] : 0;
+    const clsOf = (j, xm, hm, ym) => {
+      const inCab = hm > 0.02;
+      if (xm > x0F || xm < x0R) return 'paint';   /* the rounded nose and tail are bodywork all the way round */
+      if (bay && j < iSh && !inCab && xm > 0.80 && xm < 2.03) return 'lid';
+      if (j < nA - 1) {
+        if (!inCab) return 'paint';
+        if (van) {
+          if (xm > xWs + 0.02 && xm < gxF - 0.06) return j === nA - 2 ? 'paint' : 'glass';
+          if (xm < xRr - 0.004) { const yt = cabTop(xm); return j >= 1 && j <= nA - 3 && yt > 1.2 && yt < Math.min(1.56, boxTop - 0.08) ? 'glass' : 'paint'; }
+          return 'paint';
+        }
+        if ((xm > xWs - 0.02 && xm < gxF - 0.06) || (xm < xRr + 0.02 && xm > gxR + 0.06)) return j === nA - 2 ? 'paint' : 'glass';
+        return 'paint';
+      }
+      if (j < iC - 1) return 'paint';
+      if (j <= iSh - 2) {
+        if (!inCab) return 'paint';
+        const m = j - (iC - 1), uHi = m === 0 ? 1 : fc[nC - m], uLo = fc[nC - 1 - m];
+        if (van) return xm > -0.25 && xm < 0.72 && hm > 0.3 && uLo >= 0.06 && uHi <= 0.8 ? 'glass' : 'paint';
+        if (bands.some(b => Math.abs(xm - b) < 0.04)) return 'dark';
+        if (s.blankRear && xm < -0.40) return 'paint';
+        if (hm < (xm > 0 ? 0.13 : 0.2)) return 'paint';
+        return uLo < 0.01 ? 'dark' : 'glass';
+      }
+      if (j === iSh - 1) return 'paint';
+      if (j <= iL - 2) return s.clad && ym < 0.46 ? 'dark' : 'paint';
+      if (j === iL - 1) return s.clad ? 'dark' : 'paint';
+      if (j === iL || j === iG) return 'well';
+      return 'dark';
+    };
+    for (let i = 0; i < xs.length - 1; i++) {
+      const xm = (xs[i] + xs[i + 1]) / 2, hm = xm > x0F || xm < x0R ? 0 : hgOf(xm), inBay = bay && ((xm > 0.83 && xm < 2.045) || archY(xm) > 0.302);
+      for (let j = 0; j < N - 1; j++) {
+        if (inBay && (j === iG || j === iH)) continue;
+        const a = V[i][j], b = V[i + 1][j], c = V[i + 1][j + 1], d = V[i][j + 1];
+        quad(clsOf(j, xm, hm, (a[1] + b[1] + c[1] + d[1]) / 4), a, b, c, d);
+      }
+      /* the shelf you see through the glass, so the cabin isn't open to the ground */
+      if (hm > 0.02) { const s0 = SEC[i], s1 = SEC[i + 1]; quad('dark', tf(xs[i], s0.yd - 0.006, 0), tf(xs[i + 1], s1.yd - 0.006, 0), tf(xs[i + 1], s1.yd - 0.006, s1.zb - 0.012), tf(xs[i], s0.yd - 0.006, s0.zb - 0.012)); }
+      /* the inner wings of the engine bay */
+      if (bay && xm > 0.80 && xm < 2.045) {
+        const s0 = SEC[i], s1 = SEC[i + 1], a = tf(xs[i], 0.40, s0.ze - 0.004), b = tf(xs[i + 1], 0.40, s1.ze - 0.004), c = tf(xs[i + 1], s1.yd - 0.012, s1.ze - 0.004), d = tf(xs[i], s0.yd - 0.012, s0.ze - 0.004);
+        tri('well', a, d, c); tri('well', a, c, b); tri('well', mir(a), mir(b), mir(c)); tri('well', mir(a), mir(c), mir(d));
+      }
+    }
+    /* build 25: racing stripes are laid on the real surface, a hair above the paint (the mod shows or hides them) */
+    if (!lod) {
+      const topY = (S, z) => { const P = S.P; for (let k = 0; k < iSh; k++) { const a = P[k], b = P[k + 1]; if (b[0] > a[0] + 1e-6 && z <= b[0] + 1e-6) return a[1] + (b[1] - a[1]) * Math.max(0, (z - a[0]) / (b[0] - a[0])); } return P[iSh][1]; };
+      for (let i = 0; i < xs.length - 1; i++) {
+        const xm = (xs[i] + xs[i + 1]) / 2; if (xm > x0F || xm < x0R) continue;
+        const hm = hgOf(xm), k = hm < 0.02 ? (xm > 0.80 && xm < 2.03 ? 'sLid' : null) : (cab && xm > xRr + 0.03 && xm < (van ? xWs + 0.02 : xWs - 0.03) ? 'sRoof' : null);
+        if (!k) continue;
+        const p = (ii, z) => tf(xs[ii], topY(SEC[ii], z) + 0.006, z);
+        for (const [z1, z2] of [[0.06, 0.12], [0.12, 0.18]]) quad(k, p(i, z1), p(i + 1, z1), p(i + 1, z2), p(i, z2));
+      }
+      for (let i = 0; i < out.sLid.length; i += 3) { out.sLid[i] -= 0.80; out.sLid[i + 1] -= 0.95; }
+    }
+    if (bay) {
+      /* the slam panel at the front of the bay and the bulkhead at the back */
+      const sf = sect(2.045), zf = sf.ze - 0.004, f = (y, z) => tf(2.045, y, z);
+      tri('well', f(0.28, -zf), f(0.28, zf), f(sf.yd - 0.02, zf)); tri('well', f(0.28, -zf), f(sf.yd - 0.02, zf), f(sf.yd - 0.02, -zf));
+      const sb = sect(0.80), zr = sb.ze - 0.004;
+      tri('well', [0.80, 0.60, -zr], [0.80, sb.yd, zr], [0.80, 0.60, zr]); tri('well', [0.80, 0.60, -zr], [0.80, sb.yd, -zr], [0.80, sb.yd, zr]);
+    }
+    /* the bonnet lid, in the hinge's own space, with an underside */
+    if (out.lid.length) {
+      const L = out.lid, n = L.length;
+      for (let i = 0; i < n; i += 3) { L[i] -= 0.80; L[i + 1] -= 0.95; }
+      for (let i = 0; i < n; i += 9) L.push(L[i], L[i + 1] - 0.018, L[i + 2], L[i + 6], L[i + 7] - 0.018, L[i + 8], L[i + 3], L[i + 4] - 0.018, L[i + 5]);
+    }
+    const mk = arr => {
+      if (!arr.length) return null;
+      const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(arr, 3));
+      const uv = new Float32Array(arr.length / 3 * 2); for (let i = 0, k = 0; i < arr.length; i += 3) { uv[k++] = arr[i] * 0.5; uv[k++] = arr[i + 1] * 0.5; }
+      g.setAttribute('uv', new T.BufferAttribute(uv, 2)); smoothNormals(g, lod ? 50 : 40);
+      return g;
+    };
+    const topAt = x => dY(x) + hgOf(x);
+    /* where the skin's centre line is at a given height on the nose or the tail */
+    const faceX = (front, y) => {
+      if (!front && cab && y > S0R.yd + 0.03) { let lo = gxR, hi = xRr; for (let k = 0; k < 24; k++) { const m = (lo + hi) / 2; if (topAt(m) < y) lo = m; else hi = m; } return (lo + hi) / 2; }
+      const x0 = front ? x0F : x0R, e = front ? eF : eR, mid = front ? midF : midR, hh = mid - 0.26, r = Math.min(1, Math.abs(y - mid) / hh), q = Math.sqrt(1 - r * r);
+      return front ? x0 + e * q : x0 - e * q;
+    };
+    return { paint: mk(out.paint), glass: mk(out.glass), dark: mk(out.dark), well: mk(out.well), lid: mk(out.lid), stripeLid: mk(out.sLid), stripeRoof: mk(out.sRoof), faceX, dY, SF, tipF, tipR, stations: xs.length };
+  }
+  /* headlamps and tail lamps are parts you take off, so they aren't bent with the body: sit each one on the new surface */
+  function conformLamps24() {
+    const SK = SK24; if (!SK) return;
+    for (const id of ['headlamp_FL', 'headlamp_FR', 'taillamp_RL', 'taillamp_RR']) {
+      const reg = PART[id]; if (!reg) continue;
+      const front = id[0] === 'h';
+      for (const obj of reg.std.concat(reg.upg)) {
+        const y = obj.position.y, sg = Math.sign(obj.position.z) || 1, xf = SK.faceX(front, y), halfW = front ? 0.165 : sty.van ? 0.06 : 0.18;
+        const zc = Math.min(Math.abs(obj.position.z), 0.9 * SK.SF(xf, y) * 0.9 - halfW * 0.8), xr = front ? 2.3 : sty.rear - 0.2;
+        const bw = bow24(xr, zc, sty.rear, sty.rx, sty.van), sl = (bow24(xr, zc + 0.01, sty.rear, sty.rx, sty.van) - bow24(xr, zc - 0.01, sty.rear, sty.rx, sty.van)) / 0.02, th = Math.atan(Math.abs(sl));
+        obj.position.set(xf + bw + (front ? -0.016 : 0.016), y, sg * zc); obj.rotation.y = (front ? -sg : sg) * th;
+        if (!sty.classic && !sty.van) obj.scale.set(1, front ? 1.45 : 1.4, 1); else if (!sty.classic && front) obj.scale.set(1, 1.45, 1);
+      }
+    }
+  }
   function shapeBody() {
-    const bend = (g, ox, oy) => { const q = g.attributes.position; for (let i = 0; i < q.count; i++) q.setZ(i, q.getZ(i) * bodyF(q.getX(i) + ox, q.getY(i) + oy)); q.needsUpdate = true; };
+    /* everything fixed to the body follows its sides, and (build 24) the sweep of its nose and tail */
+    const bend = (g, ox, oy) => { const q = g.attributes.position; for (let i = 0; i < q.count; i++) { const x = q.getX(i) + ox, z = q.getZ(i) * bodyF(x, q.getY(i) + oy); q.setZ(i, z); q.setX(i, q.getX(i) + bow24(x, z, sty.rear, sty.rx, sty.van)); } q.needsUpdate = true; };
     car.updateMatrixWorld(true);
     car.children.slice().forEach(o => {
       if (!o.isMesh || o.userData.part || o.userData.noShape) return;
@@ -5487,7 +5711,7 @@ const Car3D = (() => {
       bend(g, 0, 0);
       if (g.attributes.position.count > 60) smoothNormals(g, 40); else g.computeVertexNormals();
     });
-    if (bonnet) bonnet.children.forEach(o => { if (!o.isMesh) return; const g = new T.BufferGeometry(); g.copy(o.geometry); o.geometry = g; if (o.userData.crown) crownGeo(g, o.userData, bonnet.position.x, bonnet.position.y); bend(g, bonnet.position.x, bonnet.position.y); smoothNormals(g, 40); });
+    if (bonnet) bonnet.children.forEach(o => { if (!o.isMesh || o.userData.noShape) return; const g = new T.BufferGeometry(); g.copy(o.geometry); o.geometry = g; if (o.userData.crown) crownGeo(g, o.userData, bonnet.position.x, bonnet.position.y); bend(g, bonnet.position.x, bonnet.position.y); smoothNormals(g, 40); });
   }
   const beam3 = (a, b, t, mat) => {
     const A = new T.Vector3(a[0], a[1], a[2]), B = new T.Vector3(b[0], b[1], b[2]), d = B.clone().sub(A);
@@ -5575,17 +5799,9 @@ const Car3D = (() => {
     g.deleteAttribute('normal'); g.computeVertexNormals();
   }
   function buildShell() {
-    const R = sty.rear, sh = new T.Shape();
-    sh.moveTo(R + 0.05, 0.30); sh.lineTo(sty.rx - 0.38, 0.30); sh.absarc(sty.rx, 0.30, 0.38, PI, 0, true);
-    sh.lineTo(0.97, 0.30); sh.absarc(1.35, 0.30, 0.38, PI, 0, true);
-    sh.lineTo(2.06, 0.30); sh.lineTo(2.13, 0.42); sh.lineTo(2.12, 0.70); sh.lineTo(2.06, 0.70); sh.lineTo(2.06, 0.63); sh.lineTo(0.80, 0.63); sh.lineTo(0.80, 0.93);
-    sty.upper.forEach(p => sh.lineTo(p[0], p[1]));
-    const g = bodyExtrude(sh, { depth: 1.70, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.04, bevelSegments: 6, curveSegments: 28, steps: 12, grid: 0.065 });
-    g.translate(0, 0, -0.85);
-    openBay21(g);
-    const shell = fixed(new T.Mesh(g, M.paint), 'auto', true);
-    Object.assign(shell.userData, { crown: 0.03, crownHW: 0.9, crownW: cabinW(sty, true) });
-    for (const zc of [-0.88, 0.82]) { const f = prism([[0.80, 0.65], [2.12, 0.65], [2.12, 0.70], [2.10, 0.76], [1.96, 0.84], [0.80, 0.95]], 0.06, M.paint, 0.008); f.position.z = zc; fixed(f, 'engine', true); }
+    const SK = SK24 = skin24(sty, { bay: true });
+    const skm = (g, mat, zone) => { if (!g) return null; const m = fixed(new T.Mesh(g, mat), zone, true); m.userData.noShape = true; return m; };
+    skm(SK.paint, M.paint, 'auto'); skm(SK.well, M.well, 'auto'); skm(SK.dark, M.trim, 'auto'); skm(SK.glass, M.glass, 'block');
     /* dark inner panels: the floor of the engine bay and the scuttle under the windscreen */
     fixed(rbox(0.05, 0.18, 1.40, 0.02, M.plastic, 0.865, 0.81, 0), 'engine');
     for (const x of [sty.rx]) fixed(box(0.84, 0.36, 1.10, M.well, x, 0.48, 0), 'auto', true);
@@ -5593,9 +5809,7 @@ const Car3D = (() => {
     /* sound-deadening pad under the bonnet, seen when it's open */
     { const pad = prismS([[0.12, -0.0654], [1.08, -0.1564], [1.08, -0.1644], [0.12, -0.0734]], 1.2, M.dark, 0, 8); pad.geometry.translate(0, 0, -0.6); setZone(pad, 'engine', true); bonnet.add(pad);
       Object.assign(pad.userData, { crown: 0.028, crownHW: 0.862, mode: 'bend', frontX: 2.08 }); }
-    const lid = prismS([[0, 0], [1.16, -0.11], [1.33, -0.21], [1.33, -0.25], [1.16, -0.15], [0, -0.04]], 1.70, M.paint, 0.012, 12);
-    Object.assign(lid.userData, { crown: 0.028, crownHW: 0.862, mode: 'bend', frontX: 2.08 });
-    lid.geometry.translate(0, 0, -0.85); setZone(lid, 'engine', true); bonnet.add(lid);
+    const lid = new T.Mesh(SK.lid, M.paint); lid.userData.noShape = true; setZone(lid, 'engine', true); bonnet.add(lid);
   }
 
   /* where the body's rear face sits at a given height, and the deck height at a given x */
@@ -5621,10 +5835,7 @@ const Car3D = (() => {
 
   function buildCabin() {
     if (sty.van) {
-      const b = prismS(sty.box, 1.62, M.paint, 0.04, 10); b.geometry.translate(0, 0, -0.81); fixed(b, 'block', true); Object.assign(b.userData, { crown: 0.025, crownHW: 0.85 });
-      const ws = prism([[0.804, 0.997], [0.812, 1.003], [0.365, 1.562], [0.357, 1.556]], 1.36, M.glass, 0); ws.geometry.translate(0, 0, -0.68); fixed(ws, 'block', true);
-      for (const s of [-1, 1]) { const w = prism([[0.70, 1.02], [0.36, 1.46], [-0.25, 1.46], [-0.25, 1.02]], 0.01, M.glass, 0); w.position.z = s > 0 ? 0.852 : -0.862; fixed(w, 'block', true); }
-      fixed(box(0.01, sty.splitH || 0.6, 0.012, M.trim, sty.rear - 0.05, sty.splitY || 1.30, 0), 'block', true);
+      fixed(box(0.01, sty.splitH || 0.6, 0.012, M.trim, SK24.faceX(false, sty.splitY || 1.30) - 0.004, sty.splitY || 1.30, 0), 'block', true);
       return;
     }
     if (sty.open) {
@@ -5643,7 +5854,6 @@ const Car3D = (() => {
       sw.rotation.z = 0.4; fixed(at(sw, 0.30, 1.13, 0.36), 'block');
       return;
     }
-    const g = prismS(sty.glass, 1.40, M.glass, 0.04, 10); g.geometry.translate(0, 0, -0.70); fixed(g, 'block', true); Object.assign(g.userData, { crown: 0.022, crownHW: 0.74 });
     /* a simple interior you can see through the glass: dashboard, steering wheel (right-hand drive) and seats */
     const fx = sty.glass[0][0] - 0.25;
     fixed(rbox(0.34, 0.16, 1.32, 0.05, M.dash, fx - 0.05, 0.98, 0), 'block');
@@ -5653,8 +5863,6 @@ const Car3D = (() => {
     const wheelRing = new T.Mesh(new T.TorusGeometry(0.15, 0.018, 8, 28), M.dash); wheelRing.rotation.y = PI / 2; wheelRing.rotation.x = 0.45;
     fixed(at(wheelRing, fx - 0.3, 1.07, 0.34), 'block');
     const [x1, x2, ry] = sty.roof;
-    { const rf = fixed(at(new T.Mesh(slabS(x2 - x1, 0.05, 1.50, 0.02, 10), M.paint), (x1 + x2) / 2, ry, 0), 'block', true); Object.assign(rf.userData, { crown: 0.03, crownHW: 0.75, mode: 'bend' }); }
-    for (const z of [-0.73, 0.73]) sty.pillars.forEach(p => fixed(beam3([p[0], p[1], z * bodyF(p[0], p[1])], [p[2], p[3], z * bodyF(p[2], p[3])], 0.07, M.paint), 'block', true));
     if (sty.rails) for (const z of [-0.6, 0.6]) {
       fixed(box(x2 - x1 - 0.1, 0.03, 0.04, M.dark, (x1 + x2) / 2, ry + 0.07, z), 'block');
       fixed(box(0.05, 0.05, 0.04, M.dark, x1 + 0.08, ry + 0.04, z), 'block');
@@ -5665,15 +5873,6 @@ const Car3D = (() => {
     fixed(prism([[x1 + 0.05, ry + 0.02], [x1 + 0.22, ry + 0.02], [x1 + 0.08, ry + 0.075]], 0.04, M.paint, 0.006), 'block', true).geometry.translate(0, 0, -0.02);
     { const gx = sty.glass[0][0], gy = sty.glass[0][1], sl = (sty.glass[1][1] - gy) / (gx - sty.glass[1][0]);
       for (const [z, len] of [[-0.18, 0.56], [0.33, 0.5]]) { const wx = gx - 0.06; fixed(box(0.014, 0.012, len, M.dark, wx, gy + 0.06 * sl + 0.04 * Math.sqrt(1 + sl * sl) + 0.008, z), 'block'); } }
-    if (sty.blankRear) {
-      /* car-derived van: rear side windows panelled over in body colour */
-      const gl = sty.glass, xa = -0.40;
-      const ya = gl[1][1] + (xa - gl[1][0]) / (gl[2][0] - gl[1][0]) * (gl[2][1] - gl[1][1]);
-      for (const s of [-1, 1]) {
-        const p = prism([[xa, 0.95], [xa, ya - 0.01], [gl[2][0] + 0.02, gl[2][1] - 0.01], [gl[3][0] + 0.02, gl[3][1]]], 0.012, M.paint, 0);
-        p.position.z = s > 0 ? 0.745 : -0.757; fixed(p, 'block', true);
-      }
-    }
     if (sty.bed) {
       /* pickup load bed: floor, two sides, bulkhead and tailgate */
       const [bx1, bx2] = sty.bed, len = bx1 - bx2, cxb = (bx1 + bx2) / 2;
@@ -5685,13 +5884,18 @@ const Car3D = (() => {
   }
 
   function buildTrim() {
-    const R = sty.rear, bumper = sty.classic ? M.chrome : M.trim;
-    fixed(rbox(0.12, 0.17, 1.82, 0.05, bumper, 2.12, 0.37, 0), 'auto', !sty.classic);
-    fixed(rbox(0.12, 0.18, 1.82, 0.05, bumper, R + 0.01, 0.40, 0), 'auto', !sty.classic);
-    fixed(rbox(0.03, 0.09, 0.78, 0.02, sty.classic ? M.chrome : M.trim, 2.168, 0.585, 0), 'auto', !sty.classic);
-    fixed(rbox(0.02, 0.06, 0.70, 0.02, M.plastic, 2.185, 0.36, 0), 'auto');
-    if (!sty.classic) { const gr = new T.Mesh(new T.PlaneGeometry(0.72, 0.075), M.grille); gr.rotation.y = PI / 2; fixed(at(gr, 2.185, 0.585, 0), 'auto'); }
-    const gi = new T.Mesh(new T.PlaneGeometry(0.64, 0.05), M.grille); gi.rotation.y = PI / 2; fixed(at(gi, 2.197, 0.36, 0), 'auto');
+    const R = sty.rear, fxF = y => SK24.faceX(true, y), fxR = y => SK24.faceX(false, y);
+    const lowX = sty.classic ? 2.185 : fxF(0.36) + 0.002;
+    if (sty.classic) { fixed(rbox(0.12, 0.17, 1.82, 0.05, M.chrome, 2.16, 0.37, 0), 'auto'); fixed(rbox(0.12, 0.18, 1.82, 0.05, M.chrome, R - 0.03, 0.40, 0), 'auto'); }
+    else {
+      /* build 25: the body is its own bumper. A dark chin under the nose, and fog lamps in the lower corners */
+      fixed(rbox(0.09, 0.10, 1.56, 0.03, M.trim, 2.07, 0.235, 0), 'auto', true);
+      for (const s of [-1, 1]) { fixed(rbox(0.02, 0.085, 0.15, 0.02, M.plastic, lowX - 0.004, 0.36, s * 0.49), 'auto'); fixed(cyl(0.03, 0.02, M.lamp, lowX + 0.004, 0.36, s * 0.49, 'x', 16), 'auto'); }
+    }
+    if (sty.classic) fixed(rbox(0.03, 0.09, 0.78, 0.02, M.chrome, 2.168, 0.585, 0), 'auto'); else fixed(rbox(0.03, 0.15, 0.80, 0.03, M.trim, 2.166, 0.575, 0), 'auto', true);
+    fixed(rbox(0.02, 0.06, 0.70, 0.02, M.plastic, lowX, 0.36, 0), 'auto');
+    if (!sty.classic) { const gr = new T.Mesh(new T.PlaneGeometry(0.74, 0.125, 8, 1), M.grille); gr.rotation.y = PI / 2; fixed(at(gr, 2.184, 0.575, 0), 'auto'); }
+    const gi = new T.Mesh(new T.PlaneGeometry(0.64, 0.05, 8, 1), M.grille); gi.rotation.y = PI / 2; fixed(at(gi, lowX + 0.012, 0.36, 0), 'auto');
     const tailX = rearXAt(sty.van ? 1.08 : sty.tailY) - 0.032;
     for (const s of [-1, 1]) {
       const sd = s < 0 ? 'L' : 'R';
@@ -5730,7 +5934,7 @@ const Car3D = (() => {
       seams.forEach((x, i) => {
         const inArch = Math.abs(x - 1.35) < 0.45 || Math.abs(x - sty.rx) < 0.45;
         const y0 = inArch ? 0.66 : 0.35;
-        fixed(at(new T.Mesh(new T.BoxGeometry(0.008, 0.93 - y0, 0.008, 1, 10, 1), M.trim), x, (0.93 + y0) / 2, s * 0.905), 'auto', true);
+        fixed(at(new T.Mesh(new T.BoxGeometry(0.008, 0.885 - y0, 0.008, 1, 10, 1), M.trim), x, (0.885 + y0) / 2, s * 0.905), 'auto', true);
         if (i > 0) fixed(rbox(0.11, 0.025, 0.02, 0.008, M.trim, x + 0.15, 0.82, s * 0.91), 'auto', true);
       });
       if (sty.clad) {
@@ -5756,13 +5960,14 @@ const Car3D = (() => {
       fixed(cyl(0.21, 0.03, M.paint, sx - 0.10, 0.80, 0, 'x', 28), 'block', true);
     }
     plateF = new T.Mesh(new T.PlaneGeometry(0.52, 0.11), new T.MeshBasicMaterial({ toneMapped: false })); plateF.userData.ownMat = true;
-    plateF.position.set(2.195, 0.44, 0); plateF.rotation.y = PI / 2; fixed(plateF, 'auto');
+    plateF.position.set(sty.classic ? 2.226 : Math.max(fxF(0.385), fxF(0.44), fxF(0.495)) + 0.008, 0.44, 0); plateF.rotation.y = PI / 2; fixed(plateF, 'auto');
     plateR = new T.Mesh(new T.PlaneGeometry(0.52, 0.11), new T.MeshBasicMaterial({ toneMapped: false })); plateR.userData.ownMat = true;
-    plateR.position.set(Math.min(rearXAt(sty.plateY) - 0.047, R - 0.056), sty.plateY, 0); plateR.rotation.y = -PI / 2; fixed(plateR, 'auto');
+    plateR.position.set(Math.min(fxR(sty.plateY - 0.055), fxR(sty.plateY), fxR(sty.plateY + 0.055)) - 0.008, sty.plateY, 0); plateR.rotation.y = -PI / 2; fixed(plateR, 'auto');
     badgeF = new T.Mesh(new T.PlaneGeometry(0.12, 0.12), new T.MeshBasicMaterial({ transparent: true, toneMapped: false })); badgeF.userData.ownMat = true;
     badgeF.position.set(2.19, 0.585, 0); badgeF.rotation.y = PI / 2; fixed(badgeF, 'auto');
     badgeR = new T.Mesh(new T.PlaneGeometry(0.11, 0.11), new T.MeshBasicMaterial({ transparent: true, toneMapped: false })); badgeR.userData.ownMat = true;
-    badgeR.position.set(Math.min(rearXAt(sty.plateY + 0.15) - 0.05, R - 0.06), sty.plateY + 0.15, 0); badgeR.rotation.y = -PI / 2; fixed(badgeR, 'auto');
+    badgeR.position.set(Math.min(fxR(sty.plateY + 0.10), fxR(sty.plateY + 0.20)) - 0.008, sty.plateY + 0.15, 0); badgeR.rotation.y = -PI / 2; fixed(badgeR, 'auto');
+    conformLamps24();
   }
 
   function rimFace(wheel, s, rim, cfg) {
@@ -6230,7 +6435,10 @@ if ( uFx > 0.5 ) {
       for (const z of [-0.28, 0.28]) { const cone = new T.Mesh(new T.CylinderGeometry(0.17, 0.1, 0.06, 28), std('#2A2D2F', { roughness: 0.6 })); cone.rotation.z = PI / 2; cone.position.set(bx - 0.22, by, z); o.add(cone); const rim = new T.Mesh(new T.TorusGeometry(0.175, 0.012, 8, 32), glowMat22('#FF3B3B', 1.6)); rim.rotation.y = PI / 2; rim.position.set(bx - 0.25, by, z); o.add(rim); }
       modPart('subwoofer', [[o]]); }
     /* gold trim: sills, grille bar and badge surround */
-    { const o = G(), gold = M22.goldSpin, xa = R + 0.45, xb = 1.75; for (const z of [-0.925, 0.925]) o.add(box(xb - xa, 0.035, 0.02, gold, (xa + xb) / 2, 0.42, z)); o.add(box(0.03, 0.045, 1.0, gold, 2.21, 0.56, 0)); o.add(box(0.03, 0.03, 1.2, gold, 2.2, 0.42, 0)); modPart('goldtrim', [[o]]); }
+    { const o = G(), gold = M22.goldSpin, xa = R + 0.45, xb = 1.75; const ga = sty.rx + 0.47, gb = 0.88, gz = 0.9 * Math.max(SK24.SF(ga, 0.42), SK24.SF((ga + gb) / 2, 0.42), SK24.SF(gb, 0.42)) + 0.004;
+      const bowBox = (w, h, d, x, y) => { const g = new T.BoxGeometry(w, h, d, 1, 1, 12), q = g.attributes.position; for (let i = 0; i < q.count; i++) q.setX(i, q.getX(i) + bow24(2.3, q.getZ(i), R, sty.rx, sty.van)); g.computeVertexNormals(); return at(new T.Mesh(g, gold), x, y, 0); };
+      for (const z of [-gz, gz]) o.add(box(gb - ga, 0.035, 0.02, gold, (ga + gb) / 2, 0.42, z));
+      o.add(bowBox(0.03, 0.04, 0.86, 2.2, 0.56)); o.add(bowBox(0.025, 0.028, 0.92, SK24.faceX(true, 0.315) + 0.012, 0.315)); modPart('goldtrim', [[o]]); }
     /* the drinks cabinet is in the boot: nothing to see from outside */
     { const o = G(); const mk = box(0.3, 0.3, 0.3, M.trim, R + 0.4, 0.7, 0); mk.visible = false; mk.userData.noGhost = true; o.add(mk); modPart('cabinet', [[o]]); }
     /* the breakdown van: an amber light bar on the roof and red-and-yellow chevrons across the back doors */
@@ -7490,11 +7698,8 @@ if ( uFx > 0.5 ) {
     if (roof) { const o = G(), mx = (roof.x1 + roof.x2) / 2 + 0.1; o.add(rbox(0.5, 0.13, 0.46, 0.04, M.paint, mx, roof.y + 0.065, 0)); o.add(box(0.012, 0.09, 0.38, M.dark, mx + 0.252, roof.y + 0.07, 0)); modPart('roofscoop', [[o]]); }
     /* racing stripes on the bonnet and roof */
     { const ob = G(), orf = G();
-      for (const z of [-0.12, 0.12]) {
-        const a = box(1.165, 0.004, 0.12, M.stripe, 0.58, -0.055 + 0.0145, z); a.rotation.z = -0.0945; ob.add(a);
-        const b = box(0.197, 0.004, 0.12, M.stripe, 1.245, -0.16 + 0.0145, z); b.rotation.z = -0.532; ob.add(b);
-        if (roof) orf.add(box(roof.x2 - roof.x1 - 0.06, 0.004, 0.12, M.stripe, (roof.x1 + roof.x2) / 2, roof.y + 0.003, z));
-      }
+      if (SK24 && SK24.stripeLid) { const m = new T.Mesh(SK24.stripeLid, M.stripe); m.userData.noShape = true; ob.add(m); }
+      if (SK24 && SK24.stripeRoof) { const m = new T.Mesh(SK24.stripeRoof, M.stripe); m.userData.noShape = true; orf.add(m); }
       modPart('stripes', [[ob, bonnet], [orf]]); }
     /* nitrous bottle on the back seat */
     { const o = G(), x = sty.van ? -1.2 : sty.glass ? sty.glass[0][0] - 1.65 : -0.5, y = sty.van ? 1.0 : 0.86;
@@ -8436,7 +8641,7 @@ if ( uFx > 0.5 ) {
   function liteGeo(name) {
     if (LITE[name]) return LITE[name];
     const s = STYLES[name] || STYLES.saloon, R = s.rear, P = { paint: [], glass: [], dark: [], well: [], chrome: [], lamp: [], tail: [], tyre: [], rim: [] }, made = [];
-    const bendF = (x, y) => sideF(x, y, R, s.van);
+    const bendF = (x, y) => sideF(x, y, R, s.van, s.rx);
     const bend = g => { const q = g.attributes.position; for (let i = 0; i < q.count; i++) q.setZ(i, q.getZ(i) * bendF(q.getX(i), q.getY(i))); q.needsUpdate = true; return g; };
     const M4 = (x, y, z, rx, ry, rz) => new T.Matrix4().compose(new T.Vector3(x, y, z), new T.Quaternion().setFromEuler(new T.Euler(rx || 0, ry || 0, rz || 0)), new T.Vector3(1, 1, 1));
     const add = (k, g, m) => { P[k].push([g, m || null]); made.push(g); return g; };
@@ -8444,22 +8649,17 @@ if ( uFx > 0.5 ) {
     const EX = (pts, depth, bevel, z0) => { const g = new T.ExtrudeGeometry(shapeOf(pts), { depth, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2, curveSegments: 8 }); g.translate(0, 0, z0); return g; };
     const rearX = y => { const pts = s.upper.concat([[R + 0.05, 0.30]]); let f = null; for (let i = 0; i < pts.length - 1; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[i + 1]; if (y1 === y2 || y > Math.max(y1, y2) || y < Math.min(y1, y2)) continue; const x = x1 + (y - y1) / (y2 - y1) * (x2 - x1); if (x < 0) f = f === null ? x : Math.min(f, x); } return f === null ? R : f; };
     const deck = x => { const pts = [[0.80, 0.93]].concat(s.upper); for (let i = 0; i < pts.length - 1; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[i + 1]; if (x <= x1 && x >= x2 && x1 !== x2) return y1 + (x - x1) / (x2 - x1) * (y2 - y1); } return 0.95; };
-    /* the body: one side profile, wheel arches cut in, the bonnet line run into the front, extruded and rounded off */
+    /* build 24: the body, glass, roof and wheel housings are one lofted skin */
+    const SKL = skin24(s, { lod: 1 });
     const sh = new T.Shape();
     sh.moveTo(R + 0.05, 0.30); sh.lineTo(s.rx - 0.38, 0.30); sh.absarc(s.rx, 0.30, 0.38, PI, 0, true);
     sh.lineTo(0.97, 0.30); sh.absarc(1.35, 0.30, 0.38, PI, 0, true);
     sh.lineTo(2.06, 0.30); sh.lineTo(2.13, 0.42); sh.lineTo(2.135, 0.70); sh.lineTo(2.09, 0.77); sh.lineTo(1.96, 0.845); sh.lineTo(0.80, 0.955);
     s.upper.forEach(p => sh.lineTo(p[0], p[1]));
-    const body = bodyExtrude(sh, { depth: 1.70, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.04, bevelSegments: 3, curveSegments: 16, steps: 8, grid: 0.09 });
-    body.translate(0, 0, -0.85); crownGeo(body, { crown: 0.03, crownHW: 0.9, crownW: cabinW(s, false) }); add('paint', bend(body));
     const EXS = (pts, depth, bevel, z0, steps) => { const g = new T.ExtrudeGeometry(shapeOf(pts), { depth, steps: steps || 8, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2, curveSegments: 8 }); g.translate(0, 0, z0); return g; };
-    for (const x of [s.rx, 1.35]) { const wl = new T.CylinderGeometry(0.386, 0.386, 1.66, 18, 1, true, PI / 2, PI); wl.rotateX(PI / 2); add('well', wl, M4(x, 0.30, 0)); }
     /* the glass and roof */
     if (s.van) {
-      add('paint', bend(crownGeo(EXS(s.box, 1.62, 0.04, -0.81), { crown: 0.025, crownHW: 0.85 })));
-      add('glass', EX([[0.804, 0.997], [0.812, 1.003], [0.365, 1.562], [0.357, 1.556]], 1.36, 0, -0.68));
-      for (const sd of [-1, 1]) add('glass', EX([[0.70, 1.02], [0.36, 1.46], [-0.25, 1.46], [-0.25, 1.02]], 0.012, 0, sd > 0 ? 0.852 : -0.864));
-      add('dark', new T.BoxGeometry(0.012, s.splitH || 0.6, 0.012), M4(R - 0.05, s.splitY || 1.30, 0));
+      add('dark', new T.BoxGeometry(0.012, s.splitH || 0.6, 0.012), M4(SKL.faceX(false, s.splitY || 1.30) - 0.004, s.splitY || 1.30, 0));
     } else if (s.open) {
       add('glass', EX([[0.80, 0.94], [0.83, 0.95], [0.53, 1.24], [0.50, 1.23]], 1.40, 0, -0.70));
       add('paint', new T.BoxGeometry(0.04, 0.03, 1.42), M4(0.515, 1.24, 0));
@@ -8469,17 +8669,9 @@ if ( uFx > 0.5 ) {
         const hoop = new T.TorusGeometry(0.17, 0.022, 8, 20, PI); hoop.rotateY(PI / 2); add('chrome', hoop, M4(-0.58, 1.05, z));
       }
     } else {
-      add('glass', bend(crownGeo(EXS(s.glass, 1.40, 0.04, -0.70), { crown: 0.022, crownHW: 0.74 })));
-      const [x1, x2, ry] = s.roof; const roof = slabS(x2 - x1, 0.05, 1.50, 0.02, 8); crownGeo(roof, { crown: 0.03, crownHW: 0.75, mode: 'bend' }); roof.translate((x1 + x2) / 2, ry, 0); add('paint', bend(roof));
-      for (const z of [-0.73, 0.73]) s.pillars.forEach((p, i) => {
-        const a = [p[0], p[1], z * bendF(p[0], p[1])], b = [p[2], p[3], z * bendF(p[2], p[3])], L = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
-        const g = new T.BoxGeometry(L, 0.07, 0.07), m = new T.Matrix4(), q = new T.Quaternion().setFromUnitVectors(new T.Vector3(1, 0, 0), new T.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]).normalize());
-        m.compose(new T.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), q, new T.Vector3(1, 1, 1));
-        add(i > 0 && i < s.pillars.length - 1 && Math.abs(p[0] - p[2]) < 0.05 ? 'dark' : 'paint', g, m);
-      });
+      const [x1, x2, ry] = s.roof;
       if (s.rails) for (const z of [-0.6, 0.6]) { add('dark', new T.BoxGeometry(x2 - x1 - 0.1, 0.03, 0.04), M4((x1 + x2) / 2, ry + 0.07, z)); for (const xx of [x1 + 0.08, x2 - 0.08]) add('dark', new T.BoxGeometry(0.05, 0.05, 0.04), M4(xx, ry + 0.04, z)); }
       if (s.roofSpoiler) add('paint', RB(0.22, 0.03, 1.34, 0.012), M4(x1 - 0.06, ry + 0.015, 0));
-      if (s.blankRear) { const gl = s.glass, xa = -0.40, ya = gl[1][1] + (xa - gl[1][0]) / (gl[2][0] - gl[1][0]) * (gl[2][1] - gl[1][1]); for (const sd of [-1, 1]) add('paint', EX([[xa, 0.95], [xa, ya - 0.01], [gl[2][0] + 0.02, gl[2][1] - 0.01], [gl[3][0] + 0.02, gl[3][1]]], 0.012, 0, sd > 0 ? 0.745 : -0.757)); }
       if (s.bed) {
         const [bx1, bx2] = s.bed, len = bx1 - bx2, cxb = (bx1 + bx2) / 2;
         add('dark', new T.BoxGeometry(len, 0.012, 1.60), M4(cxb, 1.015, 0));
@@ -8488,19 +8680,21 @@ if ( uFx > 0.5 ) {
       }
     }
     /* bumpers, grille, lights, mirrors, door shut lines and handles */
-    const bump = s.classic ? 'chrome' : 'dark';
-    add(bump, RB(0.12, 0.17, 1.82, 0.05), M4(2.12, 0.37, 0)); add(bump, RB(0.12, 0.18, 1.82, 0.05), M4(R + 0.01, 0.40, 0));
-    add(s.classic ? 'chrome' : 'dark', RB(0.03, 0.09, 0.78, 0.02), M4(2.168, 0.585, 0)); add('dark', RB(0.02, 0.06, 0.70, 0.02), M4(2.185, 0.36, 0));
-    const tailX = rearX(s.van ? 1.08 : s.tailY) - 0.03;
+    const bump = s.classic ? 'chrome' : 'paint';
+    const lowXL = s.classic ? 2.185 : SKL.faceX(true, 0.36) + 0.004;
+    if (s.classic) { add(bump, RB(0.12, 0.17, 1.82, 0.05), M4(2.16, 0.37, 0)); add(bump, RB(0.12, 0.18, 1.82, 0.05), M4(R - 0.03, 0.40, 0)); }
+    else { add('dark', RB(0.09, 0.10, 1.56, 0.03), M4(2.07, 0.235, 0)); for (const sd of [-1, 1]) add('lamp', new T.BoxGeometry(0.02, 0.05, 0.07), M4(lowXL, 0.36, sd * 0.49)); }
+    add(s.classic ? 'chrome' : 'dark', RB(0.03, s.classic ? 0.09 : 0.15, 0.78, 0.02), M4(2.166, s.classic ? 0.585 : 0.575, 0)); add('dark', RB(0.02, 0.06, 0.70, 0.02), M4(lowXL, 0.36, 0));
+    const tailX = SKL.faceX(false, s.van ? 1.08 : s.tailY) + 0.014;
     for (const sd of [-1, 1]) {
       if (s.classic) { const lp = new T.CylinderGeometry(0.055, 0.055, 0.03, 20); lp.rotateZ(PI / 2); add('lamp', lp, M4(2.168, 0.64, sd * 0.60)); const ring = new T.TorusGeometry(0.058, 0.01, 6, 20); ring.rotateY(PI / 2); add('chrome', ring, M4(2.183, 0.64, sd * 0.60)); }
-      else { add('lamp', RB(0.05, 0.085, 0.33, 0.024), M4(2.148, 0.635, sd * 0.545)); add('chrome', RB(0.01, 0.06, 0.08, 0.02), M4(2.165, 0.638, sd * 0.47)); }
-      if (s.van) add('tail', RB(0.05, 0.30, 0.12, 0.02), M4(tailX, 1.08, sd * 0.74)); else add('tail', RB(0.05, 0.085, 0.36, 0.02), M4(tailX, s.tailY, sd * 0.58));
+      else { add('lamp', RB(0.05, 0.085, 0.33, 0.024), M4(2.148, 0.635, sd * 0.5)); add('chrome', RB(0.01, 0.06, 0.08, 0.02), M4(2.165, 0.638, sd * 0.43)); }
+      if (s.van) add('tail', RB(0.05, 0.30, 0.12, 0.02), M4(tailX, 1.08, sd * 0.74)); else add('tail', RB(0.05, 0.085, 0.36, 0.02), M4(tailX, s.tailY, sd * 0.5));
       { const mg = RB(0.12, 0.08, 0.16, 0.03); mg.applyMatrix4(M4(0.66, s.van ? 1.08 : 1.0, sd * 0.97)); add('paint', bend(mg)); const gg = new T.BoxGeometry(0.004, 0.06, 0.11); gg.applyMatrix4(M4(0.598, s.van ? 1.08 : 1.0, sd * 0.97)); add('glass', bend(gg)); }
       const seams = s.seams || [0.78, -0.35].concat(s.doors > 1 ? [-1.15] : []);
       seams.forEach((x, i) => {
         const inArch = Math.abs(x - 1.35) < 0.45 || Math.abs(x - s.rx) < 0.45, y0 = inArch ? 0.66 : 0.35;
-        { const sg = new T.BoxGeometry(0.008, 0.93 - y0, 0.008, 1, 8, 1); sg.applyMatrix4(M4(x, (0.93 + y0) / 2, sd * 0.905)); add('dark', bend(sg)); }
+        { const sg = new T.BoxGeometry(0.008, 0.885 - y0, 0.008, 1, 8, 1); sg.applyMatrix4(M4(x, (0.885 + y0) / 2, sd * 0.905)); add('dark', bend(sg)); }
         if (i > 0) { const hg = RB(0.11, 0.025, 0.02, 0.008); hg.applyMatrix4(M4(x + 0.15, 0.82, sd * 0.912)); add('chrome', bend(hg)); }
       });
       if (s.clad) for (const ax of [1.35, s.rx]) { const csh = new T.Shape(); csh.absarc(ax, 0.30, 0.45, 0, PI, false); csh.absarc(ax, 0.30, 0.385, PI, 0, true); const cg = new T.ExtrudeGeometry(csh, { depth: 0.05, bevelEnabled: false, curveSegments: 14 }); cg.translate(0, 0, sd > 0 ? 0.87 : -0.92); add('dark', bend(cg)); }
@@ -8523,6 +8717,9 @@ if ( uFx > 0.5 ) {
     }
     const out = { len: 2.2 - R, rear: R, tailX, plateY: s.plateY, scale: s.scale || 1, wide: s.wide || 1, tall: s.van ? 1.95 : s.roof ? s.roof[2] : 1.3 };
     for (const k of Object.keys(P)) if (P[k].length) out[k] = mergeGeo(P[k]);
+    /* everything fixed to the body follows the sweep of its nose and tail; then the skin itself goes in */
+    for (const k of ['paint', 'glass', 'dark', 'chrome', 'lamp', 'tail']) if (out[k]) { const q = out[k].attributes.position; for (let i = 0; i < q.count; i++) q.setX(i, q.getX(i) + bow24(q.getX(i), q.getZ(i), R, s.rx, s.van)); }
+    for (const k of ['paint', 'glass', 'dark', 'well']) if (SKL[k]) { const old = out[k]; out[k] = old ? mergeGeo([[old, null], [SKL[k], null]]) : SKL[k]; if (old) { old.dispose(); SKL[k].dispose(); } }
     made.forEach(g => g.dispose());
     LITE[name] = out;
     return out;
@@ -17075,7 +17272,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 24</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 25</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -17556,7 +17753,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 24;
+const BUILD = 25;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -22176,6 +22373,17 @@ function showWhatsNew24() {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 25: what's new */
+function showWhatsNew25(had24) {
+  showModal(`<div><span class="label">Build 25</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>All-new car bodies.</b> Every car, van and pickup has been remodelled: curved panels, rounded noses and tails, flared wheel arches and a proper glass line. No more boxes.</li>
+      <li><b>Everywhere you see a car.</b> On the lift, in the side bays, out on the road, in the showroom and at the Fix-Off.</li>
+      <li><b>Lamps and grilles that fit.</b> Headlamps and tail lamps follow the shape of the body.</li>
+      ${had24 ? '' : '<li><b>Better lighting.</b> Soft glow round lamps and chrome, richer colour, a shadow under the car and a real sky on the road. Switch the effects off under Garage, Settings if your phone prefers.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -22183,8 +22391,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen24) { S.seen24 = true; save(); setTimeout(() => showWhatsNew24(), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen25) { const had24 = !!S.seen24; S.seen24 = true; S.seen25 = true; save(); setTimeout(() => showWhatsNew25(had24), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
