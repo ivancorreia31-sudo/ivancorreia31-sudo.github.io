@@ -1158,6 +1158,8 @@ body.tool22 .bolt.seized .hex{box-shadow:0 0 10px var(--tool22)}
 .gate22 .gate-car small{display:block;color:var(--muted);font-size:12.5px}
 .gate22 .gate-car .row{flex-wrap:wrap;justify-content:flex-end;gap:6px}
 .step.mini .st-sub,.step.mini .st-why,.step.mini .st-note{display:none}.step.mini h3{font-size:19px}.st-mini{margin-left:2px}
+/* ===== build 24 ===== */
+.subtabs{margin:6px -16px 0}
 /* ===== build 23: skip time ===== */
 .clk23{display:flex;align-items:center;gap:6px;min-width:0}
 .h-skip{width:26px;height:22px;flex:0 0 auto;border-radius:7px;border:1.5px solid rgba(242,183,5,.6);background:rgba(242,183,5,.12);color:#F7D35A;display:inline-grid;place-items:center;padding:0;cursor:pointer}
@@ -2445,7 +2447,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -4713,7 +4715,7 @@ const Car3D = (() => {
   let HEMI0 = 0.1, EXPO0 = 1.0;
   const hemi = new T.HemisphereLight(0xffffff, 0x7d8580, HEMI0); scene.add(hemi);
   /* the key light casts real shadows from the car and lift onto the floor */
-  const sun = new T.DirectionalLight(0xfff4e6, 0.95); sun.position.set(2.5, 9, 3.5); sun.castShadow = true;
+  const sun = new T.DirectionalLight(0xfff1dc, 1.3); sun.position.set(2.5, 9, 3.5); sun.castShadow = true;
   const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 700;
   sun.shadow.mapSize.set(smallScreen ? 1024 : 2048, smallScreen ? 1024 : 2048);
   Object.assign(sun.shadow.camera, { left: -5.5, right: 5.5, top: 5.5, bottom: -5.5, near: 1, far: 26 });
@@ -5190,7 +5192,7 @@ const Car3D = (() => {
   });
   for (const k of ['clad', 'roofP', 'rooflight', 'grime', 'stain', 'girder', 'liftPaint', 'liftArm', 'zinc', 'plate', 'toolRed', 'craneRed', 'benchSteel', 'benchTop', 'drumBlue', 'drumBlack', 'safety', 'enclosure', 'yellowPaint', 'rack', 'galv', 'card2', 'blackPlastic']) M[k].name = k;
   /* the floor and walls themselves */
-  M.floor.map = TX.concrete; M.floor.roughnessMap = TX.concreteR; M.floor.roughness = 1; M.floor.envMapIntensity = 1; M.floor.color.copy(col('#FFFFFF')); M.floor.needsUpdate = true;
+  M.floor.map = TX.concrete; M.floor.roughnessMap = TX.concreteR; M.floor.roughness = 1; M.floor.envMapIntensity = 0.74; M.floor.color.copy(col('#FFFFFF')); M.floor.needsUpdate = true;
   M.wall.map = TX.block; M.wall.bumpMap = TX.blockB; M.wall.bumpScale = 0.02; M.wall.color.copy(col('#BDBCB4')); M.wall.roughness = 0.9; M.wall.needsUpdate = true;
   M.dado.map = TX.block; M.dado.bumpMap = TX.blockB; M.dado.bumpScale = 0.02; M.dado.color.copy(col('#59625C')); M.dado.roughness = 0.75; M.dado.needsUpdate = true;
   M.ceil.color.copy(col('#2E3331'));
@@ -8686,6 +8688,9 @@ if ( uFx > 0.5 ) {
   const glowTex = (() => { const gc = document.createElement('canvas'); gc.width = gc.height = 128; const gx = gc.getContext('2d'), gg = gx.createRadialGradient(64, 64, 6, 64, 64, 64); gg.addColorStop(0, 'rgba(255,255,255,1)'); gg.addColorStop(0.6, 'rgba(255,255,255,0.55)'); gg.addColorStop(1, 'rgba(255,255,255,0)'); gx.fillStyle = gg; gx.fillRect(0, 0, 128, 128); return new T.CanvasTexture(gc); })();
   const glowMat = new T.MeshBasicMaterial({ map: glowTex, color: col('#27E6FF'), transparent: true, depthWrite: false, opacity: 0, blending: T.AdditiveBlending, toneMapped: false });
   const glowPlane = new T.Mesh(new T.PlaneGeometry(5.6, 2.8), glowMat); glowPlane.rotation.x = -PI / 2; glowPlane.position.y = 0.01; scene.add(glowPlane);
+  const aoTex = (() => { const gc = document.createElement('canvas'); gc.width = 256; gc.height = 128; const gx = gc.getContext('2d'); gx.setTransform(2, 0, 0, 1, -128, 0); const gg = gx.createRadialGradient(128, 64, 10, 128, 64, 64); gg.addColorStop(0, 'rgba(0,0,0,0.95)'); gg.addColorStop(0.5, 'rgba(0,0,0,0.6)'); gg.addColorStop(0.8, 'rgba(0,0,0,0.18)'); gg.addColorStop(1, 'rgba(0,0,0,0)'); gx.fillStyle = gg; gx.fillRect(0, 0, 256, 128); return new T.CanvasTexture(gc); })();
+  const aoMat = new T.MeshBasicMaterial({ map: aoTex, transparent: true, depthWrite: false, opacity: 0, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
+  const aoPlane = new T.Mesh(new T.PlaneGeometry(5.3, 2.5), aoMat); aoPlane.rotation.x = -PI / 2; aoPlane.position.y = 0.006; aoPlane.renderOrder = 1; scene.add(aoPlane);
   /* a work lamp under the lift lights the underside once the car is up */
   const underLight = new T.PointLight(0xfff1dc, 0, 6, 2); scene.add(underLight);
   /* rolling road (dyno) in the floor, and a laptop on a trolley, shown while tuning */
@@ -8821,8 +8826,9 @@ if ( uFx > 0.5 ) {
     let ca = 1; if (cc0) { renderer.getClearColor(clearTmp); ca = renderer.getClearAlpha ? renderer.getClearAlpha() : 1; renderer.setClearColor(0x000000, 1); }
     scene.background = null;
     let cc;
+    POST.hold = true;
     try { renderer.render(scene, camera); cc = snap(); }
-    finally { swaps.forEach(([o, m]) => { o.material = m; }); hid.forEach(o => { o.visible = true; }); scene.background = bg; if (cc0) renderer.setClearColor(clearTmp, ca); }
+    finally { POST.hold = false; swaps.forEach(([o, m]) => { o.material = m; }); hid.forEach(o => { o.visible = true; }); scene.background = bg; if (cc0) renderer.setClearColor(clearTmp, ca); }
     const px = cc.getContext('2d').getImageData(0, 0, W, H).data, cls = new Uint8Array(W * H);
     for (let i = 0, j = 0; i < W * H; i++, j += 4) cls[i] = DECODE[(px[j] > 127 ? 1 : 0) | (px[j + 1] > 127 ? 2 : 0) | (px[j + 2] > 127 ? 4 : 0)];
     out.cls = cls;
@@ -9077,6 +9083,7 @@ if ( uFx > 0.5 ) {
       blobs[2].position.x = rx; blobs[2].position.z = -wz; blobs[3].position.x = rx; blobs[3].position.z = wz;
       underLight.intensity = car ? clampN((st.lift - 0.45) * 1.1, 0, 0.9) : 0;
       glowMat.opacity = car && glowOn ? clampN(0.9 - st.lift * 1.6, 0, 0.9) : 0; glowPlane.position.x = st.carX + ((sty.rx + 1.35) / 2) * sx; glowPlane.scale.set(sx, sx, 1);
+      { const up = 1 + st.lift * 0.22; aoMat.opacity = car ? clampN(0.6 - st.lift * 0.26, 0.14, 0.6) : 0; aoPlane.position.x = glowPlane.position.x; aoPlane.scale.set(sx * up, sx * up, 1); }
       underLight.position.set(st.carX + 0.3, Math.max(0.15, st.lift * 0.45), 0);
     }
     rig.position.y = st.lift + 0.30 * (sty.scale - 1);
@@ -10473,6 +10480,7 @@ if ( uFx > 0.5 ) {
     if (!W || !W.sun) return;
     const wet = weather === 'rain', t = clampN(((clock || 600) - 330) / 780, 0, 1), el = Math.max(0.16, Math.sin(PI * t)), az = PI * t, warm = Math.pow(1 - el, 1.6);
     W.sunOff = [Math.cos(az) * 62, 22 + 52 * el, -Math.sin(az) * 34 - 12];
+    if (W.sunDisc) { const so = W.sunOff, sl = Math.hypot(so[0], so[1], so[2]) || 1; W.sunDisc.position.set(so[0] / sl * 370, so[1] / sl * 370, so[2] / sl * 370); W.sunDisc.visible = !wet; W.sunDisc.material.color.copy(moodA.set('#FFFFFF').lerp(moodB.set('#FFB877'), warm)); }
     W.sun.color.copy(moodA.set('#FFF2DE').lerp(moodB.set('#FFAA66'), warm));
     W.sun.intensity = (wet ? 0.45 : 1.75) * (0.6 + 0.4 * el);
     if (W.hemi) { W.hemi.color.copy(moodA.set(wet ? '#C4CCD2' : '#EAF3FF').lerp(moodB.set('#FFD7B4'), wet ? 0 : warm * 0.7)); W.hemi.intensity = wet ? 0.55 : 0.26; }
@@ -10571,9 +10579,20 @@ if ( uFx > 0.5 ) {
     W.bumps = [tg.bump1, tg.bump2];
     const flat = (g, mat, x, y, z) => { const m = new T.Mesh(g, mat); m.rotation.x = -PI / 2; m.position.set(x, y, z); m.receiveShadow = true; sc.add(m); return m; };
     /* sky dome */
-    const skyTex = canvasTex(64, 256, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#5D97D2'); gr.addColorStop(0.42, '#9CC4E6'); gr.addColorStop(0.5, skyCol); gr.addColorStop(1, skyCol); c.fillStyle = gr; c.fillRect(0, 0, w, h); });
+    const skyTex = canvasTex(1024, 256, (c, w, h) => {
+      const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#3F7FC6'); gr.addColorStop(0.3, '#74ACDD'); gr.addColorStop(0.44, '#B5D4EC'); gr.addColorStop(0.5, skyCol); gr.addColorStop(1, skyCol); c.fillStyle = gr; c.fillRect(0, 0, w, h);
+      let sd = 24; const rnd = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+      const puff = (x, y, r, al) => { for (const dx of [-w, 0, w]) { const g = c.createRadialGradient(x + dx, y, r * 0.1, x + dx, y, r); g.addColorStop(0, 'rgba(255,255,255,' + al + ')'); g.addColorStop(0.55, 'rgba(255,255,255,' + (al * 0.55) + ')'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(x + dx - r, y - r, r * 2, r * 2); } };
+      for (let i = 0; i < 16; i++) { const cx = rnd() * w, cy = h * (0.2 + rnd() * 0.24), n = 4 + (rnd() * 5 | 0), big = 14 + rnd() * 20; c.save(); c.beginPath(); c.rect(0, 0, w, cy + big * 0.28); c.clip(); for (let k = 0; k < n; k++) puff(cx + (k - n / 2) * big * 0.75 + rnd() * 8, cy - rnd() * big * 0.3, big * (0.7 + rnd() * 0.6), 0.5 + rnd() * 0.3); c.restore(); }
+      const hz = c.createLinearGradient(0, h * 0.4, 0, h * 0.5); hz.addColorStop(0, 'rgba(255,255,255,0)'); hz.addColorStop(1, 'rgba(255,250,240,0.55)'); c.fillStyle = hz; c.fillRect(0, h * 0.4, w, h * 0.1);
+    });
     const dome = new T.Mesh(new T.SphereGeometry(390, 24, 12), new T.MeshBasicMaterial({ map: skyTex, side: T.BackSide, toneMapped: false, depthWrite: false, fog: false }));
     dome.renderOrder = -10; sc.add(dome); W.dome = dome;
+    try {
+      const sunTex = canvasTex(128, 128, (c, w, h) => { c.clearRect(0, 0, w, h); const g = c.createRadialGradient(64, 64, 2, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.09, 'rgba(255,252,235,1)'); g.addColorStop(0.16, 'rgba(255,240,200,0.5)'); g.addColorStop(0.45, 'rgba(255,225,170,0.14)'); g.addColorStop(1, 'rgba(255,220,160,0)'); c.fillStyle = g; c.fillRect(0, 0, w, h); });
+      const sd = new T.Sprite(new T.SpriteMaterial({ map: sunTex, transparent: true, depthWrite: false, fog: false, toneMapped: false, blending: T.AdditiveBlending }));
+      sd.scale.set(120, 120, 1); sd.renderOrder = -9; sc.add(sd); W.sunDisc = sd;
+    } catch (e) { /* no sprites here */ }
     /* clouds: a few soft sprites high up */
     const cloudTex = canvasTex(256, 128, (c, w, h) => { for (let i = 0; i < 9; i++) { const x = 40 + Math.random() * (w - 80), y = 50 + Math.random() * 30, r = 22 + Math.random() * 26, g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); } });
     for (let i = 0; i < 9; i++) {
@@ -11492,6 +11511,55 @@ if ( uFx > 0.5 ) {
   /* anything the game asks of the 3D view may change the scene, so the shadows get redrawn on the next frame
      (turning the camera alone never needs them redrawn) */
   Object.keys(api).forEach(k => { const f = api[k]; if (typeof f !== 'function' || /^(ext|on|perf|tri|renderInfo|envState|driving|fpState|routeInfo|stageEl|bayTest)/.test(k)) return; api[k] = function () { shadowDirty = true; return f.apply(this, arguments); }; });
+  /* ======================= build 24: the picture gets a finish =======================
+     Each frame is drawn into an off-screen buffer, then one quick pass adds a soft glow round bright things (strip
+     lights, chrome glints, neon, headlamps, the low sun), a gentle vignette and a touch more colour and contrast.
+     WebGL 2 only (the buffer has to be multisampled to keep edges smooth); anything older draws exactly as before,
+     and so does a phone that's already had to drop to its lowest resolution. Off in Garage > Settings. */
+  const POST = { ok: false, user: true, auto: true, busy: false, bloom: 0.5, vig: 0.26, thr: 0.8 };
+  (function postInit() {
+    try {
+      if (!renderer.capabilities || !renderer.capabilities.isWebGL2 || !T.WebGLMultisampleRenderTarget || !T.ShaderMaterial || !T.OrthographicCamera || !T.PlaneGeometry) return;
+      const sz = new T.Vector2();
+      const main = new T.WebGLMultisampleRenderTarget(4, 4, { minFilter: T.LinearFilter, magFilter: T.LinearFilter, format: T.RGBAFormat, encoding: T.sRGBEncoding });
+      const small = () => new T.WebGLRenderTarget(2, 2, { minFilter: T.LinearFilter, magFilter: T.LinearFilter, format: T.RGBAFormat, depthBuffer: false, stencilBuffer: false });
+      const a = small(), b = small();
+      const cam = new T.OrthographicCamera(-1, 1, 1, -1, 0, 1), sc = new T.Scene();
+      const VS = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }';
+      const mat = (fs, u) => new T.ShaderMaterial({ vertexShader: VS, fragmentShader: fs, uniforms: u, depthTest: false, depthWrite: false, toneMapped: false });
+      const mBright = mat('uniform sampler2D t; uniform vec2 px; uniform float thr; varying vec2 vUv; void main(){ vec3 c = (texture2D(t, vUv + px * vec2(-1.0, -1.0)).rgb + texture2D(t, vUv + px * vec2(1.0, -1.0)).rgb + texture2D(t, vUv + px * vec2(-1.0, 1.0)).rgb + texture2D(t, vUv + px * vec2(1.0, 1.0)).rgb) * 0.25; float l = max(c.r, max(c.g, c.b)); gl_FragColor = vec4(c * smoothstep(thr, thr + 0.2, l), 1.0); }',
+        { t: { value: null }, px: { value: new T.Vector2() }, thr: { value: POST.thr } });
+      const mBlur = mat('uniform sampler2D t; uniform vec2 d; varying vec2 vUv; void main(){ vec3 c = texture2D(t, vUv).rgb * 0.2270; c += (texture2D(t, vUv + d * 1.3846).rgb + texture2D(t, vUv - d * 1.3846).rgb) * 0.3162; c += (texture2D(t, vUv + d * 3.2308).rgb + texture2D(t, vUv - d * 3.2308).rgb) * 0.0703; gl_FragColor = vec4(c, 1.0); }',
+        { t: { value: null }, d: { value: new T.Vector2() } });
+      const mOut = mat('uniform sampler2D t; uniform sampler2D g; uniform float bloom; uniform float vig; varying vec2 vUv; void main(){ vec3 c = texture2D(t, vUv).rgb; vec3 gl = texture2D(g, vUv).rgb; c = 1.0 - (1.0 - c) * (1.0 - gl * bloom); float l = dot(c, vec3(0.2126, 0.7152, 0.0722)); c = mix(vec3(l), c, 1.1); c = mix(c, c * c * (3.0 - 2.0 * c), 0.16); vec2 q = vUv - 0.5; c *= 1.0 - vig * smoothstep(0.32, 0.86, length(q) * 1.18); gl_FragColor = vec4(clamp(c, 0.0, 1.0), 1.0); }',
+        { t: { value: null }, g: { value: null }, bloom: { value: POST.bloom }, vig: { value: POST.vig } });
+      const quad = new T.Mesh(new T.PlaneGeometry(2, 2), mOut); quad.frustumCulled = false; sc.add(quad);
+      const base = renderer.render.bind(renderer);
+      const pass = (m, target) => { quad.material = m; renderer.setRenderTarget(target); base(sc, cam); };
+      POST.draw = (scene, camera) => {
+        renderer.getDrawingBufferSize(sz);
+        const W = Math.max(4, sz.x | 0), H = Math.max(4, sz.y | 0);
+        if (main.width !== W || main.height !== H) { main.setSize(W, H); const w = Math.max(2, W >> 2), h = Math.max(2, H >> 2); a.setSize(w, h); b.setSize(w, h); }
+        renderer.setRenderTarget(main); base(scene, camera);
+        mBright.uniforms.t.value = main.texture; mBright.uniforms.px.value.set(1 / W, 1 / H); mBright.uniforms.thr.value = POST.thr; pass(mBright, a);
+        mBlur.uniforms.t.value = a.texture; mBlur.uniforms.d.value.set(1 / a.width, 0); pass(mBlur, b);
+        mBlur.uniforms.t.value = b.texture; mBlur.uniforms.d.value.set(0, 1 / a.height); pass(mBlur, a);
+        mBlur.uniforms.t.value = a.texture; mBlur.uniforms.d.value.set(2.2 / a.width, 0); pass(mBlur, b);
+        mBlur.uniforms.t.value = b.texture; mBlur.uniforms.d.value.set(0, 2.2 / a.height); pass(mBlur, a);
+        mOut.uniforms.t.value = main.texture; mOut.uniforms.g.value = a.texture; mOut.uniforms.bloom.value = POST.bloom; mOut.uniforms.vig.value = POST.vig; pass(mOut, null);
+      };
+      renderer.render = function (scene, camera) {
+        if (!POST.ok || !POST.user || !POST.auto || POST.busy || POST.hold || renderer.getRenderTarget() || window.__noPost) return base(scene, camera);
+        if (typeof dprNow === 'number' && dprNow <= 0.76 && !window.__fixedDpr) { POST.auto = false; return base(scene, camera); }   /* struggling: plain frames from here on */
+        POST.busy = true;
+        try { POST.draw(scene, camera); } catch (e) { POST.ok = false; try { renderer.setRenderTarget(null); } catch (e2) { /* gone */ } window.__postErr = String(e && e.message || e); base(scene, camera); }
+        POST.busy = false;
+      };
+      POST.ok = true;
+    } catch (e) { POST.ok = false; window.__postErr = String(e && e.message || e); }
+  })();
+  api.post = v => { if (v != null) { POST.user = !!v; shadowDirty = true; } return { ok: POST.ok, user: POST.user, auto: POST.auto }; };
+  window.__post = () => ({ ok: POST.ok, user: POST.user, auto: POST.auto, err: window.__postErr || null });
   api.stageEl = () => stage;
   return api;
 })();
@@ -17007,7 +17075,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<span class="build-tag">Build 23</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 24</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -17488,7 +17556,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 23;
+const BUILD = 24;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -22095,6 +22163,19 @@ function showWhatsNew23() {
     <p class="muted">Here are 40 Gold Bolts and 50 shards to try it out.</p>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 24: the lighting-effects switch, and what's new */
+hookOn('ensure', () => { try { if (Car3D.ok && Car3D.post) Car3D.post(S.fx24 !== false); } catch (e) { /* no 3D */ } });
+act22('fx24', () => { S.fx24 = S.fx24 === false; save(); try { if (Car3D.ok && Car3D.post) Car3D.post(S.fx24); } catch (e) { /* no 3D */ } toast(S.fx24 ? 'Lighting effects on: glow, depth and richer colour.' : 'Lighting effects off: plainer, and a little quicker on older phones.'); render(); });
+function showWhatsNew24() {
+  showModal(`<div><span class="label">Build 24</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Better lighting.</b> Lamps, chrome, neon and headlights glow softly, colours are richer and the picture has more depth. Switch it off under Garage, Settings if your phone prefers.</li>
+      <li><b>Cars that sit on the floor.</b> A proper shadow underneath, and a stronger workshop light.</li>
+      <li><b>A real sky.</b> Clouds and a sun out on the road, warm and low in the evening.</li>
+      <li><b>Tidier pages.</b> Less dead space under the section buttons.</li>
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -22102,7 +22183,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen24) { S.seen24 = true; save(); setTimeout(() => showWhatsNew24(), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
