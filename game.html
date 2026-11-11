@@ -1158,6 +1158,9 @@ body.tool22 .bolt.seized .hex{box-shadow:0 0 10px var(--tool22)}
 .gate22 .gate-car small{display:block;color:var(--muted);font-size:12.5px}
 .gate22 .gate-car .row{flex-wrap:wrap;justify-content:flex-end;gap:6px}
 .step.mini .st-sub,.step.mini .st-why,.step.mini .st-note{display:none}.step.mini h3{font-size:19px}.st-mini{margin-left:2px}
+/* ===== build 26 ===== */
+.cut26 canvas{animation:cut26 .3s ease-out}
+@keyframes cut26{from{opacity:.05}to{opacity:1}}
 /* ===== build 24 ===== */
 .subtabs{margin:6px -16px 0}
 /* ===== build 23: skip time ===== */
@@ -2447,7 +2450,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5271,7 +5274,7 @@ const Car3D = (() => {
     core.computeVertexNormals();
     CROWN.core = core; CROWN.card = new T.PlaneGeometry(1, 1);
     /* a lumpy hedge block */
-    const hb = new T.BoxGeometry(1, 1, 1, 5, 3, 3), hp = hb.attributes.position, hd = new Map();
+    const hb = new T.BoxGeometry(1, 1, 1, 3, 2, 2), hp = hb.attributes.position, hd = new Map();
     for (let i = 0; i < hp.count; i++) {
       const k = Math.round(hp.getX(i) * 1e3) + ',' + Math.round(hp.getY(i) * 1e3) + ',' + Math.round(hp.getZ(i) * 1e3);
       let s = hd.get(k); if (!s) hd.set(k, s = [(rnd20() - 0.5) * 0.08, (rnd20() - 0.5) * 0.06, (rnd20() - 0.5) * 0.08]);
@@ -5511,7 +5514,7 @@ const Car3D = (() => {
   let SK24 = null;
   function skin24(s, o) {
     o = o || {};
-    const lod = o.lod ? 1 : 0, R = s.rear, rx = s.rx, van = !!s.van, bay = !!o.bay, RA = 0.385;
+    const lod = Math.min(2, o.lod | 0), R = s.rear, rx = s.rx, van = !!s.van, bay = !!o.bay, RA = 0.385;
     const SF = (x, y) => sideF(x, y, R, van, rx);
     /* the deck line: boot, waist under the cabin, bonnet */
     const U = [[0.80, 0.93]].concat(s.upper);
@@ -5521,14 +5524,14 @@ const Car3D = (() => {
     const dp = []; for (let i = ti; i >= 1; i--) dp.push([U[i][0], U[i][1] + 0.04]);
     for (let i = 1; i < dp.length; i++) if (dp[i][0] <= dp[i - 1][0] + 0.002) dp[i][0] = dp[i - 1][0] + 0.002;
     dp.push([0.80, 0.968], [1.40, 0.926], [1.96, 0.855], [2.07, 0.795], [2.20, 0.74]);
-    const deck = chainRound(dp, 0.14, lod ? 4 : 7), dY = x => chainY(deck, x);
+    const deck = chainRound(dp, 0.14, [7, 4, 2][lod]), dY = x => chainY(deck, x);
     /* the cabin line: rear screen, roof, windscreen (or a van's box) */
     let cab = null, gxF = 0, gxR = 0, xWs = 0, xRr = 0;
     if (!s.open) {
       const G = van ? s.box : s.glass, n = G.length, lift = van ? 0.035 : 0.048;
       gxR = G[n - 1][0] - 0.02; gxF = G[0][0] + 0.02; xWs = G[1][0]; xRr = G[n - 2][0];
       const cp = [[gxR, dY(gxR)]]; for (let i = n - 2; i >= 1; i--) cp.push([G[i][0], G[i][1] + lift]); cp.push([gxF, dY(gxF)]);
-      cab = chainRound(cp, van ? 0.10 : 0.21, lod ? 4 : 8);
+      cab = chainRound(cp, van ? 0.10 : 0.21, [8, 4, 2][lod]);
     }
     const cabTop = x => { let y = chainY(cab, x); if (!van && x > xRr && x < xWs) { const u = (x - xRr) / (xWs - xRr); y += 0.016 * 4 * u * (1 - u); } return y; };
     const hgOf = x => (cab && x > gxR && x < gxF ? Math.max(0, cabTop(x) - dY(x)) : 0);
@@ -5536,18 +5539,18 @@ const Car3D = (() => {
     const archY = x => { let y = 0.30; for (const ax of [1.35, rx]) { const d = x - ax; if (Math.abs(d) < RA) y = Math.max(y, 0.30 + Math.sqrt(RA * RA - d * d)); } return y; };
     /* stations along the car: even steps along the top line, plus the places that must be exact */
     const must = [], auto = [];
-    { const ds = lod ? 0.15 : 0.075; let px = x0R, py = dY(px) + hgOf(px), acc = 0;
+    { const ds = [0.075, 0.15, 0.36][lod]; let px = x0R, py = dY(px) + hgOf(px), acc = 0;
       for (let x = x0R + 0.004; x < x0F; x += 0.004) { const y = dY(x) + hgOf(x); acc += Math.hypot(x - px, y - py); px = x; py = y; if (acc >= ds) { auto.push(x); acc = 0; } } }
     must.push(x0R, x0F, 1.75);
-    const nc = lod ? 3 : 5; for (let k = 1; k <= nc; k++) { const u = Math.sin(k / nc * PI / 2); must.push(x0R - eR * u, x0F + eF * u); }
-    const na = lod ? 7 : 12; for (const ax of [1.35, rx]) for (let k = 0; k <= na; k++) must.push(ax + RA * Math.cos(PI * k / na));
+    const nc = [5, 3, 2][lod]; for (let k = 1; k <= nc; k++) { const u = Math.sin(k / nc * PI / 2); must.push(x0R - eR * u, x0F + eF * u); }
+    const na = [12, 7, 4][lod]; for (const ax of [1.35, rx]) for (let k = 0; k <= na; k++) must.push(ax + RA * Math.cos(PI * k / na));
     if (cab) { must.push(gxF - 0.06, gxR + 0.06, van ? xWs + 0.02 : xWs - 0.02); if (!van) must.push(xRr + 0.02); for (const b of bands) must.push(b - 0.04, b + 0.04); if (van) must.push(-0.25, 0.72); if (s.blankRear) must.push(-0.40); }
     if (bay) must.push(0.80, 0.83, 2.03, 2.045);
     const xs = must.concat(auto.filter(a => must.every(m => Math.abs(m - a) > 0.014))).sort((a, b) => a - b).filter((x, i, arr) => i === 0 || x - arr[i - 1] > 1e-4);
     /* one half cross-section: roof or deck, roof edge, side glass, shelf, shoulder, flank, sill, wheel housing, floor */
-    const fa = lod ? [0, 0.34, 0.68, 0.94, 1] : [0, 0.06, 0.24, 0.42, 0.6, 0.78, 0.94, 1];
-    const fc = lod ? [0, 0.07, 0.55, 1] : [0, 0.07, 0.3, 0.53, 0.77, 1];
-    const nA = fa.length, nB = lod ? 2 : 4, nC = fc.length - 1, nS = lod ? 3 : 5, nE = lod ? 4 : 8;
+    const fa = lod > 1 ? [0, 0.5, 1] : lod ? [0, 0.34, 0.68, 0.94, 1] : [0, 0.06, 0.24, 0.42, 0.6, 0.78, 0.94, 1];
+    const fc = lod > 1 ? [0, 0.07, 1] : lod ? [0, 0.07, 0.55, 1] : [0, 0.07, 0.3, 0.53, 0.77, 1];
+    const nA = fa.length, nB = [4, 2, 1][lod], nC = fc.length - 1, nS = [5, 3, 2][lod], nE = [8, 4, 2][lod];
     const iB = nA, iC = iB + nB, iSh = iC + nC, iS = iSh + 1, iE = iS + nS, iL = iE + nE, iG = iL + 1, iH = iG + 1, iI = iH + 1, N = iI + 1;
     const rs = van ? 0.035 : 0.085, rsz = van ? 0.03 : 0.07, shelf = van ? 0 : 0.012, tumble = van ? 0.10 : 0.42, crown = 0.034;
     const sect = x => {
@@ -5669,7 +5672,7 @@ const Car3D = (() => {
       if (!arr.length) return null;
       const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(arr, 3));
       const uv = new Float32Array(arr.length / 3 * 2); for (let i = 0, k = 0; i < arr.length; i += 3) { uv[k++] = arr[i] * 0.5; uv[k++] = arr[i + 1] * 0.5; }
-      g.setAttribute('uv', new T.BufferAttribute(uv, 2)); smoothNormals(g, lod ? 50 : 40);
+      g.setAttribute('uv', new T.BufferAttribute(uv, 2)); smoothNormals(g, [40, 50, 62][lod]);
       return g;
     };
     const topAt = x => dY(x) + hgOf(x);
@@ -7870,11 +7873,154 @@ if ( uFx > 0.5 ) {
   let shutter = null, shutTexR = null, doorBar = null, doorPanel = null, outside = null, queueG = null, parkedG = null, skyMat = null;
   const DOOR_BTN = { x: 5.6, y: 1.5 };
   const WIN = { x0: -2.6, x1: 1.4, y0: 1.15, y1: 2.75 };
-  let roomG = null;
+  let roomG = null, roomGround26 = null;
+  const P26 = { ok: false, ready: false };
   const fpTargets = {};
+  /* ---- build 26: the workshop fitted out like a working garage. Air lines and trunking round the walls with drops to
+     couplers and sockets, a fuse board, a fire exit with its sign, safety notices, a first-aid box and a fire point; a
+     tyre bay in the front corner (changer, balancer, a rack of tyres on the wall); a parts washer, a pillar drill and
+     the welding bottles down the right-hand wall; a hatched strip inside the door and a green walkway. Things fixed to
+     the walls are merged into a few meshes; things that stand on the floor are separate, so you walk round them. ---- */
+  function fitOut26(g) {
+    const { W, D } = ROOM, G = () => new T.Group();
+    const blue = pbr('#2C6FB7', { roughness: 0.45, metalness: 0.3 }), galv = pbr('#AEB5B8', { roughness: 0.5, metalness: 0.7 }), white = std('#ECEDE8', { roughness: 0.6 }), dark = std('#1E2123', { roughness: 0.7 });
+    const grey = pbr('#7E868B', { roughness: 0.55, metalness: 0.4 }), red = std('#B3261E', { roughness: 0.45 }), yel = std('#E2B21A', { roughness: 0.55 }), rubber = std('#141615', { roughness: 0.92 }), brass = pbr('#B08D3C', { roughness: 0.35, metalness: 0.8 });
+    const steel = pbr('#C3C8CA', { roughness: 0.3, metalness: 0.85 });
+    /* --- services on the side walls --- */
+    {
+      const S = G();
+      for (const s of [-1, 1]) {
+        const xw = s * (W - 0.06), z0 = -D + 0.5, z1 = s < 0 ? D - 1.4 : 9.6;
+        S.add(cyl(0.019, z1 - z0, blue, xw, 2.85, (z0 + z1) / 2, 'z', 8));
+        for (let z = z0 + 0.6; z < z1; z += 2.4) S.add(box(0.05, 0.05, 0.03, galv, s * (W - 0.03), 2.85, z));
+        for (const z of (s < 0 ? [3.55, -2.5, -7.4] : [-3.45, -7.6])) {
+          S.add(cyl(0.014, 1.35, blue, xw, 2.175, z, null, 8)); S.add(box(0.07, 0.15, 0.09, dark, xw - s * 0.01, 1.44, z)); S.add(cyl(0.022, 0.05, steel, xw - s * 0.01, 1.35, z, null, 8)); S.add(cyl(0.012, 0.07, brass, xw - s * 0.01, 1.3, z, null, 8));
+          for (let k = 0; k < 6; k++) { const t = new T.Mesh(new T.TorusGeometry(0.075, 0.008, 5, 14), yel); t.rotation.x = PI / 2; t.position.set(xw - s * 0.09, 1.22 - k * 0.024, z); S.add(t); }
+          S.add(box(0.1, 0.02, 0.02, galv, xw - s * 0.05, 1.26, z));
+        }
+        /* trunking above the blockwork, with conduit down to the sockets */
+        S.add(box(0.07, 0.07, 2 * D - 0.4, galv, s * (W - 0.04), 3.12, 0));
+        for (const z of (s < 0 ? [0.6, -4.8, -9.6] : [-5.4, -9.4, 5.0])) { S.add(cyl(0.011, 1.75, galv, s * (W - 0.02), 2.215, z, null, 6)); S.add(box(0.045, 0.095, 0.16, white, s * (W - 0.025), 1.3, z)); for (const dz of [-0.04, 0.04]) S.add(box(0.008, 0.03, 0.03, dark, s * (W - 0.05), 1.3, z + dz)); }
+      }
+      /* the compressor's riser, and the fuse board with its isolators by the door on the right */
+      S.add(cyl(0.019, 1.75, blue, W - 0.06, 1.98, 9.6, null, 8));
+      S.add(rbox(0.17, 0.82, 0.56, 0.015, grey, W - 0.09, 1.62, 10.5)); S.add(box(0.012, 0.74, 0.5, pbr('#8D959A', { roughness: 0.5, metalness: 0.4 }), W - 0.181, 1.62, 10.5)); S.add(box(0.02, 0.1, 0.03, dark, W - 0.19, 1.62, 10.3));
+      for (const z of [10.95, 11.2]) { S.add(box(0.1, 0.2, 0.14, grey, W - 0.05, 1.5, z)); S.add(box(0.03, 0.07, 0.03, red, W - 0.11, 1.52, z)); }
+      S.add(cyl(0.014, 1.5, galv, W - 0.02, 2.4, 10.5, null, 6));
+      g.add(bake20(S));
+    }
+    /* --- notices, the fire exit, first aid and a fire point on the left wall --- */
+    {
+      const N = G(), xw = -W + 0.012, onL = (m, y, z) => { m.rotation.y = PI / 2; m.position.set(xw, y, z); N.add(m); return m; };
+      const signs = canvasTex(512, 128, (c, w, h) => {
+        c.fillStyle = '#F4F4F0'; c.fillRect(0, 0, w, h);
+        const cell = i => i * 128 + 64;
+        /* wear eye protection */
+        c.fillStyle = '#1F5FA8'; c.beginPath(); c.arc(cell(0), 56, 46, 0, 7); c.fill(); c.strokeStyle = '#FFFFFF'; c.lineWidth = 7; c.beginPath(); c.arc(cell(0) - 16, 56, 13, 0, 7); c.stroke(); c.beginPath(); c.arc(cell(0) + 16, 56, 13, 0, 7); c.stroke(); c.beginPath(); c.moveTo(cell(0) - 3, 54); c.lineTo(cell(0) + 3, 54); c.stroke();
+        /* mind out: vehicles moving */
+        c.fillStyle = '#F2C200'; c.strokeStyle = '#16191A'; c.lineWidth = 7; c.lineJoin = 'round'; c.beginPath(); c.moveTo(cell(1), 10); c.lineTo(cell(1) + 50, 98); c.lineTo(cell(1) - 50, 98); c.closePath(); c.fill(); c.stroke(); c.fillStyle = '#16191A'; c.fillRect(cell(1) - 5, 40, 10, 32); c.beginPath(); c.arc(cell(1), 84, 6, 0, 7); c.fill();
+        /* first aid */
+        c.fillStyle = '#1E8A4A'; c.fillRect(cell(2) - 46, 10, 92, 92); c.fillStyle = '#FFFFFF'; c.fillRect(cell(2) - 11, 24, 22, 64); c.fillRect(cell(2) - 32, 45, 64, 22);
+        /* no naked flames */
+        c.strokeStyle = '#C8201A'; c.lineWidth = 11; c.beginPath(); c.arc(cell(3), 56, 41, 0, 7); c.stroke(); c.fillStyle = '#16191A'; c.beginPath(); c.moveTo(cell(3), 28); c.quadraticCurveTo(cell(3) + 22, 56, cell(3), 84); c.quadraticCurveTo(cell(3) - 22, 60, cell(3), 28); c.fill(); c.beginPath(); c.moveTo(cell(3) - 29, 27); c.lineTo(cell(3) + 29, 85); c.stroke();
+        c.fillStyle = '#16191A'; c.font = '700 13px Barlow, sans-serif'; c.textAlign = 'center'; ['Eye protection', 'Vehicles moving', 'First aid', 'No naked flames'].forEach((t, i) => c.fillText(t, cell(i), 120));
+      });
+      const sm = std('#FFFFFF', { map: signs, roughness: 0.6 });
+      const sign = (i, y, z, sz) => { const gq = new T.PlaneGeometry(sz || 0.34, sz || 0.34), u = gq.attributes.uv; for (let k = 0; k < u.count; k++) u.setX(k, (i + u.getX(k)) / 4); return onL(new T.Mesh(gq, sm), y, z); };
+      sign(0, 2.3, 6.84, 0.3); sign(1, 1.95, 6.84, 0.3); sign(3, 1.6, 6.84, 0.3); sign(2, 2.08, 5.1, 0.3);
+      /* the fire exit: a steel door in a frame, a push bar, a kick plate, and a lit running-man sign over it */
+      const dz = 7.6, doorT = canvasTex(256, 512, (c, w, h) => {
+        c.fillStyle = '#3F5468'; c.fillRect(0, 0, w, h); c.strokeStyle = 'rgba(0,0,0,.22)'; c.lineWidth = 3; c.strokeRect(14, 14, w - 28, h - 28);
+        c.fillStyle = '#1E2A33'; c.fillRect(150, 60, 62, 120); c.strokeStyle = 'rgba(255,255,255,.25)'; c.lineWidth = 1; for (let k = 0; k < 7; k++) { c.beginPath(); c.moveTo(150 + k * 10, 60); c.lineTo(150 + k * 10 - 30, 180); c.stroke(); }
+        c.fillStyle = '#9AA1A5'; c.fillRect(0, h - 70, w, 70);
+        c.fillStyle = '#1E8A4A'; c.fillRect(30, 200, 196, 40); c.fillStyle = '#FFFFFF'; c.font = '800 22px Barlow, sans-serif'; c.textAlign = 'center'; c.fillText('FIRE EXIT · KEEP CLEAR', w / 2, 228);
+      });
+      onL(new T.Mesh(new T.PlaneGeometry(0.98, 2.06), std('#FFFFFF', { map: doorT, roughness: 0.55, metalness: 0.2 })), 1.03, dz).position.x = -W + 0.035;
+      for (const sz of [-1, 1]) N.add(box(0.07, 2.14, 0.07, dark, -W + 0.035, 1.07, dz + sz * 0.525)); N.add(box(0.07, 0.07, 1.12, dark, -W + 0.035, 2.14, dz));
+      N.add(box(0.04, 0.045, 0.8, steel, -W + 0.085, 1.05, dz)); for (const sz of [-1, 1]) N.add(box(0.06, 0.07, 0.05, dark, -W + 0.065, 1.05, dz + sz * 0.4));
+      const exitT = canvasTex(256, 96, (c, w, h) => { c.fillStyle = '#17924B'; c.fillRect(0, 0, w, h); c.fillStyle = '#FFFFFF'; c.font = '900 56px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'left'; c.textBaseline = 'middle'; c.fillText('EXIT', 96, h / 2 + 4);
+        c.beginPath(); c.arc(46, 22, 9, 0, 7); c.fill(); c.lineWidth = 8; c.lineCap = 'round'; c.strokeStyle = '#FFFFFF'; c.beginPath(); c.moveTo(46, 34); c.lineTo(40, 56); c.lineTo(26, 76); c.moveTo(40, 56); c.lineTo(56, 70); c.lineTo(60, 84); c.moveTo(30, 44); c.lineTo(46, 38); c.lineTo(64, 48); c.stroke(); });
+      N.add(box(0.06, 0.24, 0.62, dark, -W + 0.04, 2.42, dz)); onL(new T.Mesh(new T.PlaneGeometry(0.58, 0.2), new T.MeshBasicMaterial({ map: exitT, toneMapped: false })), 2.42, dz).position.x = -W + 0.072;
+      /* first-aid box and eyewash; a second extinguisher on a red board with a call point */
+      N.add(rbox(0.13, 0.38, 0.38, 0.015, white, -W + 0.07, 1.62, 5.1)); N.add(box(0.006, 0.2, 0.07, std('#1E8A4A', { roughness: 0.5 }), -W + 0.137, 1.62, 5.1)); N.add(box(0.006, 0.07, 0.2, std('#1E8A4A', { roughness: 0.5 }), -W + 0.138, 1.62, 5.1));
+      N.add(box(0.02, 1.0, 0.42, red, -W + 0.015, 1.15, 8.52)); N.add(cyl(0.075, 0.5, red, -W + 0.12, 0.98, 8.52, null, 14)); N.add(cyl(0.03, 0.1, dark, -W + 0.12, 1.28, 8.52, null, 10)); N.add(box(0.03, 0.03, 0.12, dark, -W + 0.12, 1.34, 8.56)); N.add(cyl(0.012, 0.3, rubber, -W + 0.16, 1.1, 8.6, null, 6));
+      N.add(box(0.05, 0.095, 0.095, red, -W + 0.03, 1.84, 8.52)); N.add(box(0.008, 0.04, 0.04, white, -W + 0.058, 1.84, 8.52)); N.add(cyl(0.06, 0.07, red, -W + 0.04, 2.5, 8.52, 'x', 14));
+      g.add(bake20(N));
+    }
+    /* --- the tyre bay: a rack of tyres on the wall, the changer and the balancer below --- */
+    {
+      const R = G(), xr = -W + 0.38, za = 8.95, zb = 11.25, rail = pbr('#C25A1C', { roughness: 0.5, metalness: 0.2 });
+      for (const z of [za, (za + zb) / 2, zb]) { R.add(box(0.05, 1.75, 0.05, galv, -W + 0.06, 2.55, z)); for (const y of [1.74, 2.72]) R.add(box(0.62, 0.04, 0.04, galv, -W + 0.33, y, z)); }
+      for (const y of [1.76, 2.74]) for (const x of [-W + 0.14, -W + 0.6]) R.add(box(0.045, 0.06, zb - za + 0.1, rail, x, y, (za + zb) / 2));
+      const tg = new T.TorusGeometry(0.2, 0.108, 9, 20);
+      for (const y of [1.79, 2.77]) for (let k = 0; k < 7; k++) { const t = new T.Mesh(tg, rubber); t.position.set(xr + ((k * 7) % 3 - 1) * 0.012, y + 0.308, za + 0.2 + k * 0.325); t.rotation.y = ((k * 5) % 3 - 1) * 0.05; R.add(t); }
+      g.add(bake20(R)); tg.dispose();
+      /* the tyre changer: a cabinet with a turntable, the column and swing arm with its mounting head, the bead breaker, three pedals */
+      const C = G(); C.position.set(-W + 1.0, 0, 10.6);
+      C.add(rbox(0.66, 0.5, 0.78, 0.03, red, 0, 0.25, 0)); C.add(cyl(0.3, 0.035, steel, 0.02, 0.535, 0, null, 24)); C.add(cyl(0.05, 0.05, dark, 0.02, 0.565, 0, null, 12));
+      for (let k = 0; k < 4; k++) { const a = k * PI / 2 + PI / 4; C.add(box(0.07, 0.05, 0.05, dark, 0.02 + Math.cos(a) * 0.24, 0.575, Math.sin(a) * 0.24)); }
+      C.add(box(0.13, 1.25, 0.13, red, -0.3, 1.1, 0)); C.add(box(0.5, 0.09, 0.09, dark, -0.07, 1.7, 0)); C.add(cyl(0.022, 0.95, steel, 0.16, 1.24, 0, null, 10)); C.add(box(0.07, 0.05, 0.11, dark, 0.16, 0.76, 0)); C.add(cyl(0.035, 0.1, yel, 0.16, 1.76, 0, null, 10));
+      C.add(box(0.06, 0.5, 0.06, dark, 0.1, 0.4, 0.44)); C.add(rbox(0.2, 0.26, 0.03, 0.01, steel, 0.2, 0.36, 0.5));
+      for (const z of [-0.2, 0, 0.2]) C.add(box(0.13, 0.03, 0.09, dark, 0.39, 0.06, z));
+      C.add(box(0.012, 0.1, 0.22, yel, 0.335, 0.36, 0));
+      g.add(bake20(C));
+      /* the wheel balancer: cabinet, weight tray, shaft with a wheel on it, hood, and a little screen */
+      const B = G(); B.position.set(-W + 0.95, 0, 9.35);
+      const bm = pbr('#3D5A73', { roughness: 0.5, metalness: 0.2 });
+      B.add(rbox(0.6, 0.9, 0.7, 0.03, bm, 0, 0.45, -0.1)); B.add(box(0.56, 0.05, 0.66, dark, 0, 0.925, -0.1));
+      [['#C8372D', -0.18], ['#E2B21A', -0.06], ['#2C6FB7', 0.06], ['#9AA1A5', 0.18]].forEach(([cl, x]) => B.add(box(0.09, 0.03, 0.2, std(cl, { roughness: 0.6 }), x, 0.96, -0.2)));
+      B.add(cyl(0.022, 0.36, steel, 0.02, 0.72, 0.43, 'z', 10));
+      const wt = new T.Mesh(new T.TorusGeometry(0.2, 0.105, 9, 20), rubber); wt.position.set(0.02, 0.72, 0.5); B.add(wt); B.add(cyl(0.2, 0.12, steel, 0.02, 0.72, 0.5, 'z', 20)); B.add(cyl(0.05, 0.14, dark, 0.02, 0.72, 0.5, 'z', 12));
+      const hood = new T.Mesh(new T.CylinderGeometry(0.38, 0.38, 0.3, 16, 1, true, 0, PI), std('#8D959A', { roughness: 0.5, side: DS })); hood.rotation.x = PI / 2; hood.rotation.y = PI / 2; hood.position.set(0.02, 0.76, 0.5); B.add(hood);
+      B.add(box(0.05, 0.42, 0.05, dark, -0.2, 1.15, -0.3)); const scr = box(0.03, 0.2, 0.3, dark, -0.18, 1.42, -0.3); scr.rotation.z = -0.25; B.add(scr);
+      const led = box(0.006, 0.12, 0.22, new T.MeshBasicMaterial({ color: col('#57E38A'), toneMapped: false }), -0.158, 1.424, -0.3); led.rotation.z = -0.25; B.add(led);
+      g.add(bake20(B));
+    }
+    /* --- down the right-hand wall: a parts washer, a pillar drill, the welding bottles on their trolley --- */
+    {
+      const P = G(); P.position.set(W - 0.5, 0, -2.3);
+      P.add(rbox(0.6, 0.34, 0.92, 0.03, red, 0, 0.82, 0)); P.add(box(0.5, 0.02, 0.82, dark, 0, 0.975, 0));
+      for (const [x, z] of [[-0.25, -0.4], [0.25, -0.4], [-0.25, 0.4], [0.25, 0.4]]) P.add(box(0.04, 0.66, 0.04, dark, x, 0.33, z));
+      const lid = rbox(0.03, 0.6, 0.92, 0.01, red, 0.33, 1.26, 0); lid.rotation.z = -0.22; P.add(lid);
+      P.add(cyl(0.012, 0.3, steel, 0.12, 1.1, 0.2, null, 6)); P.add(cyl(0.012, 0.14, steel, 0.06, 1.25, 0.2, 'x', 6));
+      P.add(cyl(0.2, 0.46, blue, 0, 0.24, 0, null, 18));
+      g.add(bake20(P));
+      const Dr = G(); Dr.position.set(W - 0.42, 0, -6.2);
+      const gm = pbr('#2F5D50', { roughness: 0.5, metalness: 0.2 });
+      Dr.add(box(0.5, 0.05, 0.36, gm, -0.08, 0.025, 0)); Dr.add(cyl(0.042, 1.72, steel, 0.08, 0.9, 0, null, 12)); Dr.add(box(0.34, 0.035, 0.34, gm, -0.14, 0.98, 0)); Dr.add(box(0.1, 0.1, 0.1, gm, 0.03, 0.96, 0));
+      Dr.add(rbox(0.62, 0.3, 0.26, 0.03, gm, -0.08, 1.72, 0)); Dr.add(rbox(0.66, 0.07, 0.3, 0.02, dark, -0.08, 1.9, 0)); Dr.add(cyl(0.1, 0.24, dark, 0.22, 1.68, 0, null, 14));
+      Dr.add(cyl(0.028, 0.2, steel, -0.26, 1.48, 0, null, 10)); Dr.add(cyl(0.02, 0.07, dark, -0.26, 1.35, 0, null, 10)); Dr.add(cyl(0.006, 0.14, steel, -0.26, 1.25, 0, null, 6));
+      for (let k = 0; k < 3; k++) { const h = cyl(0.009, 0.24, steel, -0.2, 1.62, 0.17, 'x', 6); h.rotation.z = k * 2.09 + 0.4; Dr.add(h); }
+      g.add(bake20(Dr));
+      const Bt = G(); Bt.position.set(W - 0.36, 0, -8.7);
+      Bt.add(box(0.36, 0.03, 0.62, dark, 0, 0.09, 0)); for (const z of [-0.28, 0.28]) Bt.add(cyl(0.085, 0.04, rubber, -0.1, 0.085, z * 1.25, 'z', 14)); Bt.add(box(0.03, 1.2, 0.03, dark, 0.16, 0.7, 0)); Bt.add(box(0.03, 0.03, 0.5, dark, 0.16, 1.3, 0));
+      Bt.add(cyl(0.11, 1.3, std('#7A2A22', { roughness: 0.5 }), -0.02, 0.76, -0.14, null, 16)); Bt.add(cyl(0.05, 0.12, steel, -0.02, 1.47, -0.14, null, 10));
+      Bt.add(cyl(0.11, 1.38, std('#1B1D1F', { roughness: 0.45 }), -0.02, 0.8, 0.14, null, 16)); Bt.add(cyl(0.112, 0.12, white, -0.02, 1.44, 0.14, null, 16)); Bt.add(cyl(0.05, 0.12, steel, -0.02, 1.55, 0.14, null, 10));
+      for (const [z, cl] of [[-0.14, red], [0.14, blue]]) Bt.add(box(0.06, 0.06, 0.1, brass, -0.1, z < 0 ? 1.5 : 1.58, z));
+      Bt.add(box(0.012, 0.04, 0.6, galv, -0.13, 1.05, 0));
+      g.add(bake20(Bt));
+    }
+    /* --- paint on the floor: hatching inside the door, and a green walkway from the fire exit to the back --- */
+    {
+      const haz = canvasTex(128, 64, (c, w, h) => { c.fillStyle = '#D9A514'; c.fillRect(0, 0, w, h); c.fillStyle = '#17191A'; for (let k = -2; k < 5; k++) { c.beginPath(); c.moveTo(k * 32, h); c.lineTo(k * 32 + 16, h); c.lineTo(k * 32 + 16 + h, 0); c.lineTo(k * 32 + h, 0); c.fill(); } });
+      haz.wrapS = haz.wrapT = T.RepeatWrapping; haz.repeat.set((2 * W - 2) / 0.8, 1);
+      const paint = o => pbr('#FFFFFF', Object.assign({ transparent: true, depthWrite: false, roughness: 0.7, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }, o));
+      const fl = (w, d, x, z, mat) => { const m = new T.Mesh(new T.PlaneGeometry(w, d), mat); m.rotation.x = -PI / 2; m.position.set(x, 0.004, z); m.renderOrder = 1; m.receiveShadow = true; g.add(m); return m; };
+      fl(2 * W - 2, 0.4, 0, D - 0.3, paint({ map: haz, opacity: 0.86 }));
+      const x0 = -W + 1.3, x1 = -W + 2.3, zA = -D + 2.7, zB = 6.6;
+      const gr = canvasTex(64, 256, (c, w, h) => { speckle(c, w, h, '#2F7D55', 0.1, 1500); c.fillStyle = '#E9E8E0'; c.fillRect(0, 0, 4, h); c.fillRect(w - 4, 0, 4, h); for (let i = 0; i < 260; i++) { c.clearRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 3, 1 + Math.random() * 4); } });
+      gr.wrapS = gr.wrapT = T.RepeatWrapping; gr.repeat.set(1, (zB - zA) / 4);
+      fl(x1 - x0, zB - zA, (x0 + x1) / 2, (zA + zB) / 2, paint({ map: gr, opacity: 0.8 }));
+      const man = canvasTex(128, 128, (c, w, h) => { c.clearRect(0, 0, w, h); c.fillStyle = '#E9E8E0'; c.strokeStyle = '#E9E8E0'; c.lineCap = 'round'; c.beginPath(); c.arc(64, 22, 11, 0, 7); c.fill(); c.lineWidth = 13; c.beginPath(); c.moveTo(64, 40); c.lineTo(60, 74); c.lineTo(42, 112); c.moveTo(60, 74); c.lineTo(80, 94); c.lineTo(84, 116); c.stroke(); c.lineWidth = 9; c.beginPath(); c.moveTo(40, 62); c.lineTo(62, 48); c.lineTo(88, 62); c.stroke(); });
+      const mm = paint({ map: man, opacity: 0.85 });
+      for (let z = zA + 1.5; z < zB; z += 4) { const m = fl(0.62, 0.62, (x0 + x1) / 2, z, mm); m.rotation.z = PI; m.position.y = 0.005; m.renderOrder = 2; }
+      /* the landing in front of the fire exit */
+      { const g2 = gr.clone(); g2.needsUpdate = true; g2.repeat.set(1, 0.4); fl(x1 - (-W + 0.5), 1.5, (x1 + (-W + 0.5)) / 2, zB + 0.75, paint({ map: g2, opacity: 0.8 })); }
+    }
+  }
   function buildRoom() {
     const { W, D, H } = ROOM, g = new T.Group(), DADO = 1.0, BLK = 3.0;
-    const ground = new T.Mesh(new T.PlaneGeometry(90, 90), std('#4A4D4A', { roughness: 1 })); ground.rotation.x = -PI / 2; ground.position.y = -0.01; g.add(ground);
+    const ground = new T.Mesh(new T.PlaneGeometry(90, 90), std('#4A4D4A', { roughness: 1 })); ground.rotation.x = -PI / 2; ground.position.y = -0.01; g.add(ground); roomGround26 = ground;
     /* the slab: power-floated concrete, a tile every 4.3 m */
     TX.concrete.repeat.set(2 * W / 4.3, 2 * D / 4.3);
     const floor = new T.Mesh(new T.PlaneGeometry(2 * W, 2 * D), M.floor); floor.rotation.x = -PI / 2; floor.receiveShadow = true; g.add(floor);
@@ -8166,6 +8312,7 @@ if ( uFx > 0.5 ) {
       const face = new T.Mesh(new T.PlaneGeometry(1.56, 1.06), new T.MeshStandardMaterial({ map: cork, roughness: 0.9 })); face.position.z = 0.022; nb.add(face);
       nb.position.set(W - 0.04, 1.9, 6.4); nb.rotation.y = -PI / 2; nb.userData.fpKind = 'board'; const nbB = bake20(nb); g.add(nbB); fpTargets.board = nbB;
     }
+    try { fitOut26(g); } catch (e) { window.__fit26Err = String(e && e.message || e); }
     g.traverse(o => { if (o.isMesh && o.parent !== g && !o.material.transparent) o.castShadow = true; });
     scene.add(g); roomG = g;
   }
@@ -8437,21 +8584,43 @@ if ( uFx > 0.5 ) {
     if (PG.ok) return PG;
     /* a limb turned on a lathe from [radius, height] pairs, listed from the bottom up */
     const limb = (pts, seg) => new T.LatheGeometry(pts.map(p => new T.Vector2(p[0], p[1])), seg || 12);
-    PG.thigh = limb([[0.001, -0.455], [0.042, -0.452], [0.054, -0.43], [0.058, -0.38], [0.066, -0.28], [0.075, -0.16], [0.083, -0.05], [0.086, 0.0], [0.072, 0.028], [0.001, 0.034]]);
-    PG.shin = limb([[0.001, -0.44], [0.034, -0.437], [0.038, -0.415], [0.04, -0.36], [0.049, -0.25], [0.057, -0.15], [0.055, -0.07], [0.05, -0.015], [0.042, 0.008], [0.001, 0.014]]);
-    PG.shoe = new T.SphereGeometry(1, 14, 8); PG.shoe.scale(0.138, 0.058, 0.054); PG.shoe.translate(0.062, -0.028, 0);
-    PG.sole = new T.BoxGeometry(0.278, 0.024, 0.1); PG.sole.translate(0.064, -0.074, 0);
+    PG.thigh = limb([[0.001, -0.462], [0.05, -0.458], [0.061, -0.435], [0.065, -0.38], [0.075, -0.28], [0.087, -0.16], [0.096, -0.05], [0.098, 0.0], [0.083, 0.03], [0.001, 0.038]], 14);
+    PG.shin = limb([[0.001, -0.44], [0.041, -0.437], [0.044, -0.41], [0.046, -0.35], [0.055, -0.25], [0.065, -0.15], [0.063, -0.07], [0.058, -0.015], [0.05, 0.008], [0.001, 0.016]], 14);
+    /* the calf sits at the back of the leg, not all the way round */
+    { const q = PG.shin.attributes.position; for (let i = 0; i < q.count; i++) { const y = q.getY(i), k = Math.max(0, 1 - Math.abs(y + 0.15) / 0.16); q.setX(i, q.getX(i) * (q.getX(i) < 0 ? 1 + 0.12 * k : 1 - 0.10 * k)); } PG.shin.computeVertexNormals(); }
+    PG.kneeJ = new T.SphereGeometry(0.062, 12, 8); PG.elbowJ = new T.SphereGeometry(0.047, 10, 8);
+    /* a boot: a rounded toe box, the body of the boot over the instep, a cuff round the ankle; and a sole with a heel */
+    { const toe = new T.SphereGeometry(1, 14, 10); toe.scale(0.088, 0.05, 0.057); toe.translate(0.118, -0.036, 0);
+      const mid = new T.SphereGeometry(1, 14, 10); mid.scale(0.112, 0.062, 0.058); mid.translate(0.03, -0.024, 0);
+      const cuff = new T.CylinderGeometry(0.052, 0.056, 0.085, 14); cuff.translate(-0.012, 0.012, 0);
+      PG.shoe = mergeGeo([[toe, null], [mid, null], [cuff, null]]); toe.dispose(); mid.dispose(); cuff.dispose();
+      const sl = new T.BoxGeometry(0.292, 0.022, 0.112); sl.translate(0.062, -0.077, 0); const heel = new T.BoxGeometry(0.09, 0.016, 0.108); heel.translate(-0.036, -0.094, 0);
+      const tread = new T.BoxGeometry(0.15, 0.012, 0.11); tread.translate(0.125, -0.092, 0);
+      PG.sole = mergeGeo([[sl, null], [heel, null], [tread, null]]); sl.dispose(); heel.dispose(); tread.dispose(); }
     PG.toe = PG.sole;
-    PG.pelvis = limb([[0.001, -0.1], [0.095, -0.096], [0.14, -0.06], [0.154, 0.0], [0.152, 0.06], [0.142, 0.095], [0.001, 0.1]], 18);
-    PG.torso = limb([[0.001, 0], [0.148, 0], [0.15, 0.08], [0.156, 0.2], [0.17, 0.31], [0.182, 0.41], [0.176, 0.47], [0.142, 0.525], [0.08, 0.552], [0.001, 0.558]], 20);
+    PG.pelvis = limb([[0.001, -0.108], [0.1, -0.104], [0.148, -0.062], [0.162, 0.0], [0.159, 0.06], [0.148, 0.098], [0.001, 0.104]], 20);
+    { const q = PG.pelvis.attributes.position; for (let i = 0; i < q.count; i++) { if (q.getX(i) < 0 && q.getY(i) < 0.04) q.setX(i, q.getX(i) * 1.12); } PG.pelvis.computeVertexNormals(); }
+    PG.belt = new T.CylinderGeometry(0.153, 0.156, 0.042, 20, 1, true); PG.buckle = new T.BoxGeometry(0.012, 0.04, 0.05);
+    PG.torso = limb([[0.001, -0.03], [0.146, -0.03], [0.15, 0.0], [0.151, 0.08], [0.158, 0.2], [0.174, 0.31], [0.19, 0.41], [0.197, 0.468], [0.192, 0.503], [0.152, 0.537], [0.086, 0.558], [0.001, 0.565]], 24);
+    /* a chest at the front, shoulder blades at the back, a waist between the ribs and the hips */
+    { const q = PG.torso.attributes.position, bump = (t, c, w) => Math.max(0, 1 - ((t - c) / w) * ((t - c) / w));
+      for (let i = 0; i < q.count; i++) { const x = q.getX(i), t = q.getY(i) / 0.56;
+        q.setX(i, x * (x > 0 ? 1 + 0.15 * bump(t, 0.66, 0.26) + 0.05 * bump(t, 0.2, 0.2) : 1 + 0.09 * bump(t, 0.72, 0.3)));
+        q.setZ(i, q.getZ(i) * (1 - 0.07 * bump(t, 0.22, 0.26) + 0.04 * bump(t, 0.8, 0.22))); }
+      PG.torso.computeVertexNormals(); }
     PG.hem = new T.CylinderGeometry(0.168, 0.19, 0.3, 18, 1, true); PG.hem.translate(0, -0.15, 0);
-    PG.upper = limb([[0.001, -0.305], [0.038, -0.3], [0.041, -0.275], [0.045, -0.2], [0.051, -0.1], [0.054, -0.03], [0.05, 0.015], [0.001, 0.035]]);
-    PG.fore = limb([[0.001, -0.28], [0.029, -0.276], [0.031, -0.255], [0.035, -0.18], [0.043, -0.08], [0.045, -0.02], [0.04, 0.01], [0.001, 0.018]]);
-    PG.sleeve = limb([[0.058, -0.16], [0.061, -0.1], [0.063, -0.03], [0.058, 0.02], [0.001, 0.045]]);
-    PG.shoulder = new T.SphereGeometry(0.058, 12, 8);
-    PG.hand = new T.SphereGeometry(0.044, 10, 8); PG.hand.scale(0.62, 1.2, 0.95); PG.hand.translate(0, -0.035, 0);
-    PG.thumb = new T.SphereGeometry(0.018, 8, 6); PG.thumb.scale(1, 1.8, 1); PG.thumb.rotateX(0.5); PG.thumb.translate(0.02, -0.03, 0);
-    PG.neck = new T.CylinderGeometry(0.047, 0.054, 0.12, 12);
+    PG.upper = limb([[0.001, -0.308], [0.043, -0.303], [0.046, -0.275], [0.05, -0.2], [0.058, -0.1], [0.062, -0.03], [0.057, 0.016], [0.001, 0.04]], 14);
+    PG.fore = limb([[0.001, -0.282], [0.031, -0.278], [0.033, -0.255], [0.038, -0.18], [0.048, -0.08], [0.05, -0.02], [0.045, 0.01], [0.001, 0.022]], 14);
+    PG.sleeve = limb([[0.064, -0.17], [0.067, -0.1], [0.069, -0.03], [0.063, 0.02], [0.001, 0.05]], 14);
+    PG.shoulder = new T.SphereGeometry(0.06, 14, 10);
+    PG.nape = new T.CylinderGeometry(0.113, 0.106, 0.1, 16, 1, true, PI, PI); PG.nape.translate(0, -0.035, 0);
+    PG.backPrint = new T.CylinderGeometry(0.2, 0.2, 0.085, 12, 1, true, 1.5 * PI - 0.52, 1.04);
+    /* a hand: the palm, and the fingers together below it, curled a touch; the thumb is its own piece */
+    { const palm = new T.SphereGeometry(0.05, 12, 8); palm.scale(0.5, 1.0, 0.92); palm.translate(0, -0.05, 0);
+      const fing = new T.SphereGeometry(0.044, 12, 8); fing.scale(0.42, 1.12, 0.9); fing.translate(0.008, -0.118, 0);
+      PG.hand = mergeGeo([[palm, null], [fing, null]]); palm.dispose(); fing.dispose(); }
+    PG.thumb = new T.SphereGeometry(0.02, 8, 6); PG.thumb.scale(0.9, 2.0, 0.9); PG.thumb.rotateZ(-0.5); PG.thumb.translate(0.028, -0.062, 0);
+    PG.neck = new T.CylinderGeometry(0.05, 0.06, 0.13, 14);
     PG.collar = new T.TorusGeometry(0.06, 0.014, 6, 18); PG.collar.rotateX(PI / 2);
     /* the head: a sphere with the jaw narrowed and the chin brought forward, the back of the skull rounded out */
     PG.head = new T.SphereGeometry(0.108, 28, 20);
@@ -8502,13 +8671,15 @@ if ( uFx > 0.5 ) {
       c.fillStyle = 'rgba(60,30,20,.28)'; for (const sx of [-1, 1]) { c.beginPath(); c.ellipse(cx + sx * 3.4, 77.5, 1.6, 1, 0, 0, 7); c.fill(); }
       for (const sx of [-1, 1]) {
         const ex = cx + sx * 12.5, ey = 61;
-        c.fillStyle = '#E9E3D8'; c.beginPath(); c.ellipse(ex, ey, 4.6, 2.2, 0, 0, 7); c.fill();
-        c.fillStyle = L.eyes; c.beginPath(); c.arc(ex + sx * 0.2, ey + 0.2, 2.1, 0, 7); c.fill();
-        c.fillStyle = '#0B0B0B'; c.beginPath(); c.arc(ex + sx * 0.2, ey + 0.2, 1, 0, 7); c.fill();
-        c.strokeStyle = shadeHex(L.skin, -0.55); c.lineWidth = 1.2; c.beginPath(); c.ellipse(ex, ey + 0.4, 5, 2.6, 0, PI * 1.05, PI * 1.95); c.stroke();
-        c.strokeStyle = brow; c.lineWidth = 2; c.lineCap = 'round'; c.beginPath(); c.moveTo(ex - sx * 6, 55); c.quadraticCurveTo(ex - sx * 0.5, 53.2, ex + sx * 6.4, 54.6); c.stroke();
+        c.fillStyle = '#F1ECE2'; c.beginPath(); c.ellipse(ex, ey, 5.4, 3.1, 0, 0, 7); c.fill();
+        c.fillStyle = L.eyes; c.beginPath(); c.arc(ex + sx * 0.2, ey + 0.1, 2.7, 0, 7); c.fill();
+        c.fillStyle = '#0B0B0B'; c.beginPath(); c.arc(ex + sx * 0.2, ey + 0.1, 1.3, 0, 7); c.fill();
+        c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.arc(ex + sx * 0.2 + 0.9, ey - 0.9, 0.7, 0, 7); c.fill();
+        c.strokeStyle = shadeHex(L.skin, -0.62); c.lineWidth = 1.5; c.beginPath(); c.ellipse(ex, ey + 0.3, 5.7, 3.5, 0, PI * 1.04, PI * 1.96); c.stroke();
+        c.strokeStyle = brow; c.lineWidth = 2.6; c.lineCap = 'round'; c.beginPath(); c.moveTo(ex - sx * 6.4, 54.4); c.quadraticCurveTo(ex - sx * 0.5, 51.8, ex + sx * 7, 53.6); c.stroke();
       }
-      c.strokeStyle = lip; c.lineWidth = 1.8; c.lineCap = 'round'; c.beginPath(); c.moveTo(cx - 6, 84); c.quadraticCurveTo(cx, 84.8, cx + 6, 84); c.stroke();
+      c.fillStyle = 'rgba(200,90,80,.10)'; for (const sx of [-1, 1]) { c.beginPath(); c.ellipse(cx + sx * 19, 73, 7, 5, 0, 0, 7); c.fill(); }
+      c.strokeStyle = lip; c.lineWidth = 2.1; c.lineCap = 'round'; c.beginPath(); c.moveTo(cx - 7.5, 83.4); c.quadraticCurveTo(cx, 86.4, cx + 7.5, 83.4); c.stroke();
       c.fillStyle = shadeHex(L.skin, -0.12); c.beginPath(); c.ellipse(cx, 87, 4.6, 1.5, 0, 0, 7); c.fill();
       if (L.beard) {
         c.fillStyle = L.hair; c.globalAlpha = 0.85;
@@ -8523,6 +8694,13 @@ if ( uFx > 0.5 ) {
     m = new T.MeshStandardMaterial({ map: tex, roughness: 0.62 });
     faceMats.set(key, m); return m;
   }
+  let BACK26 = null;
+  function backPrint26() {
+    if (BACK26) return BACK26;
+    const t = canvasTex(256, 64, (c, w, h) => { c.clearRect(0, 0, w, h); c.fillStyle = '#F2B705'; c.font = '900 44px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('BONNET UP', w / 2, h / 2 + 3); });
+    BACK26 = new T.MeshStandardMaterial({ map: t, transparent: true, depthWrite: false, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    return BACK26;
+  }
   function person(look) {
     const L = fillLook(look || {}), G = personGeos(), g = new T.Group(), rig = {};
     const overalls = L.topDo === 'overalls';
@@ -8531,12 +8709,14 @@ if ( uFx > 0.5 ) {
     const hipY = 0.952, b = L.build;
     const hips = new T.Group(); hips.position.y = hipY; g.add(hips); rig.hips = hips;
     add(hips, G.pelvis, L.bottom === 'skirt' ? pm(L.legs) : legs, 0, 0.02, 0).scale.set(0.8 * b, 1, b);
+    if (!overalls && L.bottom !== 'skirt' && L.topDo !== 'coat' && L.topDo !== 'hoodie') { add(hips, G.belt, pm('#2B2622', { roughness: 0.55 }), 0, 0.1, 0).scale.set(0.8 * b, 1, b); add(hips, G.buckle, pm('#B9B4A6', { roughness: 0.3, metalness: 0.7 }), 0.124 * b, 0.1, 0); }
     for (const sd of [-1, 1]) {
       const leg = new T.Group(); leg.position.set(0, 0, sd * 0.088 * b); hips.add(leg);
       add(leg, G.thigh, L.bottom === 'skirt' ? skin : legs).scale.set(b, 1, b);
       const knee = new T.Group(); knee.position.y = -0.44; leg.add(knee);
       add(knee, G.shin, L.bottom === 'shorts' || L.bottom === 'skirt' ? skin : legs);
-      if (overalls) add(knee, G.band, pm('#C9CDCF', { roughness: 0.3, metalness: 0.4 }), 0, -0.3, 0);
+      add(knee, G.kneeJ, L.bottom === 'skirt' ? skin : legs).scale.set(b, 1, b);
+      if (overalls) add(knee, G.band, pm('#C9CDCF', { roughness: 0.3, metalness: 0.4 }), 0, -0.3, 0).scale.set(0.84, 1, 0.84);
       const ankle = new T.Group(); ankle.position.y = -0.43; knee.add(ankle);
       add(ankle, G.shoe, shoe); add(ankle, G.sole, sole);
       rig[sd < 0 ? 'legL' : 'legR'] = leg; rig[sd < 0 ? 'kneeL' : 'kneeR'] = knee; rig[sd < 0 ? 'ankleL' : 'ankleR'] = ankle;
@@ -8549,21 +8729,22 @@ if ( uFx > 0.5 ) {
     if (L.topDo === 'shirt' || L.topDo === 'jacket' || L.topDo === 'coat' || overalls) add(chest, G.collar, top, -0.004, 0.548, 0).scale.set(0.95, 1, 1.05);
     if (L.topDo === 'jacket' || overalls) add(chest, G.zip, pm(shadeHex(L.top, -0.35), { roughness: 0.5, metalness: 0.3 }), 0.124 * b, 0.27, 0);
     if (overalls) add(chest, G.pocket, pm(shadeHex(L.top, -0.12)), 0.12 * b, 0.38, 0.07);
+    if (overalls) add(chest, G.backPrint, backPrint26(), 0, 0.37, 0).scale.set(0.72 * b * 1.1, 1, b);
     for (const sd of [-1, 1]) {
-      add(chest, G.shoulder, top, -0.005, 0.47, sd * 0.192 * b).scale.set(0.95, 0.9, 1);
-      const arm = new T.Group(); arm.position.set(0, 0.47, sd * 0.21 * b); arm.rotation.x = -sd * 0.06; chest.add(arm);
+      add(chest, G.shoulder, top, -0.005, 0.474, sd * 0.204 * b).scale.set(0.95, 0.84, 1);
+      const arm = new T.Group(); arm.position.set(0, 0.47, sd * 0.22 * b); arm.rotation.x = -sd * 0.045; chest.add(arm);
       add(arm, L.topDo === 'tee' ? G.sleeve : G.upper, top);
       if (L.topDo === 'tee') add(arm, G.upper, skin).scale.set(0.93, 1, 0.93);
-      if (overalls) add(arm, G.band, pm('#C9CDCF', { roughness: 0.3, metalness: 0.4 }), 0, -0.2, 0).scale.set(0.85, 1, 0.85);
+      if (overalls) add(arm, G.band, pm('#C9CDCF', { roughness: 0.3, metalness: 0.4 }), 0, -0.2, 0).scale.set(0.9, 1, 0.9);
       const elbow = new T.Group(); elbow.position.y = -0.3; arm.add(elbow);
-      add(elbow, G.fore, L.topDo === 'tee' ? skin : top);
+      add(elbow, G.fore, L.topDo === 'tee' ? skin : top); add(elbow, G.elbowJ, L.topDo === 'tee' ? skin : top);
       const hand = new T.Group(); hand.position.y = -0.275; elbow.add(hand);
       add(hand, G.hand, skin); add(hand, G.thumb, skin, 0, 0, sd * -0.006);
       rig[sd < 0 ? 'armL' : 'armR'] = arm; rig[sd < 0 ? 'elbowL' : 'elbowR'] = elbow;
     }
     add(chest, G.neck, skin, 0, 0.59, 0);
     const head = new T.Group(); head.position.y = 0.705; chest.add(head); rig.head = head;
-    const hg = new T.Group(); hg.scale.set(0.95, 1.1, 0.9); head.add(hg);
+    const hg = new T.Group(); hg.scale.set(1.01, 1.15, 0.96); head.add(hg);
     add(hg, G.head, faceMat(L));
     add(hg, G.nose, skin, 0.104, -0.014, 0).rotation.z = -0.25;
     for (const sz of [-1, 1]) add(hg, G.ear, skin, -0.004, -0.006, sz * 0.104);
@@ -8572,6 +8753,7 @@ if ( uFx > 0.5 ) {
     else if (hd === 'beanie') { const bn = add(hg, G.beanie, pm(L.hat, { roughness: 0.95 }), 0, 0.005, 0); bn.rotation.z = 0.32; const cf = add(hg, G.cuff, pm(L.hat, { roughness: 0.95 }), -0.005, 0.03, 0); cf.rotation.z = 0.32; }
     else if (hd !== 'bald') {
       add(hg, hd === 'curly' ? G.curly : G.hair, hair).rotation.z = 0.5;
+      if (hd === 'short' || hd === 'curly' || hd === 'ponytail' || hd === 'bun') add(hg, G.nape, hair, -0.004, 0.0, 0);
       if (hd === 'long') add(hg, G.hairBack, hair, -0.004, 0.0, 0);
       if (hd === 'ponytail') { const p = add(hg, G.pony, hair, -0.105, -0.02, 0); p.rotation.z = -0.35; }
       if (hd === 'bun') add(hg, G.bun, hair, -0.075, 0.085, 0);
@@ -8605,13 +8787,13 @@ if ( uFx > 0.5 ) {
     const toeL = (0.22 * Math.max(0, Math.sin(ph + 0.4)) - 0.35 * Math.max(0, Math.sin(ph - 2.2))) * A;
     const toeR = (0.22 * Math.max(0, Math.sin(ph + PI + 0.4)) - 0.35 * Math.max(0, Math.sin(ph + PI - 2.2))) * A;
     flatFeet(r, [toeL, toeR]);
-    r.armL.rotation.z = -0.38 * A * s; r.armR.rotation.z = 0.38 * A * s;
+    r.armL.rotation.z = -0.38 * A * s + 0.05 * (1 - A); r.armR.rotation.z = 0.38 * A * s + 0.05 * (1 - A);
     r.elbowL.rotation.z = 0.2 + 0.3 * A * (0.5 + 0.5 * Math.max(0, -s)); r.elbowR.rotation.z = 0.2 + 0.3 * A * (0.5 + 0.5 * Math.max(0, s));
     const breathe = Math.sin(u.idle * 1.7) * 0.004 * (1 - A);
     r.hips.position.y = 0.952 + c2 * 0.026 * A - 0.016 * A;
-    r.hips.rotation.y = -0.09 * A * s; r.hips.rotation.x = 0.035 * A * s;
+    r.hips.rotation.y = -0.09 * A * s; r.hips.rotation.x = 0.035 * A * s + Math.sin(u.idle * 0.55) * 0.012 * (1 - A);
     r.chest.position.y = 1.022 + c2 * 0.026 * A - 0.016 * A + breathe;
-    r.chest.rotation.y = 0.08 * A * s; r.chest.rotation.z = 0.05 * A; r.chest.rotation.x = -0.02 * A * s;
+    r.chest.rotation.y = 0.08 * A * s; r.chest.rotation.z = 0.05 * A; r.chest.rotation.x = -0.02 * A * s - Math.sin(u.idle * 0.55) * 0.01 * (1 - A);
     r.head.rotation.y = (1 - A) * Math.sin(u.idle * 0.37) * 0.35 * Math.max(0, Math.sin(u.idle * 0.11)) - 0.05 * A * s;
   }
   /* a pose for people standing still: arms folded, hands on hips, or pointing at something */
@@ -8638,19 +8820,21 @@ if ( uFx > 0.5 ) {
   const liteBlobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 6, 64, 64, 64); gr.addColorStop(0, 'rgba(0,0,0,.55)'); gr.addColorStop(0.7, 'rgba(0,0,0,.25)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new T.CanvasTexture(c); })();
   const liteBlobMat = new T.MeshBasicMaterial({ map: liteBlobTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
   const liteBlobGeo = new T.PlaneGeometry(1, 1); liteBlobGeo.rotateX(-PI / 2);
-  function liteGeo(name) {
-    if (LITE[name]) return LITE[name];
+  let LITE_FAR = false;
+  function liteGeo(name, far) {
+    const key26 = far ? name + '~far' : name;
+    if (LITE[key26]) return LITE[key26];
     const s = STYLES[name] || STYLES.saloon, R = s.rear, P = { paint: [], glass: [], dark: [], well: [], chrome: [], lamp: [], tail: [], tyre: [], rim: [] }, made = [];
     const bendF = (x, y) => sideF(x, y, R, s.van, s.rx);
     const bend = g => { const q = g.attributes.position; for (let i = 0; i < q.count; i++) q.setZ(i, q.getZ(i) * bendF(q.getX(i), q.getY(i))); q.needsUpdate = true; return g; };
     const M4 = (x, y, z, rx, ry, rz) => new T.Matrix4().compose(new T.Vector3(x, y, z), new T.Quaternion().setFromEuler(new T.Euler(rx || 0, ry || 0, rz || 0)), new T.Vector3(1, 1, 1));
     const add = (k, g, m) => { P[k].push([g, m || null]); made.push(g); return g; };
-    const RB = (w, h, d, r) => rbox(w, h, d, r, LM.dark).geometry;
+    const RB = (w, h, d, r) => (far ? new T.BoxGeometry(w, h, d) : rbox(w, h, d, r, LM.dark).geometry);
     const EX = (pts, depth, bevel, z0) => { const g = new T.ExtrudeGeometry(shapeOf(pts), { depth, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2, curveSegments: 8 }); g.translate(0, 0, z0); return g; };
     const rearX = y => { const pts = s.upper.concat([[R + 0.05, 0.30]]); let f = null; for (let i = 0; i < pts.length - 1; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[i + 1]; if (y1 === y2 || y > Math.max(y1, y2) || y < Math.min(y1, y2)) continue; const x = x1 + (y - y1) / (y2 - y1) * (x2 - x1); if (x < 0) f = f === null ? x : Math.min(f, x); } return f === null ? R : f; };
     const deck = x => { const pts = [[0.80, 0.93]].concat(s.upper); for (let i = 0; i < pts.length - 1; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[i + 1]; if (x <= x1 && x >= x2 && x1 !== x2) return y1 + (x - x1) / (x2 - x1) * (y2 - y1); } return 0.95; };
     /* build 24: the body, glass, roof and wheel housings are one lofted skin */
-    const SKL = skin24(s, { lod: 1 });
+    const SKL = skin24(s, { lod: far ? 2 : 1 });
     const sh = new T.Shape();
     sh.moveTo(R + 0.05, 0.30); sh.lineTo(s.rx - 0.38, 0.30); sh.absarc(s.rx, 0.30, 0.38, PI, 0, true);
     sh.lineTo(0.97, 0.30); sh.absarc(1.35, 0.30, 0.38, PI, 0, true);
@@ -8692,7 +8876,7 @@ if ( uFx > 0.5 ) {
       if (s.van) add('tail', RB(0.05, 0.30, 0.12, 0.02), M4(tailX, 1.08, sd * 0.74)); else add('tail', RB(0.05, 0.085, 0.36, 0.02), M4(tailX, s.tailY, sd * 0.5));
       { const mg = RB(0.12, 0.08, 0.16, 0.03); mg.applyMatrix4(M4(0.66, s.van ? 1.08 : 1.0, sd * 0.97)); add('paint', bend(mg)); const gg = new T.BoxGeometry(0.004, 0.06, 0.11); gg.applyMatrix4(M4(0.598, s.van ? 1.08 : 1.0, sd * 0.97)); add('glass', bend(gg)); }
       const seams = s.seams || [0.78, -0.35].concat(s.doors > 1 ? [-1.15] : []);
-      seams.forEach((x, i) => {
+      (far ? [] : seams).forEach((x, i) => {
         const inArch = Math.abs(x - 1.35) < 0.45 || Math.abs(x - s.rx) < 0.45, y0 = inArch ? 0.66 : 0.35;
         { const sg = new T.BoxGeometry(0.008, 0.885 - y0, 0.008, 1, 8, 1); sg.applyMatrix4(M4(x, (0.885 + y0) / 2, sd * 0.905)); add('dark', bend(sg)); }
         if (i > 0) { const hg = RB(0.11, 0.025, 0.02, 0.008); hg.applyMatrix4(M4(x + 0.15, 0.82, sd * 0.912)); add('chrome', bend(hg)); }
@@ -8703,17 +8887,17 @@ if ( uFx > 0.5 ) {
     if (s.spoiler) { const sx = R + 0.14, sy = deck(sx) + 0.095; add('paint', RB(0.24, 0.025, 1.30, 0.01), M4(sx, sy, 0)); for (const z of [-0.45, 0.45]) add('dark', new T.BoxGeometry(0.04, 0.07, 0.03), M4(sx + 0.02, sy - 0.045, z)); }
     if (s.spare) { const sx = rearX(0.80) - 0.152; const sp = new T.LatheGeometry(TYRE.map(p => new T.Vector2(p[0], p[1])), 20); sp.rotateZ(PI / 2); add('tyre', sp, M4(sx, 0.80, 0)); const cv = new T.CylinderGeometry(0.21, 0.21, 0.03, 20); cv.rotateZ(PI / 2); add('paint', cv, M4(sx - 0.10, 0.80, 0)); }
     /* wheels: tyre, a dark barrel, the rim face with five holes, and the hub */
-    const tyre = new T.LatheGeometry(TYRE.map(p => new T.Vector2(p[0], p[1])), 26); tyre.rotateX(PI / 2); made.push(tyre);
-    const face = liteWheelGeo(); made.push(face);
+    const tyre = new T.LatheGeometry(TYRE.map(p => new T.Vector2(p[0], p[1])), far ? 12 : 26); tyre.rotateX(PI / 2); made.push(tyre);
+    let face; if (far) { face = new T.CylinderGeometry(0.2, 0.2, 0.02, 12); face.rotateX(PI / 2); } else face = liteWheelGeo(); made.push(face);
     const disc = new T.CylinderGeometry(0.15, 0.15, 0.02, 20); disc.rotateX(PI / 2); made.push(disc);
     const barrel = new T.CylinderGeometry(0.19, 0.19, 0.18, 18, 1, true); barrel.rotateX(PI / 2); made.push(barrel);
     const hub = new T.CylinderGeometry(0.052, 0.052, 0.03, 12); hub.rotateX(PI / 2); made.push(hub);
     const hole = new T.BoxGeometry(0.058, 0.085, 0.012); made.push(hole);
     for (const [x, z] of [[1.35, -0.78], [1.35, 0.78], [s.rx, -0.78], [s.rx, 0.78]]) {
       const sd = Math.sign(z);
-      P.tyre.push([tyre, M4(x, 0.31, z)]); P.dark.push([barrel, M4(x, 0.31, z)]);
-      P.rim.push([face, sd > 0 ? M4(x, 0.31, z + sd * 0.085) : M4(x, 0.31, z + sd * 0.085, 0, PI, 0)]); P.chrome.push([hub, M4(x, 0.31, z + sd * 0.104)]);
-      P.dark.push([disc, M4(x, 0.31, z + sd * 0.035)]);
+      P.tyre.push([tyre, M4(x, 0.31, z)]); if (!far) P.dark.push([barrel, M4(x, 0.31, z)]);
+      P.rim.push([face, sd > 0 ? M4(x, 0.31, z + sd * 0.085) : M4(x, 0.31, z + sd * 0.085, 0, PI, 0)]); if (!far) P.chrome.push([hub, M4(x, 0.31, z + sd * 0.104)]);
+      if (!far) P.dark.push([disc, M4(x, 0.31, z + sd * 0.035)]);
     }
     const out = { len: 2.2 - R, rear: R, tailX, plateY: s.plateY, scale: s.scale || 1, wide: s.wide || 1, tall: s.van ? 1.95 : s.roof ? s.roof[2] : 1.3 };
     for (const k of Object.keys(P)) if (P[k].length) out[k] = mergeGeo(P[k]);
@@ -8721,7 +8905,7 @@ if ( uFx > 0.5 ) {
     for (const k of ['paint', 'glass', 'dark', 'chrome', 'lamp', 'tail']) if (out[k]) { const q = out[k].attributes.position; for (let i = 0; i < q.count; i++) q.setX(i, q.getX(i) + bow24(q.getX(i), q.getZ(i), R, s.rx, s.van)); }
     for (const k of ['paint', 'glass', 'dark', 'well']) if (SKL[k]) { const old = out[k]; out[k] = old ? mergeGeo([[old, null], [SKL[k], null]]) : SKL[k]; if (old) { old.dispose(); SKL[k].dispose(); } }
     made.forEach(g => g.dispose());
-    LITE[name] = out;
+    LITE[key26] = out;
     return out;
   }
   const litePaint = c => {
@@ -8734,7 +8918,7 @@ if ( uFx > 0.5 ) {
   /* c: { paint, style, metallic, finish, rimColor, reg, dirt }; o: { plates, shadow, blob } */
   function liteCar(c, o) {
     o = o || {};
-    const geo = liteGeo(c.style || 'hatch'), g = new T.Group();
+    const geo = liteGeo(c.style || 'hatch', o.far != null ? !!o.far : LITE_FAR), g = new T.Group();
     const mk = (k, mat) => { if (!geo[k]) return null; const m = new T.Mesh(geo[k], mat); m.userData.shared = true; m.userData.part = k; g.add(m); return m; };
     const body = mk('paint', litePaint(c)); mk('glass', LM.glass); mk('dark', LM.dark); mk('well', LM.well); mk('chrome', LM.chrome); mk('lamp', LM.lamp); mk('tail', LM.tail); mk('tyre', LM.tyre); mk('rim', liteRim(c));
     if (o.shadow !== false && body) body.castShadow = true;
@@ -8864,7 +9048,7 @@ if ( uFx > 0.5 ) {
     });
     const old = Array.from(parkedG.children || []);
     old.forEach(o => { parkedG.remove(o); o.traverse(m => { if (m.isMesh && !m.userData.shared) m.geometry.dispose(); }); });
-    list.slice(0, 4).forEach((j, i) => { const c = miniCar(j.car.paint, j.car.style); c.position.set([-9, -4.8, 4.8, 9][i], 0, ROOM.D + 7.6); c.rotation.y = PI / 2; parkedG.add(c); });
+    list.slice(0, 4).forEach((j, i) => { const c = miniCar(j.car.paint, j.car.style); c.position.set((P26.ok ? [-10.9, -8.0, -5.1, -2.2] : [-9, -4.8, 4.8, 9])[i], 0, ROOM.D + 7.6); c.rotation.y = PI / 2; parkedG.add(c); });
   }
   buildRoom();
 
@@ -9472,7 +9656,8 @@ if ( uFx > 0.5 ) {
   function fpStart(o) {
     o = o || {};
     if (fp || drv || booth) return false;
-    fp = { x: o.x != null ? o.x : 0, z: o.z != null ? o.z : 7.2, yaw: o.yaw != null ? o.yaw : PI / 2, pitch: -0.05, joy: null, v: 0, bob: 0, t: 0, keys: {}, look: null, prompt: null, pT: 0 };
+    fp = { x: o.x != null ? o.x : 0, z: o.z != null ? o.z : 7.2, yaw: o.yaw != null ? o.yaw : PI / 2, pitch: o.pitch != null ? o.pitch : -0.05, joy: o.joy || null, v: 0, bob: o.bob || 0, t: 0, keys: o.keys || {}, look: null, prompt: null, pT: 0, cool: o.cool || 0 };
+    if (o.ptr && o.ptr.id != null) Object.assign(FPP, o.ptr);
     fpBoxes = collectBoxes();
     stage.classList.add('fp-on'); layer.classList.add('fp-hide');
     setHighlight(curJob, null); hotEl.innerHTML = ''; pinsEl.innerHTML = '';
@@ -9520,11 +9705,12 @@ if ( uFx > 0.5 ) {
     }
     f.v = L > 0.01 ? sp : 0;
     /* out of the open door: outside */
-    if (f.z > ROOM.D + 0.5 && api.onFpOut) { const cb = api.onFpOut; fpEnd(); cb(); return; }
+    if (f.cool > 0) f.cool -= dt;
+    if (f.z > ROOM.D + 0.3 && !(f.cool > 0) && api.onFpOut) { const cb = api.onFpOut, pose = { x: f.x + P26.OX, z: f.z + P26.OZ, yaw: f.yaw, pitch: f.pitch, bob: f.bob, joy: f.joy, keys: f.keys, ptr: Object.assign({}, FPP) }; fpEnd(); cb(pose); return; }
     const bob = f.v ? Math.sin(f.bob) * 0.028 : 0;
     camera.position.set(f.x, FP_EYE + bob, f.z);
     camera.lookAt(f.x + fx * 4 * Math.cos(f.pitch), FP_EYE + bob + Math.sin(f.pitch) * 4, f.z + fz * 4 * Math.cos(f.pitch));
-    camera.fov = landscape ? 62 : 74; camera.updateProjectionMatrix();
+    camera.fov = landscape ? 62 : 74; camera.clearViewOffset(); camera.updateProjectionMatrix();
     /* what you're looking at */
     f.pT += dt;
     if (f.pT > 0.25) { f.pT = 0; const h = fpHit(0, 0), p = h && h.d < 4.2 ? FP_SAY[h.kind] : null; if (p !== f.prompt) { f.prompt = p; if (api.onFpPrompt) api.onFpPrompt(p); } }
@@ -10147,11 +10333,35 @@ if ( uFx > 0.5 ) {
   }
   const ROAD_W = 7.2, LANE = 1.75;
   /* small one-off textures for the outside */
-  const roadTexOut = () => canvasTex(128, 512, (c, w, h) => {
-    speckle(c, w, h, '#4A4F50', 0.13, 7000);
-    c.fillStyle = 'rgba(30,32,33,.25)'; for (let i = 0; i < 8; i++) c.fillRect(w * (0.2 + Math.random() * 0.6), Math.random() * h, 2 + Math.random() * 6, 20 + Math.random() * 60);
-    c.fillStyle = '#E8E8E0'; c.fillRect(w * 0.035, 0, w * 0.03, h); c.fillRect(w * 0.935, 0, w * 0.03, h);
-    c.fillRect(w * 0.49, 0, w * 0.025, h * 0.42);
+  /* build 26: 7.2 m of road across, 18 m along (three centre-line marks), about a centimetre a pixel */
+  const roadTexOut = () => canvasTex(512, 2048, (c, w, h) => {
+    const mx = w / ROAD_W, my = h / 18, rn = Math.random;
+    c.fillStyle = '#44484A'; c.fillRect(0, 0, w, h);
+    /* the stone in the asphalt: fine grain, with the odd pale chip */
+    { const im = c.getImageData(0, 0, w, h), d = im.data; for (let i = 0; i < d.length; i += 4) { let n = (rn() - 0.5) * 30; if (rn() < 0.05) n += 22 + rn() * 20; else if (rn() < 0.04) n -= 22; d[i] = Math.max(0, Math.min(255, d[i] + n)); d[i + 1] = Math.max(0, Math.min(255, d[i + 1] + n)); d[i + 2] = Math.max(0, Math.min(255, d[i + 2] + n * 1.04)); } c.putImageData(im, 0, 0); }
+    const band = (xm, wm, col) => { const g = c.createLinearGradient((xm - wm) * mx, 0, (xm + wm) * mx, 0); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.5, col); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.fillRect((xm - wm) * mx, 0, 2 * wm * mx, h); };
+    /* each lane: a dark strip down the middle where engines drip, paler polished tracks where the wheels run; grime in the gutters */
+    for (const lc of [1.8, 5.4]) { band(lc, 0.5, 'rgba(14,14,16,.26)'); band(lc - 0.8, 0.46, 'rgba(170,170,172,.11)'); band(lc + 0.8, 0.46, 'rgba(170,170,172,.11)'); }
+    band(0.05, 0.55, 'rgba(22,19,14,.34)'); band(ROAD_W - 0.05, 0.55, 'rgba(22,19,14,.34)');
+    /* everything below is drawn three times so it joins up where the picture repeats */
+    const wrap = fn => { for (const oy of [-h, 0, h]) { c.save(); c.translate(0, oy); fn(); c.restore(); } };
+    /* two patches where the road has been dug up, edged with tar */
+    for (const [x0, y0, pw, ph, sh] of [[4.1, 2.6, 1.5, 3.1, 'rgba(22,24,26,.34)'], [0.5, 11.2, 1.9, 1.3, 'rgba(120,122,124,.12)']]) wrap(() => { c.fillStyle = sh; c.fillRect(x0 * mx, y0 * my, pw * mx, ph * my); c.strokeStyle = 'rgba(8,8,9,.75)'; c.lineWidth = 3; c.strokeRect(x0 * mx, y0 * my, pw * mx, ph * my); });
+    /* cracks, some sealed with a line of tar */
+    for (let i = 0; i < 6; i++) { const sx = rn() * w, sy = rn() * h, sealed = i < 2, pts = []; let x = sx, y = sy; for (let k = 0; k < 9; k++) { x += (rn() - 0.5) * 0.6 * mx; y += (0.25 + rn() * 0.5) * my; pts.push([x, y]); }
+      wrap(() => { c.strokeStyle = sealed ? "rgba(8,8,9,.6)" : "rgba(10,10,11,.36)"; c.lineWidth = sealed ? 2.2 : 1.1; c.lineJoin = 'round'; c.beginPath(); c.moveTo(sx, sy); pts.forEach(p => c.lineTo(p[0], p[1])); c.stroke(); }); }
+    /* a rubber mark or two from someone braking */
+    for (const [xm, y0, len] of [[4.6, 6.2, 3.4], [5.9, 6.5, 3.0], [2.5, 14.4, 2.2]]) wrap(() => { const g = c.createLinearGradient(0, y0 * my, 0, (y0 + len) * my); g.addColorStop(0, 'rgba(8,8,8,0)'); g.addColorStop(0.3, 'rgba(8,8,8,.3)'); g.addColorStop(1, 'rgba(8,8,8,0)'); c.fillStyle = g; c.fillRect(xm * mx, y0 * my, 0.2 * mx, len * my); });
+    /* the paint: a solid line a hand from each edge, and a broken one down the middle (2 m marks, 4 m gaps) */
+    c.fillStyle = '#E7E6DD';
+    for (const xe of [0.24, ROAD_W - 0.24]) c.fillRect((xe - 0.055) * mx, 0, 0.11 * mx, h);
+    for (let k = 0; k < 3; k++) c.fillRect((ROAD_W / 2 - 0.06) * mx, (k * 6 + 0.5) * my, 0.12 * mx, 2 * my);
+    /* worn: bits of the paint have flaked away */
+    for (let i = 0; i < 1500; i++) { const onMid = rn() < 0.4, x = onMid ? (ROAD_W / 2 - 0.07 + rn() * 0.14) * mx : ((rn() < 0.5 ? 0.24 : ROAD_W - 0.24) - 0.07 + rn() * 0.14) * mx; c.fillStyle = 'rgba(62,66,68,' + (0.25 + rn() * 0.5).toFixed(2) + ')'; c.fillRect(x, rn() * h, 1 + rn() * 3, 1 + rn() * 5); }
+    /* a reflecting stud in each gap of the centre line */
+    for (let k = 0; k < 3; k++) { const y = (k * 6 + 4.5) * my, x = ROAD_W / 2 * mx; c.fillStyle = '#2B2D2E'; c.fillRect(x - 5, y - 6, 10, 12); c.fillStyle = '#F4F4EE'; c.fillRect(x - 3, y - 4, 6, 3); c.fillRect(x - 3, y + 1, 6, 3); }
+    /* a gully grate in each gutter */
+    for (const [xe, ym] of [[0.02, 9], [ROAD_W - 0.47, 0.2]]) { const x = xe * mx, y = ym * my, gw = 0.45 * mx, gh = 0.32 * my; c.fillStyle = '#1F2122'; c.fillRect(x, y, gw, gh); c.fillStyle = '#050606'; for (let bx = 4; bx < gw - 4; bx += 7) c.fillRect(x + bx, y + 4, 3.5, gh - 8); c.strokeStyle = 'rgba(0,0,0,.5)'; c.lineWidth = 2; c.strokeRect(x, y, gw, gh); }
   });
   const signTex = (w, h, draw) => canvasTex(w, h, draw);
 
@@ -10536,7 +10746,7 @@ if ( uFx > 0.5 ) {
     W.traffic.forEach(tc => { sc.remove(tc.g); });
     W.traffic = [];
     for (let i = 0; i < 7; i++) {
-      const c = liteCar({ paint: rpick(['#2D4C78', '#D8D7D2', '#B4392F', '#16191A', '#3F5E47', '#8E959A', '#E3B23C', '#F4F4EF', '#6B2E5C']), style: rpick(['hatch', 'estate', 'van', 'saloon', 'suv', 'city', 'mpv', 'pickup', 'crossover', 'highvan']), metallic: Math.random() < 0.5 });
+      const c = liteCar({ paint: rpick(['#2D4C78', '#D8D7D2', '#B4392F', '#16191A', '#3F5E47', '#8E959A', '#E3B23C', '#F4F4EF', '#6B2E5C']), style: rpick(['hatch', 'estate', 'van', 'saloon', 'suv', 'city', 'mpv', 'pickup', 'crossover', 'highvan']), metallic: Math.random() < 0.5 }, { far: false });
       sc.add(c); W.traffic.push({ g: c, s: (R.N * (0.08 + i * 0.13)) % R.N, v: 10.5 + Math.random() * 4, q: {} });
     }
     /* -- the forecourt: oil stains, an air and water machine, cones, and a bench by the door -- */
@@ -10544,9 +10754,8 @@ if ( uFx > 0.5 ) {
       const stainTex = canvasTex(128, 128, (c, w, h) => { c.clearRect(0, 0, w, h); for (let k = 0; k < 5; k++) { const x = 30 + Math.random() * 68, y = 30 + Math.random() * 68, r = 10 + Math.random() * 22, g = c.createRadialGradient(x, y, 1, x, y, r); g.addColorStop(0, 'rgba(18,16,14,.55)'); g.addColorStop(1, 'rgba(18,16,14,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); } });
       const sm = new T.MeshBasicMaterial({ map: stainTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
       for (const [x, z] of [[-4, -10], [5, -12.5], [1, -7], [24, -14], [33, -18], [-30, -9]]) { const m = new T.Mesh(new T.PlaneGeometry(2.4, 2.4), sm); m.rotation.x = -PI / 2; m.rotation.z = Math.random() * 6; m.position.set(x, 0.026, z); sc.add(m); }
-      B.add('red', new T.BoxGeometry(0.6, 1.4, 0.45), at4(11.3, 0.7, -16.6)); B.add('metal', new T.BoxGeometry(0.5, 0.3, 0.05), at4(11.3, 1.1, -16.36));
+      B.add('red', new T.BoxGeometry(0.6, 1.4, 0.45), at4(12.9, 0.7, -17.42)); B.add('metal', new T.BoxGeometry(0.5, 0.3, 0.05), at4(12.9, 1.1, -17.18));
       for (const [x, z] of [[-11.6, -5], [-11.6, -7.5], [12.4, -5]]) { B.add('cone', new T.ConeGeometry(0.2, 0.55, 10), at4(x, 0.3, z)); }
-      B.add('wood', new T.BoxGeometry(1.6, 0.06, 0.4), at4(-8.5, 0.48, -17.6)); for (const sx of [-0.65, 0.65]) B.add('metal', new T.BoxGeometry(0.06, 0.48, 0.4), at4(-8.5 + sx, 0.24, -17.6));
     }
     buildUnit19(W, B); buildWash19(W, B);
   }
@@ -10751,7 +10960,7 @@ if ( uFx > 0.5 ) {
   function buildDriveWorld() {
     if (dW) return dW;
     const W = {};
-    try { buildWorldInto(W); } catch (e) { dW = null; throw e; }
+    try { LITE_FAR = true; buildWorldInto(W); } catch (e) { dW = null; throw e; } finally { LITE_FAR = false; }
     dW = W; return W;
   }
   function buildWorldInto(W) {
@@ -10767,6 +10976,7 @@ if ( uFx > 0.5 ) {
     Object.assign(sunO.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 140 }); sunO.shadow.camera.updateProjectionMatrix();
     sunO.shadow.bias = -0.0006; sunO.shadow.normalBias = 0.03;
     sc.add(sunO); sc.add(sunO.target); W.sun = sunO;
+    { const fillO = new T.DirectionalLight(0xCFE0FF, 0.14); fillO.position.set(30, 40, 40); sc.add(fillO); W.fill = fillO; }
     const R = buildPath(RT_PTS); W.R = R;
     const tg = R.tags;
     W.sec = {
@@ -10804,27 +11014,58 @@ if ( uFx > 0.5 ) {
       const p = g.attributes.position;
       for (let i = 0; i < p.count; i++) { const x = p.getX(i) + cx, z = p.getZ(i) + cz; p.setY(i, groundH(x, z) - 0.09); }
       p.needsUpdate = true; g.computeVertexNormals();
+      { const cl = new Float32Array(p.count * 3);
+        for (let i = 0; i < p.count; i++) { const x = p.getX(i) + cx, z = p.getZ(i) + cz, n = Math.sin(x * 0.021 + Math.sin(z * 0.017) * 2.1) * Math.cos(z * 0.019 + Math.sin(x * 0.013) * 1.7) + 0.5 * Math.sin(x * 0.047 + z * 0.039), k = 0.88 + 0.16 * n; cl[i * 3] = k * (0.96 + 0.05 * n); cl[i * 3 + 1] = k; cl[i * 3 + 2] = k * (0.9 - 0.06 * n); }
+        g.setAttribute('color', new T.BufferAttribute(cl, 3)); }
       const grassTex = grassTex20(); if (false) canvasTex(256, 256, (c, w, h) => { speckle(c, w, h, '#6E8F4E', 0.16, 9000); for (let i = 0; i < 40; i++) { const x = Math.random() * w, y = Math.random() * h, r = 10 + Math.random() * 30, gr = c.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, Math.random() < 0.5 ? 'rgba(160,170,80,.22)' : 'rgba(40,70,30,.2)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = gr; c.fillRect(x - r, y - r, 2 * r, 2 * r); } });
       grassTex.wrapS = grassTex.wrapT = T.RepeatWrapping; grassTex.repeat.set(200, 200);
-      const m = new T.Mesh(g, std('#FFFFFF', { map: grassTex, roughness: 1 })); m.position.set(cx, 0, cz); m.receiveShadow = true; sc.add(m);
+      const m = new T.Mesh(g, std('#FFFFFF', { map: grassTex, roughness: 1, vertexColors: true })); m.position.set(cx, 0, cz); m.receiveShadow = true; sc.add(m);
     }
     /* the road, with a pavement through town, and a car park tarmac disc */
-    const rTex = roadTexOut(); rTex.wrapS = rTex.wrapT = T.RepeatWrapping;
+    const rTex = roadTexOut(); rTex.wrapS = rTex.wrapT = T.RepeatWrapping; try { rTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); } catch (e) { /* the default will do */ }
     const roadMat = std('#FFFFFF', { map: rTex, roughness: 0.9 }); W.roadMat = roadMat;
     const inCarpark = (x, z) => Math.hypot(x - RBT.x, z - RBT.z) < RBT.ro - 0.6;
-    const road = new T.Mesh(stripGeo(R, 0, 0, ROAD_W / 2, -ROAD_W / 2, 0.03, 10, inCarpark), roadMat); road.receiveShadow = true; sc.add(road);
-    const paveTex = canvasTex(128, 128, (c, w, h) => { speckle(c, w, h, '#B9B6AE', 0.07, 2500); c.fillStyle = 'rgba(80,78,72,.35)'; for (let k = 0; k <= 2; k++) { c.fillRect(0, k * h / 2 - 1, w, 2); c.fillRect(k * w / 2 - 1, 0, 2, h); } });
-    paveTex.wrapS = paveTex.wrapT = T.RepeatWrapping; paveTex.repeat.set(2, 1);
+    const road = new T.Mesh(stripGeo(R, 0, 0, ROAD_W / 2, -ROAD_W / 2, 0.03, 18, inCarpark), roadMat); road.receiveShadow = true; sc.add(road);
+    const paveTex = canvasTex(512, 256, (c, w, h) => {
+      /* 2.6 m across, 1.8 m along: three rows of slabs, half a slab out of step, between two lines of kerbstones */
+      const kw = 0.15 / 2.6 * w, rows = 3, rh = (w - 2 * kw) / rows;
+      speckle(c, w, h, '#ACA9A1', 0.06, 9000);
+      for (let r = 0; r < rows; r++) for (let k = -1; k < 3; k++) { const x = kw + r * rh, y = (k + (r % 2 ? 0.5 : 0)) * h / 2; c.fillStyle = ['rgba(255,255,255,.05)', 'rgba(0,0,0,.05)', 'rgba(120,100,70,.05)', 'rgba(0,0,0,0)'][(r * 3 + k + 5) % 4]; c.fillRect(x, y, rh, h / 2); c.strokeStyle = 'rgba(58,56,50,.55)'; c.lineWidth = 2; c.strokeRect(x, y, rh, h / 2); }
+      for (const x of [0, w - kw]) { c.fillStyle = '#BDBBB4'; c.fillRect(x, 0, kw, h); c.fillStyle = 'rgba(60,58,52,.5)'; c.fillRect(x, 0, kw, 2); c.fillRect(x, h / 2, kw, 2); c.fillRect(x === 0 ? kw - 1.5 : x, 0, 1.5, h); }
+      for (let i = 0; i < 5; i++) { const x = Math.random() * w, y = Math.random() * h, r = 6 + Math.random() * 12, g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, 'rgba(40,36,30,.22)'); g.addColorStop(1, 'rgba(40,36,30,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); }
+    });
+    paveTex.wrapS = paveTex.wrapT = T.RepeatWrapping; try { paveTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); } catch (e) { /* the default will do */ }
     const paveMat = std('#FFFFFF', { map: paveTex, roughness: 0.92 });
     const tEnd = Math.round(tg.roughEnd + 8), townL = Math.round(48);
-    for (const [a, b, side] of [[0, tEnd, -1], [townL, tEnd, 1]]) {
+    for (const [a, b, side] of [[R.N - 34, tEnd, -1], [townL, tEnd, 1]]) {
       const d0 = side * (ROAD_W / 2), d1 = side * (ROAD_W / 2 + 2.6);
-      const pave = new T.Mesh(stripGeo(R, a, b, side > 0 ? d1 : d0, side > 0 ? d0 : d1, 0.13, 4), paveMat); pave.receiveShadow = true; sc.add(pave);
+      const pave = new T.Mesh(stripGeo(R, a, b, side > 0 ? d1 : d0, side > 0 ? d0 : d1, 0.13, 1.8), paveMat); pave.receiveShadow = true; sc.add(pave);
       /* the kerb face, between road and pavement */
       const kp = [], ki = [], q = {};
-      for (let s = a, r = 0; s <= b; s += 2, r++) { pathAt(R, s, d0, q); kp.push(q.x, q.y + 0.03, q.z, q.x, q.y + 0.14, q.z); if (r) { const o = (r - 1) * 2; ki.push(o, o + 2, o + 1, o + 1, o + 2, o + 3); } }
+      for (let s = a > b ? a - R.N : a, r = 0; s <= b; s += 2, r++) { pathAt(R, s, d0, q); kp.push(q.x, q.y + 0.03, q.z, q.x, q.y + 0.14, q.z); if (r) { const o = (r - 1) * 2; ki.push(o, o + 2, o + 1, o + 1, o + 2, o + 3); } }
       const kg = new T.BufferGeometry(); kg.setAttribute('position', new T.Float32BufferAttribute(kp, 3)); kg.setIndex(ki); kg.computeVertexNormals();
       const kerb = new T.Mesh(kg, new T.MeshStandardMaterial({ color: col('#C9C7C0'), roughness: 0.8, side: DS })); sc.add(kerb);
+    }
+    /* build 26: the crossover. Concrete fills the gap between the forecourt, the yard and the road, with a line of
+       kerbstones laid flush along the road edge */
+    {
+      const pos = [], uv = [], idx = [], kp = [], kuv = [], ki = [], q = {}, d0 = ROAD_W / 2, zEdge = -3.98;
+      let rows = 0;
+      for (let s = -17; s <= 45; s += 1) {
+        pathAt(R, s, d0, q); if (q.z < zEdge + 0.05) continue;
+        const x0 = q.x, z0 = q.z; pathAt(R, s, d0 + 0.3, q);
+        const x1 = q.x, z1 = Math.max(zEdge, q.z);
+        pos.push(x1, 0.028, z1, x1, 0.028, zEdge); uv.push(x1 / 4.3, z1 / 4.3, x1 / 4.3, zEdge / 4.3);
+        kp.push(x0, 0.034, z0, x1, 0.034, z1); kuv.push(0, s / 0.9, 1, s / 0.9);
+        if (rows) { const o = (rows - 1) * 2; idx.push(o, o + 2, o + 1, o + 1, o + 2, o + 3); ki.push(o, o + 2, o + 1, o + 1, o + 2, o + 3); }
+        rows++;
+      }
+      const mk = (p, u, ix, mat) => { const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(p, 3)); g.setAttribute('uv', new T.Float32BufferAttribute(u, 2)); g.setIndex(ix); g.computeVertexNormals(); const m = new T.Mesh(g, mat); m.receiveShadow = true; sc.add(m); return m; };
+      if (rows > 1) {
+        mk(pos, uv, idx, new T.MeshStandardMaterial({ color: col('#FFFFFF'), map: fore26(), roughness: 0.95, side: DS }));
+        const kt = canvasTex(64, 128, (c, w, h) => { speckle(c, w, h, '#C2C0B8', 0.06, 900); c.fillStyle = 'rgba(60,58,52,.6)'; c.fillRect(0, 0, w, 3); c.fillRect(0, 0, 2, h); c.fillRect(w - 2, 0, 2, h); }); kt.wrapS = kt.wrapT = T.RepeatWrapping;
+        mk(kp, kuv, ki, new T.MeshStandardMaterial({ color: col('#FFFFFF'), map: kt, roughness: 0.9, side: DS }));
+      }
     }
     /* speed bumps, the brake-test cones and the rough patch */
     const bumpTex = canvasTex(256, 32, (c, w, h) => { for (let x = 0; x < w; x += 32) { c.fillStyle = (x / 32) % 2 ? '#1D1F1E' : '#F2C230'; c.fillRect(x, 0, 32, h); } });
@@ -10966,48 +11207,139 @@ if ( uFx > 0.5 ) {
 
   /* ---- the forecourt and the yard: where finished project cars wait for buyers ---- */
   const YARD = { x0: 13.5, x1: 44, z0: -31, z1: -4.4, bays: [17, 21.4, 25.8, 30.2, 34.6, 39], bayZ: -26.2 };
-  const GAR = { x0: -12, x1: 12, z0: -34, z1: -18 };
+  const GAR = { x0: -13.3, x1: 13.3, z0: -49, z1: -18 };
+  /* ---- build 26: brushed concrete for the forecourt: 4.3 m bays with tarred joints, broom marks, the odd stain ---- */
+  let FORE26 = null;
+  function fore26() {
+    if (FORE26) return FORE26;
+    FORE26 = canvasTex(512, 512, (c, w, h) => {
+      speckle(c, w, h, '#A8A7A0', 0.07, 14000);
+      c.strokeStyle = 'rgba(255,255,255,.035)'; c.lineWidth = 1; for (let y = 0; y < h; y += 3) { c.beginPath(); c.moveTo(0, y + Math.random()); c.lineTo(w, y + Math.random()); c.stroke(); }
+      for (let i = 0; i < 16; i++) { const x = Math.random() * w, y = Math.random() * h, r = 20 + Math.random() * 60, g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, Math.random() < 0.6 ? 'rgba(60,58,52,.10)' : 'rgba(255,255,255,.06)'); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); }
+      c.fillStyle = 'rgba(34,33,30,.7)'; c.fillRect(0, 0, w, 3); c.fillRect(0, 0, 3, h);
+      c.fillStyle = 'rgba(255,255,255,.06)'; c.fillRect(0, 3, w, 2); c.fillRect(3, 0, 2, h);
+    });
+    FORE26.wrapS = FORE26.wrapT = T.RepeatWrapping;
+    try { FORE26.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); } catch (e) { /* the default will do */ }
+    return FORE26;
+  }
+  /* ---- build 26: the garage from outside: the same footprint, door opening and roller shutter as the workshop inside ---- */
+  function garage26(W, A) {
+    const G = new T.Group(); A.add(G); W.gar = G;
+    const X = GAR.x1, ZF = GAR.z1, Z0 = GAR.z0, TH = 0.32, zf = ZF + TH, gh = 7.6, HW = ROOM.W - 1, HH = ROOM.H - 0.5, BLK = 3.0;
+    const blockM = std('#D6D5CD', { map: TX.block, roughness: 0.92 }), cladM = pbr('#3A4D62', { map: TX.clad, bumpMap: TX.cladB, bumpScale: 0.025, roughness: 0.5, metalness: 0.3 });
+    const trimM = pbr('#222D38', { roughness: 0.5, metalness: 0.4 }), galvM = pbr('#B9BFC1', { roughness: 0.5, metalness: 0.75 }), yelM = std('#E2A90F', { roughness: 0.55 }), darkM = std('#1B1E20', { roughness: 0.7 });
+    /* a stretch of wall facing out: 'f' front (+z), 'b' back (-z), 'r' right (+x), 'l' left (-x); a runs along the wall */
+    const face = (mat, side, a0, a1, y0, y1, at, uv) => {
+      const m = wallQuad(mat, a0, y0, a1, y1, uv);
+      if (side === 'f') m.position.z = at; else if (side === 'b') { m.rotation.y = PI; m.position.z = at; } else if (side === 'r') { m.rotation.y = PI / 2; m.position.x = at; } else { m.rotation.y = -PI / 2; m.position.x = at; }
+      m.castShadow = true; G.add(m); return m;
+    };
+    const BUV = [1.8, 0.9], CUV = [2.0, 1.0];
+    const wall = (side, a0, a1, at, y0, y1) => { if (y0 < BLK) face(blockM, side, a0, a1, y0, Math.min(BLK, y1), at, BUV); if (y1 > BLK) face(cladM, side, a0, a1, Math.max(BLK, y0), y1, at, CUV); };
+    wall('r', -zf, -Z0, X, 0, gh); wall('l', Z0, zf, -X, 0, gh); wall('b', -X, X, Z0, 0, gh);
+    /* the front: a pier each side of the opening, the head over it, and the reveals you see as you walk through */
+    wall('f', HW, X, zf, 0, gh); wall('f', -X, -HW, zf, 0, gh); face(cladM, 'f', -HW, HW, HH, gh, zf, CUV);
+    wall('l', ZF, zf, HW, 0, HH); wall('r', -zf, -ZF, -HW, 0, HH);
+    { const sof = new T.Mesh(new T.PlaneGeometry(2 * HW, TH), trimM); sof.rotation.x = PI / 2; sof.position.set(0, HH, ZF + TH / 2); G.add(sof); }
+    /* the fire exit in the side wall, where the one inside is */
+    { const dz = 7.6 + P26.OZ, dm = std('#3F5468', { roughness: 0.55, metalness: 0.2 }), d = new T.Mesh(new T.PlaneGeometry(0.98, 2.06), dm); d.rotation.y = -PI / 2; d.position.set(-X - 0.012, 1.03, dz); G.add(d);
+      for (const s of [-1, 1]) G.add(box(0.05, 2.14, 0.07, darkM, -X - 0.02, 1.07, dz + s * 0.525)); G.add(box(0.05, 0.07, 1.12, darkM, -X - 0.02, 2.14, dz)); G.add(box(0.03, 0.03, 0.12, galvM, -X - 0.035, 1.05, dz - 0.36)); }
+    /* the roof, its edge trim, and the flashing where blockwork meets cladding */
+    { const roof = box(2 * X + 0.5, 0.3, (zf - Z0) + 0.5, trimM, 0, gh + 0.15, (zf + Z0) / 2); roof.castShadow = true; G.add(roof); }
+    G.add(box(2 * X + 0.56, 0.07, 0.07, galvM, 0, gh + 0.33, zf + 0.25));
+    for (const s of [-1, 1]) { G.add(box(X - HW, 0.05, 0.05, galvM, s * (X + HW) / 2, BLK, zf + 0.02)); G.add(box(0.05, 0.05, zf - Z0, galvM, s * (X + 0.02), BLK, (zf + Z0) / 2)); }
+    /* the fascia sign over the door */
+    {
+      const sign = canvasTex(2048, 128, (c, w, h) => {
+        c.fillStyle = '#18222D'; c.fillRect(0, 0, w, h); c.fillStyle = '#C9A227'; c.fillRect(0, 0, w, 7); c.fillRect(0, h - 7, w, 7);
+        c.textBaseline = 'middle'; c.textAlign = 'center';
+        c.fillStyle = '#F2F3F0'; { const nm = gSign21(); let fs = 96; c.font = '900 ' + fs + 'px "Big Shoulders Display", Impact, sans-serif'; while (c.measureText(nm).width > w * 0.42 && fs > 40) { fs -= 4; c.font = '900 ' + fs + 'px "Big Shoulders Display", Impact, sans-serif'; } c.fillText(nm, w / 2, h / 2 + 4); }
+        c.fillStyle = '#E2B93B'; c.font = '700 34px Barlow, sans-serif';
+        c.fillText('MOT · SERVICING · TYRES', w * 0.15, h / 2 + 2); c.fillText('RESPRAYS · TUNING · DIAGNOSTICS', w * 0.845, h / 2 + 2);
+      });
+      const sm = new T.MeshStandardMaterial({ map: sign, emissiveMap: sign, emissive: new T.Color(0xffffff), emissiveIntensity: 0.16, roughness: 0.5, metalness: 0.1 });
+      G.add(box(2 * HW - 0.2, 1.56, 0.12, trimM, 0, (HH + gh) / 2, zf + 0.05));
+      const sp = new T.Mesh(new T.PlaneGeometry(2 * HW - 0.4, (2 * HW - 0.4) / 16), sm); sp.position.set(0, (HH + gh) / 2, zf + 0.115); G.add(sp);
+    }
+    /* hazard stripes up the door edges, a bollard to protect each one, a light and a notice on each pier, the downpipes */
+    {
+      const haz = canvasTex(64, 64, (c, w, h) => { c.fillStyle = '#E2A90F'; c.fillRect(0, 0, w, h); c.fillStyle = '#16191A'; for (let k = -2; k < 4; k++) { c.beginPath(); c.moveTo(k * 32, h); c.lineTo(k * 32 + 16, h); c.lineTo(k * 32 + 16 + h, 0); c.lineTo(k * 32 + h, 0); c.fill(); } });
+      haz.wrapS = haz.wrapT = T.RepeatWrapping;
+      const hazM = std('#FFFFFF', { map: haz, roughness: 0.7 });
+      const lampM = new T.MeshStandardMaterial({ color: col('#FFF6DC'), emissive: col('#FFE9B0'), emissiveIntensity: 0.85, roughness: 0.4 });
+      const note = (lines, bg, fg) => canvasTex(256, 320, (c, w, h) => { c.fillStyle = bg; c.fillRect(0, 0, w, h); c.strokeStyle = fg; c.lineWidth = 8; c.strokeRect(8, 8, w - 16, h - 16); c.fillStyle = fg; c.textAlign = 'center'; c.textBaseline = 'middle'; lines.forEach((t, i) => { c.font = (i ? '700 30px Barlow, sans-serif' : '900 52px "Big Shoulders Display", Impact, sans-serif'); c.fillText(t, w / 2, i ? 110 + i * 46 : 62); }); });
+      const notes = [note(['OPEN', 'Mon to Fri 8 to 6', 'Saturday 8 to 1', 'Walk-ins welcome'], '#F2F3F0', '#18222D'), note(['RECEPTION', 'Inside, at the back', 'Customer parking', 'on the forecourt'], '#1F4E8C', '#FFFFFF')];
+      [-1, 1].forEach((s, i) => {
+        const px = s * (X + HW) / 2;
+        face(hazM, 'f', s > 0 ? HW + 0.02 : -HW - 0.3, s > 0 ? HW + 0.3 : -HW - 0.02, 0, 2.1, zf + 0.012, [0.3, 0.3]);
+        const b = cyl(0.085, 1.1, yelM, s * (HW + 0.2), 0.55, zf + 0.42, null, 14); b.castShadow = true; G.add(b);
+        G.add(cyl(0.088, 0.14, darkM, s * (HW + 0.2), 0.86, zf + 0.42, null, 14)); G.add(cyl(0.095, 0.03, yelM, s * (HW + 0.2), 1.11, zf + 0.42, null, 14));
+        G.add(box(0.36, 0.13, 0.2, darkM, px, 3.72, zf + 0.1)); G.add(box(0.3, 0.05, 0.16, lampM, px, 3.64, zf + 0.11));
+        const np = new T.Mesh(new T.PlaneGeometry(0.84, 1.05), std('#FFFFFF', { map: notes[i], roughness: 0.6 })); np.position.set(px + s * 0.08, 1.95, zf + 0.014); G.add(np);
+        G.add(cyl(0.05, gh - 0.2, galvM, s * (X - 0.14), (gh - 0.2) / 2, zf + 0.07, null, 10));
+      });
+      /* a drain channel across the threshold */
+      const gr = canvasTex(256, 32, (c, w, h) => { c.fillStyle = '#2A2C2D'; c.fillRect(0, 0, w, h); c.fillStyle = '#0B0C0C'; for (let x = 5; x < w; x += 12) c.fillRect(x, 5, 6, h - 10); });
+      gr.wrapS = T.RepeatWrapping; gr.repeat.set(12, 1);
+      const gm = new T.Mesh(new T.PlaneGeometry(2 * HW, 0.2), pbr('#FFFFFF', { map: gr, roughness: 0.6, metalness: 0.6 })); gm.rotation.x = -PI / 2; gm.position.set(0, 0.026, zf + 0.02); G.add(gm);
+    }
+    /* the roller shutter from outside, its bottom rail and guides. It moves with the one inside */
+    {
+      const sm = pbr('#FFFFFF', { map: TX.shutter, bumpMap: TX.shutterB, bumpScale: 0.03, roughness: 0.5, metalness: 0.65 });
+      W.shut = new T.Mesh(new T.PlaneGeometry(2 * HW, HH), sm); W.shut.position.set(0, HH / 2, ZF + 0.08); G.add(W.shut);
+      W.shutBar = box(2 * HW, 0.07, 0.1, trimM, 0, 0.04, ZF + 0.1); G.add(W.shutBar);
+      for (const s of [-1, 1]) G.add(box(0.14, HH, 0.14, galvM, s * (HW - 0.05), HH / 2, ZF + 0.1));
+      /* the doorway itself: drawn first, to the depth buffer only, so the workshop already on the screen shows through;
+         from too far away to bother it is simply dark */
+      W.maskM = new T.MeshBasicMaterial({ color: col('#131617') });
+      W.mask = new T.Mesh(new T.PlaneGeometry(2 * HW, HH), W.maskM); W.mask.position.set(0, HH / 2, ZF + 0.004); W.mask.renderOrder = -100; W.mask.visible = false; G.add(W.mask);
+    }
+    /* the building's shadow is cast by a stand-in that draws nothing, so it still falls on the forecourt when the
+       building itself is hidden because you are looking out from inside it */
+    { const px = new T.Mesh(new T.BoxGeometry(2 * X, gh, zf - Z0), new T.MeshBasicMaterial({ colorWrite: false, depthWrite: false })); px.position.set(0, gh / 2, (zf + Z0) / 2); px.castShadow = true; A.add(px); W.garShadow = px; }
+    /* light spilling out of the doorway */
+    const inner = new T.PointLight(0xFFF1D6, 0.5, 16, 2); inner.position.set(0, 4.2, ZF + 3); A.add(inner);
+    /* the side wall facing the yard gets a big painted sign */
+    const side = canvasTex(1024, 256, (c, w, h) => { c.fillStyle = '#1D2521'; c.fillRect(0, 0, w, h); c.fillStyle = '#F2B705'; c.font = '900 92px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('QUALITY USED CARS', w / 2, 100); c.fillStyle = '#FFFFFF'; c.font = '700 36px Barlow, sans-serif'; c.fillText('Every car road-tested by us', w / 2, 190); });
+    const sd = new T.Mesh(new T.PlaneGeometry(12.4, 3.1), std('#FFFFFF', { map: side, roughness: 0.7 })); sd.position.set(X + 0.03, 5.15, (ZF + YARD.z0) / 2); sd.rotation.y = PI / 2; G.add(sd);
+    /* where the customers' cars wait: the workshop's parked cars are moved here, in workshop coordinates */
+    W.fore = new T.Group(); W.fore.position.set(P26.OX, 0, P26.OZ); A.add(W.fore);
+  }
   function buildYardArea(W) {
     const sc = W.scene, A = new T.Group(); sc.add(A); W.area = A;
     const flatA = (w, d, x, z, mat, y) => { const m = new T.Mesh(new T.PlaneGeometry(w, d), mat); m.rotation.x = -PI / 2; m.position.set(x, y || 0.02, z); m.receiveShadow = true; A.add(m); return m; };
-    const conc = canvasTex(512, 512, (c, w, h) => { speckle(c, w, h, '#B4B7B1', 0.08, 9000); c.fillStyle = 'rgba(60,64,62,.35)'; for (let k = 0; k <= 4; k++) { c.fillRect(k * w / 4 - 1, 0, 2, h); c.fillRect(0, k * h / 4 - 1, w, 2); } });
-    conc.wrapS = conc.wrapT = T.RepeatWrapping; conc.repeat.set(4, 2);
-    { const cc = TX.concrete.clone(); cc.needsUpdate = true; cc.repeat.set(25 / 4.3, 14.2 / 4.3); flatA(25, 14.2, 0, -11.1, std('#E6E4DE', { map: cc, roughnessMap: TX.concreteR, roughness: 1 })); }
-    const tarm = canvasTex(512, 512, (c, w, h) => {
-      speckle(c, w, h, '#4D5253', 0.12, 12000);
-      const px = x => (x - YARD.x0) / (YARD.x1 - YARD.x0) * w, pz = z => (z - YARD.z0) / (YARD.z1 - YARD.z0) * h;
-      c.fillStyle = '#ECECE4';
-      for (let i = 0; i <= YARD.bays.length; i++) { const x = (i < YARD.bays.length ? YARD.bays[i] : YARD.bays[i - 1] + 4.4) - 2.2; c.fillRect(px(x) - 2, pz(-30.6), 4, pz(-21.6) - pz(-30.6)); }
-      c.fillRect(px(YARD.bays[0] - 2.2), pz(-21.7) - 2, px(YARD.bays[YARD.bays.length - 1] + 2.2) - px(YARD.bays[0] - 2.2), 4);
-      c.font = '700 22px Barlow, sans-serif'; c.textAlign = 'center';
-      YARD.bays.forEach((x, i) => c.fillText(String(i + 1), px(x), pz(-22.6)));
-    });
-    flatA(YARD.x1 - YARD.x0, YARD.z1 - YARD.z0, (YARD.x0 + YARD.x1) / 2, (YARD.z0 + YARD.z1) / 2, std('#FFFFFF', { map: tarm, roughness: 0.88 }));
-    /* the garage building, with its roller door up */
-    const gw = GAR.x1 - GAR.x0, gd = GAR.z1 - GAR.z0, gh = 7.4;
-    const block = canvasTex(512, 256, (c, w, h) => { speckle(c, w, h, '#D7D9D3', 0.05, 5000); c.fillStyle = 'rgba(110,115,110,.32)'; for (let r = 0; r < 8; r++) { c.fillRect(0, r * h / 8, w, 2); const off = r % 2 ? 32 : 0; for (let x = off; x < w; x += 64) c.fillRect(x, r * h / 8, 2, h / 8); } });
-    block.wrapS = block.wrapT = T.RepeatWrapping; block.repeat.set(4, 2);
-    const bt2 = TX.block.clone(); bt2.needsUpdate = true; bt2.repeat.set(gw / 1.8, gh / 0.9);
-    const wallM = std('#BDBCB4', { map: bt2, roughness: 0.92 });
-    const bld = box(gw, gh, gd, wallM, 0, gh / 2, (GAR.z0 + GAR.z1) / 2); bld.castShadow = true; bld.receiveShadow = true; A.add(bld);
-    A.add(box(gw + 0.5, 0.35, gd + 0.5, std('#5A605C', { roughness: 0.8 }), 0, gh + 0.17, (GAR.z0 + GAR.z1) / 2));
-    const front = canvasTex(1024, 320, (c, w, h) => {
-      c.fillStyle = '#E9EAE5'; c.fillRect(0, 0, w, h);
-      c.fillStyle = '#1F2B38'; c.fillRect(0, 0, w, 92); c.fillStyle = '#C9A227'; c.fillRect(0, 84, w, 8);
-      c.fillStyle = '#EEF1F2'; c.font = '900 70px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('BONNET UP MOTORS', w / 2, 40);
-      c.fillStyle = '#1D2521'; c.font = '700 26px Barlow, sans-serif'; c.fillText('MOT · SERVICING · TYRES · RESPRAYS · TUNING', w / 2, 118);
-      /* the open door: dark inside with the workshop lights */
-      const dx0 = w * 0.32, dx1 = w * 0.68; const gr = c.createLinearGradient(0, 140, 0, h); gr.addColorStop(0, '#2B302D'); gr.addColorStop(1, '#4C524E'); c.fillStyle = gr; c.fillRect(dx0, 140, dx1 - dx0, h - 140);
-      c.fillStyle = '#FFF4D8'; for (let i = 0; i < 3; i++) c.fillRect(dx0 + 30 + i * 115, 150, 70, 8);
-      c.fillStyle = '#F2B705'; c.fillRect(dx0 - 10, 136, 10, h - 136); c.fillRect(dx1, 136, 10, h - 136);
-      c.fillStyle = '#2C3E4A'; c.fillRect(70, 160, 170, 100); c.fillRect(w - 240, 160, 170, 100); c.fillStyle = '#3B4440'; c.fillRect(w - 290, 170, 40, h - 170);
-    });
-    const fr = new T.Mesh(new T.PlaneGeometry(gw, gh), std('#FFFFFF', { map: front, roughness: 0.8 })); fr.position.set(0, gh / 2, GAR.z1 + 0.02); A.add(fr);
-    /* a glimpse inside: the lift posts and a warm light */
-    const inner = new T.PointLight(0xFFF1D6, 0.8, 14, 2); inner.position.set(0, 3, GAR.z1 - 3); A.add(inner);
-    /* the side wall facing the yard gets a big painted sign */
-    const side = canvasTex(1024, 256, (c, w, h) => { c.fillStyle = '#1D2521'; c.fillRect(0, 0, w, h); c.fillStyle = '#F2B705'; c.font = '900 92px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('QUALITY USED CARS', w / 2, 100); c.fillStyle = '#FFFFFF'; c.font = '700 36px Barlow, sans-serif'; c.fillText('Every car road-tested by us', w / 2, 190); });
-    const sd = new T.Mesh(new T.PlaneGeometry(gd * 0.9, 3.2), std('#FFFFFF', { map: side, roughness: 0.7 })); sd.position.set(GAR.x1 + 0.02, 4.4, (GAR.z0 + GAR.z1) / 2); sd.rotation.y = PI / 2; A.add(sd);
+    /* the forecourt: brushed concrete in bays with tarred joints, the customers' parking marked out, a line to keep
+       clear of the door */
+    const paintM = new T.MeshStandardMaterial({ color: col('#E9E8E0'), roughness: 0.75, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const yellowM = new T.MeshStandardMaterial({ color: col('#E2B21A'), roughness: 0.75, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const lines = [], ylines = [], lineG = (w, d) => { const g = new T.PlaneGeometry(w, d); g.rotateX(-PI / 2); return g; };
+    const line = (list, x, z, w, d) => list.push([lineG(w, d), mtxOf(x, 0.027, z)]);
+    { const ft = fore26().clone(); ft.needsUpdate = true; ft.repeat.set(27.2 / 4.3, 14.2 / 4.3);
+      flatA(27.2, 14.2, -0.1, -11.1, std('#FFFFFF', { map: ft, roughness: 0.95 }));
+      const bz0 = GAR.z1 + 5.1, bz1 = GAR.z1 + 10.3;
+      for (const x of [-12.35, -9.45, -6.55, -3.65, -0.75]) line(lines, x, (bz0 + bz1) / 2, 0.1, bz1 - bz0);
+      line(lines, -6.55, bz0, 11.7, 0.1);
+      line(ylines, 0, GAR.z1 + 1.55, 2 * (ROOM.W - 1), 0.1);
+      const st = canvasTex(512, 96, (c, w, h) => { c.clearRect(0, 0, w, h); c.fillStyle = '#E9E8E0'; c.font = '900 64px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('CUSTOMER PARKING', w / 2, h / 2 + 4); });
+      const sm = new T.Mesh(new T.PlaneGeometry(5.6, 1.05), new T.MeshStandardMaterial({ map: st, transparent: true, depthWrite: false, roughness: 0.75, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); sm.rotation.x = -PI / 2; sm.position.set(-6.55, 0.027, bz1 + 1.1); A.add(sm);
+      const kc = canvasTex(512, 96, (c, w, h) => { c.clearRect(0, 0, w, h); c.fillStyle = '#E2B21A'; c.font = '900 64px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('KEEP CLEAR', w / 2, h / 2 + 4); });
+      const km = new T.Mesh(new T.PlaneGeometry(4.2, 0.8), new T.MeshStandardMaterial({ map: kc, transparent: true, depthWrite: false, roughness: 0.75, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); km.rotation.x = -PI / 2; km.position.set(5.5, 0.027, GAR.z1 + 2.3); A.add(km);
+    }
+    /* the yard: tarmac, with the bays painted on it and numbered */
+    {
+      const tm = canvasTex(256, 256, (c, w, h) => { speckle(c, w, h, '#4B4F51', 0.14, 9000); for (let i = 0; i < 26; i++) { const x = Math.random() * w, y = Math.random() * h, r = 8 + Math.random() * 26, g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, Math.random() < 0.5 ? 'rgba(20,20,22,.16)' : 'rgba(150,150,150,.07)'); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); } });
+      tm.wrapS = tm.wrapT = T.RepeatWrapping; tm.repeat.set((YARD.x1 - YARD.x0) / 3.2, (YARD.z1 - YARD.z0) / 3.2);
+      flatA(YARD.x1 - YARD.x0, YARD.z1 - YARD.z0, (YARD.x0 + YARD.x1) / 2, (YARD.z0 + YARD.z1) / 2, std('#FFFFFF', { map: tm, roughness: 0.9 }));
+      const n = YARD.bays.length;
+      for (let i = 0; i <= n; i++) { const x = (i < n ? YARD.bays[i] : YARD.bays[n - 1] + 4.4) - 2.2; line(lines, x, (-30.6 - 21.6) / 2, 0.1, 9.0); }
+      line(lines, (YARD.bays[0] + YARD.bays[n - 1]) / 2, -21.6, YARD.bays[n - 1] - YARD.bays[0] + 4.5, 0.1);
+      const nt = canvasTex(64 * n, 64, (c, w, h) => { c.clearRect(0, 0, w, h); c.fillStyle = '#E9E8E0'; c.font = '700 50px Barlow, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; for (let i = 0; i < n; i++) c.fillText(String(i + 1), i * 64 + 32, 34); });
+      const nm = new T.MeshStandardMaterial({ map: nt, transparent: true, depthWrite: false, roughness: 0.75, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+      YARD.bays.forEach((x, i) => { const g = new T.PlaneGeometry(0.9, 0.9), u = g.attributes.uv; for (let k = 0; k < u.count; k++) u.setX(k, (i + u.getX(k)) / n); const m = new T.Mesh(g, nm); m.rotation.x = -PI / 2; m.position.set(x, 0.027, -22.5); A.add(m); });
+    }
+    { const lm = new T.Mesh(mergeGeo(lines), paintM); lm.receiveShadow = true; A.add(lm); const ym = new T.Mesh(mergeGeo(ylines), yellowM); ym.receiveShadow = true; A.add(ym); }
+    garage26(W, A);
     /* the yard fence, a gate sign and bunting */
     const fm = std('#2F3633', { roughness: 0.6, metalness: 0.4 }), fparts = [], pg = new T.BoxGeometry(0.1, 1.3, 0.1), rgx = new T.BoxGeometry(3.05, 0.06, 0.06);
     const fenceLine = (x0, z0, x1, z1) => {
@@ -11168,6 +11500,7 @@ if ( uFx > 0.5 ) {
       me.userData.me = true; W.people.add(me);
       const fromU = o.from === 'unit', fromG = o.from === 'garage';
       drv.walk = { me, keys: {}, pitch: 0, fp: fromG || !!o.fp, x: fromG ? 0 : fromU ? -30.5 : 4.5, z: fromG ? -16.2 : fromU ? -9.5 : -12.5, phi: fromG ? PI / 2 : fromU ? -PI / 2 : 0, v: 0, yaw: fromG ? -PI / 2 : fromU ? PI / 2 + 0.2 : PI - 0.35, tx: null, tz: null, near: null, joy: null, phase: 0 };
+      if (o.pose) { const w = drv.walk, p = o.pose; w.x = p.x; w.z = p.z; w.yaw = p.yaw; w.pitch = p.pitch || 0; w.fp = true; w.phi = p.yaw + PI; w.phase = (p.bob || 0) / 1.7; w.enterCool = 0.6; if (p.keys) w.keys = p.keys; if (p.ptr && p.ptr.id != null) { Object.assign(DP, p.ptr); w.joy = p.joy || null; } }
     }
     camera.far = 520; camera.updateProjectionMatrix();
     try { setMood(W, S ? S.clock : 600, S ? S.weather : null); } catch (e) { /* the light is a nice-to-have */ }
@@ -11306,6 +11639,7 @@ if ( uFx > 0.5 ) {
       if (px < -11.2 || px > YARD.x1 - 0.9 || pz > -1.6 || pz < YARD.z0 + 0.9) return 'edge';
       if (px > GAR.x0 - 0.9 && px < GAR.x1 + 0.9 && pz < GAR.z1 + 0.9) return 'wall';
       for (const g of Object.values(dW.yardCars)) { if (Math.abs(px - g.position.x) < 1.75 && Math.abs(pz - g.position.z) < 2.9) return 'car'; }
+      if (parkedG && parkedG.parent && parkedG.parent !== outside) for (const g of parkedG.children) { if (Math.abs(px - g.position.x - P26.OX) < 1.7 && Math.abs(pz - g.position.z - P26.OZ) < 2.9) return 'car'; }
     }
     return null;
   }
@@ -11343,7 +11677,8 @@ if ( uFx > 0.5 ) {
     for (const a of WALK_A) if (inBox(x, z, a)) { ok = true; break; }
     if (!ok && z > -14.45 && z < -13.75 && ((x > UNIT.walkDoor[0] + 0.25 && x < UNIT.walkDoor[1] - 0.25) || (x > UNIT.door[0] + 0.3 && x < UNIT.door[1] - 0.3))) ok = true;
     if (!ok) return false;
-    if (x > GAR.x0 - 0.4 && x < GAR.x1 + 0.4 && z < GAR.z1 + 0.35) return false;
+    if (x > GAR.x0 - 0.4 && x < GAR.x1 + 0.4 && z < GAR.z1 + 0.35 && !(st.door >= 0.85 && Math.abs(x) < ROOM.W - 1.5 && z > GAR.z1 - 0.45)) return false;
+    if (parkedG && parkedG.parent && parkedG.parent !== outside) for (const g of parkedG.children) if (Math.abs(x - g.position.x - P26.OX) < 1.2 && Math.abs(z - g.position.z - P26.OZ) < 2.5) return false;
     if (inBox(x, z, [-27.7, -25.1, -24.7, -23.3]) || inBox(x, z, [-25.4, -24.2, -30.3, -26.8])) return false;
     for (const g of Object.values(dW.yardCars)) if (Math.abs(x - g.position.x) < 1.25 && Math.abs(z - g.position.z) < 2.45) return false;
     if (dW.unitCars) for (const g of Object.values(dW.unitCars)) { const r = g.userData.box; if (r && inBox(x, z, r)) return false; }
@@ -11369,7 +11704,10 @@ if ( uFx > 0.5 ) {
       const ok = walkOk;
       if (ok(nx, nz)) { w.x = nx; w.z = nz; } else if (ok(nx, w.z)) w.x = nx; else if (ok(w.x, nz)) w.z = nz; else w.tx = null;
       /* push into the open garage door and you're back inside */
-      if (Math.abs(w.x) < 4.6 && w.z < GAR.z1 + 0.85 && mz / L < -0.45 && !(w.enterCool > 0)) { w.enterCool = 2.5; d.ev.push({ type: 'enterGarage' }); }
+      if (!(w.enterCool > 0)) {
+        if (st.door >= 0.85 && Math.abs(w.x) < ROOM.W - 1.5 && w.z < GAR.z1 + 0.1) { w.enterCool = 1; d.ev.push({ type: 'enterGarage', pose: { x: w.x - P26.OX, z: w.z - P26.OZ, yaw: w.yaw, pitch: w.pitch || 0, bob: w.phase * 1.7, fp: !!w.fp, joy: w.joy, keys: w.keys, ptr: Object.assign({}, DP), cool: 0.6 } }); }
+        else if (st.door < 0.85 && Math.abs(w.x) < ROOM.W - 1.5 && w.z < GAR.z1 + 0.85 && mz / L < -0.45) { w.enterCool = 1.5; P26.openDoor(); d.ev.push({ type: 'doorKnock' }); }
+      }
       const ta = Math.atan2(mz, mx); let da = ta - w.phi; while (da > PI) da -= 2 * PI; while (da < -PI) da += 2 * PI; w.phi += da * Math.min(1, dt * 10);
       w.phase += dt * speed * 2.6;
     }
@@ -11439,7 +11777,7 @@ if ( uFx > 0.5 ) {
     camera.position.copy(d.camP);
     if (d.fx.shake && !reduced && d.cam !== 'bonnet') camera.position.y += (Math.random() - 0.5) * 0.02 * d.fx.shake;
     camera.lookAt(d.camLk);
-    camera.fov = baseFov + (d.mode === 'route' && d.cam !== 'bonnet' ? Math.min(9, d.v * 0.2) : 0) + (d.walk && d.walk.fp ? (landscape ? 20 : 22) : 0);
+    camera.fov = baseFov + (d.mode === 'route' && d.cam !== 'bonnet' ? Math.min(9, d.v * 0.2) : 0) + (d.walk && d.walk.fp ? (landscape ? 22 : 24) : 0);
     camera.clearViewOffset(); camera.updateProjectionMatrix();
     const sp = dW.sun, fx = d.camLk.x, fz = d.camLk.z, so = dW.sunOff || [-30, 60, -20]; sp.position.set(fx + so[0], so[1], fz + so[2]); sp.target.position.set(fx, 0, fz); sp.target.updateMatrixWorld();
     dW.dome.position.set(camera.position.x, 0, camera.position.z);
@@ -11464,6 +11802,7 @@ if ( uFx > 0.5 ) {
       if (fxx.drip && !dW.drip.visible) { const p = carPt(1.0, 0.02, 0); dW.drip.position.set(p.x, (d.y || 0.02) + 0.01, p.z); dW.drip.visible = true; }
     }
     road22(d, dt);
+    if (d.mode !== 'route') P26.traffic(dt);
     if (api.onDriveTick) api.onDriveTick(d, dt);
     if (!drv) { kick(); return; }
     driveCam(d, dt, d.t < 0.05);
@@ -11708,6 +12047,207 @@ if ( uFx > 0.5 ) {
   /* anything the game asks of the 3D view may change the scene, so the shadows get redrawn on the next frame
      (turning the camera alone never needs them redrawn) */
   Object.keys(api).forEach(k => { const f = api[k]; if (typeof f !== 'function' || /^(ext|on|perf|tri|renderInfo|envState|driving|fpState|routeInfo|stageEl|bayTest)/.test(k)) return; api[k] = function () { shadowDirty = true; return f.apply(this, arguments); }; });
+  /* ======================= build 26: one outside =======================
+     The street you see through the roller door is the street you walk out into. A workshop frame is drawn in two
+     passes: the road world first, from the same eye (moved to where the garage stands out there), then the workshop
+     over it, so the world shows wherever the door is open. Outside it is the other way round: the workshop first, then
+     the world over it with a hole in the garage front where the door is up. One door, one state, both sides.
+     Needs real WebGL; anywhere else the old painted street stays. window.__noPortal switches it off. */
+  Object.assign(P26, { OX: 0, OZ: GAR.z1 - ROOM.D, HW: ROOM.W - 1, HH: ROOM.H - 0.5, RANGE: 90, stat: {}, cam: null, last: 0, t: 0, shT: 0, inShadow: true, busy: false, failed: false, mood: null, fails: 0 });
+  (function init26() {
+    try {
+      const gl = renderer.getContext ? renderer.getContext() : null;
+      const real = !!gl && ((typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext) || (typeof WebGLRenderingContext !== 'undefined' && gl instanceof WebGLRenderingContext));
+      P26.ok = real && !window.__noPortal && !!(renderer.clearDepth && renderer.setScissor && renderer.setScissorTest && renderer.getClearColor && T.Vector4 && T.PerspectiveCamera && new T.Matrix4().invert);
+      if (P26.ok) P26.cam = new T.PerspectiveCamera();
+    } catch (e) { P26.ok = false; }
+  })();
+  {
+    const FULL = [0, 0, 1, 1], BLACK = new T.Color(0x0E1012), P4 = [0, 1, 2, 3].map(() => new T.Vector4()), clipped = [];
+    /* the open part of the doorway on the screen: [x0, y0, x1, y1] from the bottom left, or null when it's out of sight */
+    P26.doorRect = (cam, ox, oz) => {
+      const HW = P26.HW, top = Math.min(P26.HH, P26.HH * st.door + 0.14), z = ROOM.D + oz, E = 0.05;
+      [[-HW, 0], [HW, 0], [HW, top], [-HW, top]].forEach(([x, y], i) => P4[i].set(x + ox, y, z, 1).applyMatrix4(cam.matrixWorldInverse).applyMatrix4(cam.projectionMatrix));
+      clipped.length = 0;
+      for (let i = 0; i < 4; i++) {
+        const a = P4[i], b = P4[(i + 1) % 4], ia = a.w > E, ib = b.w > E;
+        if (ia) clipped.push(a.x / a.w, a.y / a.w);
+        if (ia !== ib) { const t = (E - a.w) / (b.w - a.w); clipped.push((a.x + (b.x - a.x) * t) / E, (a.y + (b.y - a.y) * t) / E); }
+      }
+      if (!clipped.length) return null;
+      let x0 = 9, y0 = 9, x1 = -9, y1 = -9;
+      for (let i = 0; i < clipped.length; i += 2) { x0 = Math.min(x0, clipped[i]); x1 = Math.max(x1, clipped[i]); y0 = Math.min(y0, clipped[i + 1]); y1 = Math.max(y1, clipped[i + 1]); }
+      x0 = clampN(x0 - 0.01, -1, 1); x1 = clampN(x1 + 0.01, -1, 1); y0 = clampN(y0 - 0.01, -1, 1); y1 = clampN(y1 + 0.01, -1, 1);
+      if (x1 - x0 < 0.004 || y1 - y0 < 0.004) return null;
+      return [(x0 + 1) / 2, (y0 + 1) / 2, (x1 + 1) / 2, (y1 + 1) / 2];
+    };
+    const tick = () => { const now = performance.now(), dt = P26.last ? Math.min(0.05, Math.max(0, (now - P26.last) / 1000)) : 0.016; P26.last = now; P26.t += dt; return dt; };
+    const bgOf = () => (scene.background && scene.background.isColor ? scene.background : BLACK);
+    /* the far side of the door keeps in step with the near side */
+    P26.door = () => {
+      const W = dW; if (!W || !W.shut) return;
+      const sh = Math.max(0.002, 1 - st.door), HH = P26.HH, op = HH * (1 - sh);
+      W.shut.scale.y = sh; W.shut.position.y = HH - HH * sh / 2; W.shut.visible = sh > 0.004; W.shutBar.position.y = op + 0.04; W.shutBar.visible = sh > 0.004;
+      W.mask.visible = st.door > 0.002; W.mask.scale.y = Math.max(0.001, op / HH); W.mask.position.y = op / 2;
+    };
+    P26.doorStep = dt => {
+      const dd = tgt.door - st.door;
+      if (dd) {
+        st.door = Math.abs(dd) < 0.0008 ? tgt.door : st.door + clampN(dd, -0.38 * dt, 0.38 * dt);
+        const sh = Math.max(0.002, 1 - st.door), HH = P26.HH;
+        shutter.scale.y = sh; shutter.position.y = HH - HH * sh / 2; shutTexR.repeat.y = 4 * sh; doorBar.position.y = HH * (1 - sh) + 0.04; hemi.intensity = HEMI0 + 0.14 * st.door;
+        P26.inShadow = true;
+      }
+      P26.door();
+    };
+    P26.openDoor = () => {
+      if (tgt.door >= 1) return;
+      if (doorOpen) { tgt.door = 1; return; }
+      doorOpen = true; tgt.door = 1;
+      try { Sfx.liftFor(2.5); doorMk.querySelector('.mk-label').textContent = 'Close the door'; doorMk.setAttribute('aria-label', 'Close the garage door'); } catch (e) { /* no label to change */ }
+    };
+    P26.moodSync = () => {
+      if (drv || !dW) return;
+      const k = S ? ((S.clock / 20) | 0) + ':' + (S.weather || '') : '';
+      if (k === P26.mood) return;
+      P26.mood = k; try { setMood(dW, S ? S.clock : 600, S ? S.weather : null); } catch (e) { /* the light is a nice-to-have */ }
+      P26.shT = 0;
+    };
+    /* cars go by on the far side of the road whether you're driving or not */
+    P26.traffic = dt => {
+      const W = dW, R = W && W.R; if (!R || !W.traffic) return;
+      for (const tc of W.traffic) {
+        tc.s = (tc.s - tc.v * dt + R.N) % R.N;
+        const tq = pathAt(R, tc.s, -LANE, tc.q || (tc.q = {})); tc.g.position.set(tq.x, tq.y + 0.02, tq.z); tc.g.rotation.y = -(tq.phi + PI); tc.g.visible = !inRange(tc.s, W.sec.carpark[0] - 18, W.sec.carpark[1] + 18);
+      }
+    };
+    /* both scenes are drawn in one frame, and they share materials (people, the simple cars): give them the same
+       number of each kind of light and the same fog switch, so a shared material keeps one shader for both */
+    P26.balance = () => {
+      const W = dW; if (!W) return;
+      const count = sc => { const n = { d: 0, p: 0, s: 0, h: 0 }; sc.traverse(o => { if (!o.isLight) return; if (o.isDirectionalLight) n.d++; else if (o.isPointLight) n.p++; else if (o.isSpotLight) n.s++; else if (o.isHemisphereLight) n.h++; }); return n; };
+      const a = count(scene), b = count(W.scene);
+      const pad = (sc, k, n) => { for (let i = 0; i < n; i++) { const L = k === 'd' ? new T.DirectionalLight(0x000000, 0) : k === 'p' ? new T.PointLight(0x000000, 0, 1) : k === 's' ? new T.SpotLight(0x000000, 0) : new T.HemisphereLight(0x000000, 0x000000, 0); L.userData.pad26 = true; sc.add(L); } };
+      for (const k of ['d', 'p', 's', 'h']) { if (a[k] < b[k]) pad(scene, k, b[k] - a[k]); else if (b[k] < a[k]) pad(W.scene, k, a[k] - b[k]); }
+      if (!scene.fog && W.scene.fog) scene.fog = new T.Fog(0xC8CFC8, 6000, 9000);
+      P26.stat.lights = [count(scene), count(W.scene)];
+    };
+    P26.feed = () => {
+      const W = dW; if (!W || drv || !P26.ready) return;
+      try {
+        const f = api.yardFeed ? api.yardFeed() : null;
+        if (f) { setYardCars(f.yard || []); setUnitCars(f.unit || pendingUnit); }
+        if (W.wash) { const ow = !!(S && S.owned && S.owned.carwash); W.wash.g.visible = ow; W.washSoon.visible = !ow; }
+      } catch (e) { /* the yard fills in when you walk out */ }
+    };
+    /* build the road world if it isn't there yet, and move the customers' parked cars out onto its forecourt */
+    P26.prep = () => {
+      if (!P26.ok || P26.failed) return false;
+      if (P26.ready && dW) return true;
+      try {
+        const t0 = performance.now();
+        buildDriveWorld();
+        const W = dW; if (!W || !W.gar || !W.fore) throw new Error('no garage outside');
+        if (!drv) W.ride.visible = false;
+        if (parkedG && parkedG.parent !== W.fore) W.fore.add(parkedG);
+        try { if (DEC.ads2 && DEC.ads2.parent !== W.fore) W.fore.add(DEC.ads2); } catch (e) { /* no billboard yet */ }
+        P26.balance();
+        P26.ready = true; P26.mood = null; P26.shT = 0; P26.inShadow = true; P26.stat.build = Math.round(performance.now() - t0);
+        P26.feed(); P26.door();
+        queueSig = null; try { updateQueue(); } catch (e) { /* no board yet */ }
+      } catch (e) { P26.failed = true; P26.ready = false; P26.err = String(e && e.message || e); }
+      return P26.ready;
+    };
+    /* in the workshop, looking out */
+    P26.inside = () => {
+      const live = P26.ready && !!dW && !!dW.gar && st.door > 0.002 && !drv && !ext && !booth;
+      if (roomGround26) roomGround26.visible = !live;
+      if (!live) return null;
+      outside.visible = false;
+      const dt = tick();
+      camera.updateMatrixWorld(); camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+      const rect = camera.position.z > ROOM.D - 0.02 ? FULL : P26.doorRect(camera, 0, 0);
+      if (!rect) return null;
+      const W = dW, c2 = P26.cam;
+      c2.copy(camera, false); c2.position.x += P26.OX; c2.position.z += P26.OZ; c2.near = 0.3; c2.far = 520; c2.updateProjectionMatrix(); c2.updateMatrixWorld(true);
+      W.gar.visible = false;
+      W.dome.position.set(c2.position.x, 0, c2.position.z);
+      P26.moodSync();
+      const so = W.sunOff || [-30, 60, -20], tz = GAR.z1 + 9; W.sun.position.set(so[0], so[1], tz + so[2]); W.sun.target.position.set(0, 0, tz); W.sun.target.updateMatrixWorld();
+      try { worldStep(dt, P26.t); P26.traffic(dt); } catch (e) { /* nothing moves this frame */ }
+      P26.shT -= dt; const bs = P26.shT <= 0; if (bs) P26.shT = 0.5;
+      return { back: W.scene, backCam: c2, rect, clear: bgOf(), backShadow: bs, view: 'in' };
+    };
+    /* out on the road or the yard, looking at the garage */
+    P26.outside = () => {
+      const W = dW; if (!W || !W.gar) return null;
+      const dt = tick();
+      P26.doorStep(dt);
+      W.gar.visible = true;
+      const cp = camera.position;
+      let rect = null;
+      if (st.door > 0.002 && cp.z > GAR.z1 + 0.02 && Math.hypot(cp.x, cp.z - GAR.z1) < P26.RANGE) { camera.updateMatrixWorld(); camera.matrixWorldInverse.copy(camera.matrixWorld).invert(); rect = P26.doorRect(camera, P26.OX, P26.OZ); }
+      W.maskM.colorWrite = !rect;
+      if (!rect) return null;
+      if (roomGround26) roomGround26.visible = false; outside.visible = false;
+      const c2 = P26.cam;
+      c2.copy(camera, false); c2.position.x -= P26.OX; c2.position.z -= P26.OZ; c2.near = 0.3; c2.far = 140; c2.layers.mask = camera.layers.mask | 5; c2.updateProjectionMatrix(); c2.updateMatrixWorld(true);
+      let wk = false; try { wk = !!stepWorkers(performance.now()); } catch (e) { wk = false; }
+      const bs = P26.inShadow || wk; P26.inShadow = false;
+      return { back: scene, backCam: c2, rect, clear: bgOf(), backShadow: bs, view: 'out' };
+    };
+    const base0 = renderer.render.bind(renderer), cc = new T.Color(), sz2 = new T.Vector2();
+    const scis = (rt, r) => {
+      if (rt) {
+        if (r) rt.scissor.set(Math.floor(r[0] * rt.width), Math.floor(r[1] * rt.height), Math.ceil((r[2] - r[0]) * rt.width), Math.ceil((r[3] - r[1]) * rt.height)); else rt.scissor.set(0, 0, rt.width, rt.height);
+        rt.scissorTest = !!r; renderer.setRenderTarget(rt);
+      } else {
+        renderer.getSize(sz2);
+        if (r) renderer.setScissor(r[0] * sz2.x, r[1] * sz2.y, (r[2] - r[0]) * sz2.x, (r[3] - r[1]) * sz2.y); else renderer.setScissor(0, 0, sz2.x, sz2.y);
+        renderer.setScissorTest(!!r);
+      }
+    };
+    renderer.render = function (s, c) {
+      let j = null;
+      let held = false; try { held = !!POST.hold; } catch (e) { held = false; }
+      if (P26.ok && !P26.busy && !held && c === camera) { try { j = s === scene ? P26.inside() : (dW && s === dW.scene ? P26.outside() : null); } catch (e) { j = null; P26.err = String(e && e.message || e); } }
+      else if (s === scene && roomGround26 && !P26.busy) roomGround26.visible = true;
+      if (!j) { P26.stat.view = null; return base0(s, c); }
+      const rt = renderer.getRenderTarget(), ac = renderer.autoClear, sm = renderer.shadowMap, want = sm.needsUpdate, fb = s.background, bb = j.back.background, ca = renderer.getClearAlpha();
+      renderer.getClearColor(cc);
+      P26.busy = true;
+      try {
+        renderer.autoClear = false;
+        scis(rt, null); renderer.setClearColor(j.clear, 1); renderer.clear(true, true, true);
+        scis(rt, j.rect);
+        j.back.background = null; sm.needsUpdate = !!j.backShadow;
+        base0(j.back, j.backCam);
+        P26.stat.back = renderer.info.render.triangles; P26.stat.backCalls = renderer.info.render.calls;
+        scis(rt, null); renderer.clearDepth();
+        s.background = null; sm.needsUpdate = want;
+        base0(s, c);
+        P26.stat.front = renderer.info.render.triangles; P26.stat.frontCalls = renderer.info.render.calls; P26.stat.view = j.view; P26.stat.rect = j.rect;
+      } catch (e) {
+        P26.err = String(e && e.message || e); if (++P26.fails > 3) P26.ok = false;
+      } finally {
+        s.background = fb; j.back.background = bb; renderer.autoClear = ac; renderer.setClearColor(cc, ca);
+        try { scis(rt, null); } catch (e2) { /* the buffer went away */ }
+        P26.busy = false;
+      }
+    };
+  }
+  /* get the street ready as soon as the door starts to open or you start walking about */
+  { const t0 = api.toggleDoor; api.toggleDoor = () => { if (!doorOpen) P26.prep(); t0(); P26.feed(); }; }
+  { const f0 = api.fpDoorOpen; api.fpDoorOpen = () => { P26.prep(); P26.feed(); f0(); }; }
+  { const s0 = api.fpStart; api.fpStart = o => { const r = s0(o); if (r) { P26.prep(); P26.feed(); } return r; }; }
+  { const d0 = api.driveStart; api.driveStart = o => { const d = d0(o); if (d) { P26.prep(); P26.door(); P26.inShadow = true; P26.last = 0; } return d; }; }
+  api.portal = () => ({ ok: P26.ok, ready: P26.ready, failed: P26.failed, err: P26.err || null, stat: P26.stat, door: st.door });
+  window.__p26 = () => api.portal();
+  api.tris26 = n => { const out = []; if (!dW) return null; dW.scene.traverse(o => { if (!o.isMesh || !o.geometry) return; for (let q = o; q; q = q.parent) if (!q.visible) return; const g = o.geometry, t = g.index ? g.index.count / 3 : (g.attributes.position ? g.attributes.position.count / 3 : 0); let tag = ''; for (let q = o; q && !tag; q = q.parent) tag = q.name || (q.userData && (q.userData.lite ? 'lite' : q.userData.person ? 'person' : '')) || ''; out.push([Math.round(t), tag || (o.material && o.material.name) || o.type]); }); const by = {}; out.forEach(([t, k]) => { by[k] = (by[k] || 0) + t; }); out.sort((a, b) => b[0] - a[0]); return { total: out.reduce((s, x) => s + x[0], 0), n: out.length, by, top: out.slice(0, n || 12) }; };
+  window.__tris26 = n => (api.tris26 ? api.tris26(n) : null);
+  window.__door = v => { if (v == null) api.toggleDoor(); else { if ((v > 0) !== doorOpen) api.toggleDoor(); st.door = v; tgt.door = v; } kick(); return tgt.door; };
+  window.__camDir = () => { const v = new T.Vector3(); camera.getWorldDirection(v); const c2 = P26.cam, v2 = new T.Vector3(); if (c2) c2.getWorldDirection(v2); return [camera.position.x, camera.position.y, camera.position.z, v.x, v.y, v.z, camera.fov, camera.aspect, camera.view ? 1 : 0].map(n => +n.toFixed(3)).concat(c2 ? [c2.position.x, c2.position.z, v2.x, v2.z, c2.fov, c2.aspect].map(n => +n.toFixed(3)) : []); };
+  window.__w26 = () => dW;
   /* ======================= build 24: the picture gets a finish =======================
      Each frame is drawn into an off-screen buffer, then one quick pass adds a soft glow round bright things (strip
      lights, chrome glints, neon, headlamps, the low sun), a gentle vignette and a touch more colour and contrast.
@@ -14101,16 +14641,17 @@ function yardAdd(job, bay, score) {
   return job;
 }
 /* walk out to the yard and look round your cars */
-function openYard(from) {
+function openYard(from, pose) {
   if (BT || RT || YW) return;
   if (!canRoad()) { yardSheet(); return; }
-  let D = null; try { D = Car3D.driveStart({ mode: 'walk', yard: yardList(), unit: unitList(), from }); } catch (e) { D = null; }
+  let D = null; try { D = Car3D.driveStart({ mode: 'walk', yard: yardList(), unit: unitList(), from, pose }); } catch (e) { D = null; }
   if (!D) { if (from === 'unit') unitSheet(); else yardSheet(); return; }
   YW = { mode: 'walk', D, near: null, card: null, say: null, sayT: 0, sayQ: [], from };
   driveUi(true);
   const n = (S.yard || []).length, u = (S.unit || []).length;
-  driveSay(from === 'unit' ? (u ? `${u} car${u > 1 ? 's' : ''} in the unit. Walk in through the glass door and up to one.` : 'The unit’s empty. Win a car at auction, or wheel a project car over from the workshop.') : n ? `${n} car${n > 1 ? 's' : ''} for sale. Walk up to one, or tap it. The car wash and the unit are next door.` : 'The yard’s empty. Finish a project car and park it out here to sell it. The unit’s next door, past the car wash.', true);
-  S.stats.yardVisits = (S.stats.yardVisits || 0) + 1;
+  const say26 = !pose || !openYard.said26; openYard.said26 = true;
+  if (say26) driveSay(from === 'unit' ? (u ? `${u} car${u > 1 ? 's' : ''} in the unit. Walk in through the glass door and up to one.` : 'The unit’s empty. Win a car at auction, or wheel a project car over from the workshop.') : n ? `${n} car${n > 1 ? 's' : ''} for sale. Walk up to one, or tap it. The car wash and the unit are next door.` : 'The yard’s empty. Finish a project car and park it out here to sell it. The unit’s next door, past the car wash.', true);
+  if (say26) S.stats.yardVisits = (S.stats.yardVisits || 0) + 1;
 }
 function yardClose() {
   if (!YW) return;
@@ -14195,7 +14736,7 @@ function yardTick(D, dt) {
       setTimeout(() => yardParked(score), 350);
     }
   } else {
-    D.ev.forEach(e => { if (e.type === 'enterGarage') { yardClose(); setTimeout(() => fpOpen('door'), 30); return; } if (e.type === 'near') { if (e.no != null) yardCard(e.no); else if (e.uno != null) unitCard(e.uno); else if (Y.card != null) { const el = document.querySelector('#drive .yd-card'); if (el) el.hidden = true; Y.card = null; } } });
+    D.ev.forEach(e => { if (e.type === 'enterGarage') { const p = e.pose; yardClose(); if (p) fpOpen('door', p); else setTimeout(() => fpOpen('door'), 30); return; } if (e.type === 'doorKnock') { driveSay('The roller door’s coming up. Walk in when it’s open.', true); return; } if (e.type === 'near') { if (e.no != null) yardCard(e.no); else if (e.uno != null) unitCard(e.uno); else if (Y.card != null) { const el = document.querySelector('#drive .yd-card'); if (el) el.hidden = true; Y.card = null; } } });
   }
   if (Y.sayQ && Y.sayQ.length && performance.now() - Y.sayT > 2600) driveSay(Y.sayQ.shift(), true);
   else if (Y.say && performance.now() - Y.sayT > 6000) { const el = document.querySelector('#drive .dv-say'); if (el) el.hidden = true; Y.say = null; }
@@ -15186,7 +15727,7 @@ window.__r3d = () => (Car3D.ok && Car3D.renderInfo ? Car3D.renderInfo() : null);
 window.__fp = () => (Car3D.ok && Car3D.fpState ? Car3D.fpState() : null);
 /* the cars on the other ramps, for the lifts either side */
 const sideList = () => S.bays.map((j, i) => ({ j, i })).filter(o => o.j && o.i !== S.activeBay).map(o => ({ idx: o.i, no: o.j.no, car: o.j.car, lift: o.j.zone === 'under' ? 1.85 : 0 }));
-function fpOpen(at) {
+function fpOpen(at, pose) {
   if (!Car3D.ok || !Car3D.fpStart || BT || RT || YW || FPW || MG || busy) return;
   let el = $('#fpw'); if (!el) { el = document.createElement('div'); el.id = 'fpw'; document.body.appendChild(el); }
   el.className = 'drive dv-walk fpw'; el.hidden = false; document.body.classList.add('driving');
@@ -15198,8 +15739,9 @@ function fpOpen(at) {
   el.querySelector('.dv-host').appendChild(Car3D.stageEl());
   FPW = { el, t0: performance.now() };
   Car3D.sideCars(sideList());
-  if (at === 'door') Car3D.fpDoorOpen();
-  if (!Car3D.fpStart(at === 'door' ? { x: 0, z: 10.6, yaw: Math.PI / 2 } : { x: 3.2, z: 6.6, yaw: Math.PI / 2 + 0.42 })) { fpClose(); return; }
+  if (at === 'door' && !pose) Car3D.fpDoorOpen();
+  if (!Car3D.fpStart(pose || (at === 'door' ? { x: 0, z: 10.6, yaw: Math.PI / 2 } : { x: 3.2, z: 6.6, yaw: Math.PI / 2 + 0.42 }))) { fpClose(); return; }
+  if (pose) { if (pose.fp === false) { const sg = Car3D.stageEl(); sg.classList.remove("cut26"); void sg.offsetWidth; sg.classList.add("cut26"); } return; }
   S.stats.walks = (S.stats.walks || 0) + 1;
   Sfx.pop();
 }
@@ -15218,7 +15760,14 @@ Car3D.onFpTap = (kind, idx) => {
   if (kind === 'chest') { fpClose(); S.view = 'garage'; render(); toTop(); return; }
   if (kind === 'board') { showGoals(); return; }
 };
-Car3D.onFpOut = () => { const keep = FPW; FPW = null; if (keep) { keep.el.hidden = true; keep.el.innerHTML = ''; document.body.classList.remove('driving'); } render(); setTimeout(() => openYard('garage'), 30); };
+/* out through the door: the yard view takes over in the same frame, from the same eye */
+Car3D.onFpOut = pose => {
+  const keep = FPW; FPW = null;
+  try { openYard('garage', pose); } catch (e) { /* falls back to the workshop below */ }
+  if (keep) { keep.el.hidden = true; keep.el.innerHTML = ''; }
+  if (!YW) { document.body.classList.remove('driving'); render(); }
+};
+Car3D.yardFeed = () => ({ yard: yardList(), unit: unitList() });
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-fp]'); if (!b || !FPW) return;
   if (b.dataset.fp === 'exit') fpClose();
@@ -17272,7 +17821,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 25</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 26</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -17753,7 +18302,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 25;
+const BUILD = 26;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -22384,6 +22933,19 @@ function showWhatsNew25(had24) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 26: what's new */
+function showWhatsNew26(had25) {
+  showModal(`<div><span class="label">Build 26</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>One street, inside and out.</b> What you see through the roller door is the real street now. Walk out and you are standing in it: same road, same buildings, no reload.</li>
+      <li><b>A door that is really open.</b> From outside you can see into your workshop. Shut it and the shutter is down on both sides; push at it from outside and it rolls up.</li>
+      <li><b>A proper road.</b> New tarmac with worn lines, kerbs and paving, a concrete forecourt with bays for customers, and a crossover out to the road.</li>
+      <li><b>A fitted-out workshop.</b> A tyre bay, air lines, a fire exit, safety signs, a parts washer and a pillar drill.</li>
+      <li><b>Better-built people.</b> Fuller figures, real hands and boots, livelier faces, and BONNET UP across the mechanics’ backs.</li>
+      ${had25 ? '' : '<li><b>All-new car bodies.</b> Every car, van and pickup remodelled with curved panels and a proper glass line.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -22391,8 +22953,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen25) { const had24 = !!S.seen24; S.seen24 = true; S.seen25 = true; save(); setTimeout(() => showWhatsNew25(had24), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen26) { const had25 = !!S.seen25; S.seen24 = true; S.seen25 = true; S.seen26 = true; save(); setTimeout(() => showWhatsNew26(had25), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
