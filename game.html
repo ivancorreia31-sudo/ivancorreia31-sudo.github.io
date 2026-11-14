@@ -661,6 +661,7 @@ input.txt{width:100%;box-sizing:border-box;font:inherit;font-size:17px;padding:1
 .ag-needle{stroke:var(--bad);stroke-width:3;stroke-linecap:round}.ag-hub{fill:var(--ink)}.ag-unit{font-size:9px;font-weight:800;fill:var(--muted);letter-spacing:.08em}
 .bolt.term.neg .hex{background:#1E2321}.bolt.term.pos .hex{background:#C8372D}
 .bolt.term small{font-size:15px;font-weight:900}
+.bolt.term{width:66px;height:70px}.bolt.term .hex{width:50px;height:50px}.bolt.term .hex::after{inset:15px}
 .holdbtn.down{transform:scale(.97);filter:brightness(.92)}
 .bl-car{position:relative;flex:none;width:96px;height:150px;border-radius:40px 40px 30px 30px;background:var(--panel-2);box-shadow:inset 0 0 0 2px var(--line)}
 .bl-front{position:absolute;top:-2px;left:0;right:0;text-align:center;font:600 9px var(--font-mono);color:var(--muted);text-transform:uppercase}
@@ -2450,7 +2451,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5682,9 +5683,159 @@ const Car3D = (() => {
       const x0 = front ? x0F : x0R, e = front ? eF : eR, mid = front ? midF : midR, hh = mid - 0.26, r = Math.min(1, Math.abs(y - mid) / hh), q = Math.sqrt(1 - r * r);
       return front ? x0 + e * q : x0 - e * q;
     };
-    return { paint: mk(out.paint), glass: mk(out.glass), dark: mk(out.dark), well: mk(out.well), lid: mk(out.lid), stripeLid: mk(out.sLid), stripeRoof: mk(out.sRoof), faceX, dY, SF, tipF, tipR, stations: xs.length };
+    /* build 27: every triangle of the nose (or the tail) is dropped onto a grid over height and width, keeping the
+       foremost (rearmost) x: that is where the surface is, seen from straight ahead (behind) */
+    const GY0 = 0.14, GDY = 0.02, GNY = 96, GZ0 = -1.0, GDZ = 0.02, GNZ = 101, grids = {};
+    const gridOf = front => {
+      const key = front ? 'f' : 'r'; if (grids[key]) return grids[key];
+      const G = new Float32Array(GNY * GNZ).fill(NaN), xc = front ? 1.2 : Math.min(-0.9, R + 1.5);
+      for (const arr of [out.paint, out.lid, out.glass]) for (let i = 0; i < arr.length; i += 9) {
+        const ax = arr[i], ay = arr[i + 1], az = arr[i + 2], bx = arr[i + 3], by = arr[i + 4], bz = arr[i + 5], cx = arr[i + 6], cy = arr[i + 7], cz = arr[i + 8];
+        if (front ? Math.max(ax, bx, cx) < xc : Math.min(ax, bx, cx) > xc) continue;
+        const den = (by - cy) * (az - cz) + (cz - bz) * (ay - cy); if (Math.abs(den) < 1e-9) continue;
+        const j0 = Math.max(0, Math.ceil((Math.min(ay, by, cy) - GY0) / GDY - 0.5)), j1 = Math.min(GNY - 1, Math.floor((Math.max(ay, by, cy) - GY0) / GDY + 0.5));
+        const k0 = Math.max(0, Math.ceil((Math.min(az, bz, cz) - GZ0) / GDZ - 0.5)), k1 = Math.min(GNZ - 1, Math.floor((Math.max(az, bz, cz) - GZ0) / GDZ + 0.5));
+        for (let j = j0; j <= j1; j++) for (let k = k0; k <= k1; k++) {
+          const y = GY0 + j * GDY, z = GZ0 + k * GDZ;
+          const w1 = ((by - cy) * (z - cz) + (cz - bz) * (y - cy)) / den, w2 = ((cy - ay) * (z - cz) + (az - cz) * (y - cy)) / den, w3 = 1 - w1 - w2;
+          if (w1 < -0.25 || w2 < -0.25 || w3 < -0.25) continue;
+          const x = w1 * ax + w2 * bx + w3 * cx, idx = j * GNZ + k;
+          if (!(front ? G[idx] >= x : G[idx] <= x)) G[idx] = x;
+        }
+      }
+      return (grids[key] = G);
+    };
+    const fx = (front, y, z) => {
+      const G = gridOf(front), fj = (y - GY0) / GDY, fk = (z - GZ0) / GDZ, j = Math.floor(fj), k = Math.floor(fk), tj = fj - j, tk = fk - k;
+      const at = (jj, kk) => (jj < 0 || jj >= GNY || kk < 0 || kk >= GNZ ? NaN : G[jj * GNZ + kk]);
+      let s = 0, w = 0, v;
+      v = at(j, k); if (v === v) { s += v * (1 - tj) * (1 - tk); w += (1 - tj) * (1 - tk); }
+      v = at(j, k + 1); if (v === v) { s += v * (1 - tj) * tk; w += (1 - tj) * tk; }
+      v = at(j + 1, k); if (v === v) { s += v * tj * (1 - tk); w += tj * (1 - tk); }
+      v = at(j + 1, k + 1); if (v === v) { s += v * tj * tk; w += tj * tk; }
+      if (w > 0.2) return s / w;
+      /* off the body: the nearest place that is on it, looking towards the centre line first, then up and down */
+      const jr = Math.round(fj), kr = Math.round(fk), dk = z > 0 ? -1 : 1;
+      for (let r = 1; r < 40; r++) { for (const dj of [0, r, -r]) { v = at(jr + dj, kr + dk * r); if (v === v) return v; v = at(jr + dj, kr); if (v === v) return v; } }
+      return faceX(front, y);
+    };
+    return { paint: mk(out.paint), glass: mk(out.glass), dark: mk(out.dark), well: mk(out.well), lid: mk(out.lid), stripeLid: mk(out.sLid), stripeRoof: mk(out.sRoof), faceX, fx, dY, SF, tipF, tipR, stations: xs.length };
   }
-  /* headlamps and tail lamps are parts you take off, so they aren't bent with the body: sit each one on the new surface */
+  /* ======================= build 27: trim that sits on the body =======================
+     The grille, the intake under it, the fog lamps, the lamps and the plates were flat boxes put where the middle of the
+     nose or tail is. The body curves away from there, so their ends stood off it: a black bar poking out at the corners
+     of the bumpers. Now every piece is laid on the real surface (the skin's own triangles, looked up through SK.fx):
+     wide pieces are cut into strips so they curve with it, small ones are moved bodily, plates are tilted to the slope
+     of the panel and stood just clear of it. A lip under the nose and the tail follows the same outline. */
+  function slice27(g, ax, step) {
+    const src = g.index ? g.toNonIndexed() : g, P = src.attributes.position, U = src.attributes.uv, out = [], ouv = [];
+    const emit = poly => { for (let i = 1; i < poly.length - 1; i++) for (const v of [poly[0], poly[i], poly[i + 1]]) { out.push(v[0], v[1], v[2]); ouv.push(v[3], v[4]); } };
+    const cut = (poly, c) => {
+      const lo = [], hi = [];
+      for (let i = 0; i < poly.length; i++) {
+        const a = poly[i], b = poly[(i + 1) % poly.length], da = a[ax] - c, db = b[ax] - c;
+        if (da <= 0) lo.push(a); if (da >= 0) hi.push(a);
+        if ((da < 0 && db > 0) || (da > 0 && db < 0)) { const t = da / (da - db), m = a.map((v, k) => v + (b[k] - v) * t); lo.push(m); hi.push(m); }
+      }
+      return [lo, hi];
+    };
+    for (let i = 0; i < P.count; i += 3) {
+      let poly = [0, 1, 2].map(k => [P.getX(i + k), P.getY(i + k), P.getZ(i + k), U ? U.getX(i + k) : 0, U ? U.getY(i + k) : 0]);
+      const mn = Math.min(poly[0][ax], poly[1][ax], poly[2][ax]), mx = Math.max(poly[0][ax], poly[1][ax], poly[2][ax]);
+      for (let c = (Math.floor(mn / step + 1e-6) + 1) * step; c < mx - 1e-6 && poly.length >= 3; c += step) { const lh = cut(poly, c); if (lh[0].length >= 3) emit(lh[0]); poly = lh[1]; }
+      if (poly.length >= 3) emit(poly);
+    }
+    const o = new T.BufferGeometry(); o.setAttribute('position', new T.Float32BufferAttribute(out, 3)); o.setAttribute('uv', new T.Float32BufferAttribute(ouv, 2));
+    return o;
+  }
+  /* g is in the car's own space. Its face nearest the body (mount, by default the back of its bounding box) goes onto
+     the surface, plus lift outwards (negative sinks it in) */
+  function seatGeo27(SK, g, front, mount, lift, rigid, step) {
+    g.computeBoundingBox(); const b = g.boundingBox, sg = front ? 1 : -1;
+    if (mount == null) mount = front ? b.min.x : b.max.x;
+    const wide = b.max.z - b.min.z > 0.09, tall = b.max.y - b.min.y > 0.12;
+    if (rigid || !(wide || tall)) {
+      const d = SK.fx(front, (b.min.y + b.max.y) / 2, (b.min.z + b.max.z) / 2) - mount + sg * (lift || 0);
+      g.translate(d, 0, 0); return g;
+    }
+    let s = g;
+    if (wide) s = slice27(s, 2, step || 0.045);
+    if (tall) s = slice27(s, 1, (step || 0.045) * 1.2);
+    /* never follow the body further round than a bumper end would go: past the corner the nearest surface at that width
+       is the wheel arch, and a chrome bumper's end was laid across the tyre */
+    const q = s.attributes.position, ref = SK.fx(front, (b.min.y + b.max.y) / 2, (b.min.z + b.max.z) / 2), wrap = 0.34;
+    for (let i = 0; i < q.count; i++) {
+      let sx = SK.fx(front, q.getY(i), q.getZ(i)); sx = front ? Math.max(sx, ref - wrap) : Math.min(sx, ref + wrap);
+      q.setX(i, q.getX(i) - mount + sx + sg * (lift || 0));
+    }
+    smoothNormals(s, 38);
+    return s;
+  }
+  /* a mesh or a group of them, before or after it has been given to the car */
+  function seat27(obj, front, o) {
+    o = o || {}; const SK = o.SK || SK24; if (!SK || !SK.fx) return obj;
+    if (obj.userData.seat27) return obj; obj.userData.seat27 = true;
+    const root = obj.parent; if (root) root.updateMatrixWorld(true); else obj.updateMatrixWorld(true);
+    const rinv = root ? new T.Matrix4().copy(root.matrixWorld).invert() : null, M = new T.Matrix4(), Mi = new T.Matrix4();
+    const all = new T.Box3(), list = [];
+    obj.traverse(m => {
+      if (!m.isMesh) return;
+      M.copy(m.matrixWorld); if (rinv) M.premultiply(rinv);
+      const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); g.applyMatrix4(M);
+      g.computeBoundingBox(); all.union(g.boundingBox); list.push([m, g, M.clone()]);
+    });
+    if (!list.length) return obj;
+    const mount = o.mount != null ? o.mount : (front ? all.min.x : all.max.x);
+    for (const [m, g, mm] of list) {
+      const s = seatGeo27(SK, g, front, mount, o.lift || 0, o.rigid, o.step);
+      s.applyMatrix4(Mi.copy(mm).invert());
+      if (s !== g) g.dispose();
+      m.geometry = s; m.userData.noShape = true;
+    }
+    obj.userData.noShape = true;
+    return obj;
+  }
+  /* a lip under the nose (or the tail): it drops from the body's own lower edge, following the corners round */
+  function skirt27(SK, front, n) {
+    const yTop = 0.318, yBot = 0.2, zH = 0.76, sg = front ? 1 : -1, pos = [];
+    n = n || 18;
+    const P = [];
+    for (let i = 0; i <= n; i++) { const z = -zH + 2 * zH * i / n, x = SK.fx(front, yTop, z); P.push([[x - sg * 0.006, yTop, z], [x - sg * 0.04, yBot, z * 0.985], [x - sg * 0.11, yBot + 0.012, z * 0.97]]); }
+    const tri = (a, b, c) => { pos.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]); };
+    for (let i = 0; i < n; i++) {
+      const a = P[i], b = P[i + 1];
+      for (let k = 0; k < 2; k++) {
+        if (front) { tri(a[k], b[k], a[k + 1]); tri(b[k], b[k + 1], a[k + 1]); tri(a[k], a[k + 1], b[k]); tri(b[k], a[k + 1], b[k + 1]); }
+        else { tri(a[k], a[k + 1], b[k]); tri(b[k], a[k + 1], b[k + 1]); tri(a[k], b[k], a[k + 1]); tri(b[k], b[k + 1], a[k + 1]); }
+      }
+    }
+    const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+    g.setAttribute('uv', new T.Float32BufferAttribute(new Float32Array(pos.length / 3 * 2), 2)); g.computeVertexNormals();
+    return g;
+  }
+  /* where a flat plate goes: leaning with the panel, its nearest point a few millimetres clear of it */
+  function plateFit27(SK, front, y, w, h, gap) {
+    const sg = front ? 1 : -1, s = clampN((SK.fx(front, y + h / 2, 0) - SK.fx(front, y - h / 2, 0)) / h, -0.45, 0.45), L = Math.hypot(1, s);
+    const X = new T.Vector3(0, 0, -sg), Z = new T.Vector3(sg / L, -sg * s / L, 0), Y = new T.Vector3().crossVectors(Z, X);
+    const q = new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(X, Y, Z));
+    /* how far the plate's plane must stand out so that nothing of it is under the surface */
+    let need = -Infinity;
+    for (const u of [-0.5, -0.25, 0, 0.25, 0.5]) for (const v of [-0.5, 0, 0.5]) {
+      const pz = X.z * u * w, py = y + Y.y * v * h, px = Y.x * v * h;
+      need = Math.max(need, sg * (SK.fx(front, py, pz) - px));
+    }
+    return { x: sg * (need + (gap == null ? 0.004 : gap)), y, q: [q.x, q.y, q.z, q.w] };
+  }
+  function fitPlate27(mesh, front, gap, SK) {
+    SK = SK || SK24; if (!SK || !SK.fx) return mesh;
+    const p = mesh.geometry.parameters || {}, f = plateFit27(SK, front, mesh.position.y, p.width || 0.52, p.height || 0.11, gap);
+    mesh.position.x = f.x; mesh.position.z = 0; mesh.quaternion.set(f.q[0], f.q[1], f.q[2], f.q[3]); mesh.userData.noShape = true;
+    /* a moulded holder behind it, so a flat plate on a curved panel never shows daylight at its ends */
+    if ((p.width || 0) > 0.3) { const b = new T.Mesh(new T.BoxGeometry((p.width || 0.52) + 0.024, (p.height || 0.11) + 0.024, 0.05), M.trim); b.position.z = -0.0265; b.userData.noShape = true; mesh.add(b); }
+    return mesh;
+  }
+  /* headlamps and tail lamps are parts you take off, so they aren't bent with the body: each is laid on the surface and
+     let into it, so only a couple of centimetres of it stand proud, all the way round the corner */
   function conformLamps24() {
     const SK = SK24; if (!SK) return;
     for (const id of ['headlamp_FL', 'headlamp_FR', 'taillamp_RL', 'taillamp_RR']) {
@@ -5692,10 +5843,10 @@ const Car3D = (() => {
       const front = id[0] === 'h';
       for (const obj of reg.std.concat(reg.upg)) {
         const y = obj.position.y, sg = Math.sign(obj.position.z) || 1, xf = SK.faceX(front, y), halfW = front ? 0.165 : sty.van ? 0.06 : 0.18;
-        const zc = Math.min(Math.abs(obj.position.z), 0.9 * SK.SF(xf, y) * 0.9 - halfW * 0.8), xr = front ? 2.3 : sty.rear - 0.2;
-        const bw = bow24(xr, zc, sty.rear, sty.rx, sty.van), sl = (bow24(xr, zc + 0.01, sty.rear, sty.rx, sty.van) - bow24(xr, zc - 0.01, sty.rear, sty.rx, sty.van)) / 0.02, th = Math.atan(Math.abs(sl));
-        obj.position.set(xf + bw + (front ? -0.016 : 0.016), y, sg * zc); obj.rotation.y = (front ? -sg : sg) * th;
+        const zc = Math.min(Math.abs(obj.position.z), 0.9 * SK.SF(xf, y) * 0.9 - halfW * 0.8);
+        obj.position.z = sg * zc; obj.rotation.y = 0;
         if (!sty.classic && !sty.van) obj.scale.set(1, front ? 1.45 : 1.4, 1); else if (!sty.classic && front) obj.scale.set(1, 1.45, 1);
+        seat27(obj, front, { lift: sty.classic && front ? 0 : -0.03 });
       }
     }
   }
@@ -5889,16 +6040,16 @@ const Car3D = (() => {
   function buildTrim() {
     const R = sty.rear, fxF = y => SK24.faceX(true, y), fxR = y => SK24.faceX(false, y);
     const lowX = sty.classic ? 2.185 : fxF(0.36) + 0.002;
-    if (sty.classic) { fixed(rbox(0.12, 0.17, 1.82, 0.05, M.chrome, 2.16, 0.37, 0), 'auto'); fixed(rbox(0.12, 0.18, 1.82, 0.05, M.chrome, R - 0.03, 0.40, 0), 'auto'); }
+    if (sty.classic) { fixed(seat27(rbox(0.12, 0.17, 1.82, 0.05, M.chrome, 2.16, 0.37, 0), true, { lift: -0.07 }), 'auto'); fixed(seat27(rbox(0.12, 0.18, 1.82, 0.05, M.chrome, R - 0.03, 0.40, 0), false, { lift: -0.07 }), 'auto'); }
     else {
       /* build 25: the body is its own bumper. A dark chin under the nose, and fog lamps in the lower corners */
-      fixed(rbox(0.09, 0.10, 1.56, 0.03, M.trim, 2.07, 0.235, 0), 'auto', true);
-      for (const s of [-1, 1]) { fixed(rbox(0.02, 0.085, 0.15, 0.02, M.plastic, lowX - 0.004, 0.36, s * 0.49), 'auto'); fixed(cyl(0.03, 0.02, M.lamp, lowX + 0.004, 0.36, s * 0.49, 'x', 16), 'auto'); }
+      for (const fr of [true, false]) { const sk = new T.Mesh(skirt27(SK24, fr), M.paint); sk.userData.noShape = true; fixed(sk, 'auto', true); }
+      for (const s of [-1, 1]) { fixed(seat27(rbox(0.02, 0.085, 0.15, 0.02, M.plastic, lowX - 0.004, 0.36, s * 0.49), true, { lift: -0.008 }), 'auto'); fixed(seat27(cyl(0.03, 0.02, M.lamp, lowX + 0.004, 0.36, s * 0.49, 'x', 16), true, { lift: 0.004, rigid: true }), 'auto'); }
     }
-    if (sty.classic) fixed(rbox(0.03, 0.09, 0.78, 0.02, M.chrome, 2.168, 0.585, 0), 'auto'); else fixed(rbox(0.03, 0.15, 0.80, 0.03, M.trim, 2.166, 0.575, 0), 'auto', true);
-    fixed(rbox(0.02, 0.06, 0.70, 0.02, M.plastic, lowX, 0.36, 0), 'auto');
-    if (!sty.classic) { const gr = new T.Mesh(new T.PlaneGeometry(0.74, 0.125, 8, 1), M.grille); gr.rotation.y = PI / 2; fixed(at(gr, 2.184, 0.575, 0), 'auto'); }
-    const gi = new T.Mesh(new T.PlaneGeometry(0.64, 0.05, 8, 1), M.grille); gi.rotation.y = PI / 2; fixed(at(gi, lowX + 0.012, 0.36, 0), 'auto');
+    if (sty.classic) fixed(seat27(rbox(0.03, 0.09, 0.78, 0.02, M.chrome, 2.168, 0.585, 0), true, { lift: -0.012 }), 'auto'); else fixed(seat27(rbox(0.03, 0.15, 0.80, 0.03, M.trim, 2.166, 0.575, 0), true, { lift: -0.012 }), 'auto', true);
+    fixed(seat27(rbox(0.02, 0.06, 0.70, 0.02, M.plastic, lowX, 0.36, 0), true, { lift: -0.008 }), 'auto');
+    if (!sty.classic) { const gr = new T.Mesh(new T.PlaneGeometry(0.74, 0.125, 8, 1), M.grille); gr.rotation.y = PI / 2; fixed(seat27(at(gr, 2.184, 0.575, 0), true, { lift: 0.0195 }), 'auto'); }
+    const gi = new T.Mesh(new T.PlaneGeometry(0.64, 0.05, 8, 1), M.grille); gi.rotation.y = PI / 2; fixed(seat27(at(gi, lowX + 0.012, 0.36, 0), true, { lift: 0.0135 }), 'auto');
     const tailX = rearXAt(sty.van ? 1.08 : sty.tailY) - 0.032;
     for (const s of [-1, 1]) {
       const sd = s < 0 ? 'L' : 'R';
@@ -5963,13 +6114,13 @@ const Car3D = (() => {
       fixed(cyl(0.21, 0.03, M.paint, sx - 0.10, 0.80, 0, 'x', 28), 'block', true);
     }
     plateF = new T.Mesh(new T.PlaneGeometry(0.52, 0.11), new T.MeshBasicMaterial({ toneMapped: false })); plateF.userData.ownMat = true;
-    plateF.position.set(sty.classic ? 2.226 : Math.max(fxF(0.385), fxF(0.44), fxF(0.495)) + 0.008, 0.44, 0); plateF.rotation.y = PI / 2; fixed(plateF, 'auto');
+    plateF.position.set(2.2, 0.44, 0); fitPlate27(plateF, true, sty.classic ? 0.056 : 0.004); fixed(plateF, 'auto');
     plateR = new T.Mesh(new T.PlaneGeometry(0.52, 0.11), new T.MeshBasicMaterial({ toneMapped: false })); plateR.userData.ownMat = true;
-    plateR.position.set(Math.min(fxR(sty.plateY - 0.055), fxR(sty.plateY), fxR(sty.plateY + 0.055)) - 0.008, sty.plateY, 0); plateR.rotation.y = -PI / 2; fixed(plateR, 'auto');
+    plateR.position.set(R, sty.plateY, 0); fitPlate27(plateR, false, sty.classic && sty.plateY < 0.5 ? 0.056 : 0.004); fixed(plateR, 'auto');
     badgeF = new T.Mesh(new T.PlaneGeometry(0.12, 0.12), new T.MeshBasicMaterial({ transparent: true, toneMapped: false })); badgeF.userData.ownMat = true;
-    badgeF.position.set(2.19, 0.585, 0); badgeF.rotation.y = PI / 2; fixed(badgeF, 'auto');
+    badgeF.position.set(2.19, 0.585, 0); fitPlate27(badgeF, true, 0.024); fixed(badgeF, 'auto');
     badgeR = new T.Mesh(new T.PlaneGeometry(0.11, 0.11), new T.MeshBasicMaterial({ transparent: true, toneMapped: false })); badgeR.userData.ownMat = true;
-    badgeR.position.set(Math.min(fxR(sty.plateY + 0.10), fxR(sty.plateY + 0.20)) - 0.008, sty.plateY + 0.15, 0); badgeR.rotation.y = -PI / 2; fixed(badgeR, 'auto');
+    badgeR.position.set(R, sty.plateY + 0.15, 0); fitPlate27(badgeR, false, 0.004); fixed(badgeR, 'auto');
     conformLamps24();
   }
 
@@ -8037,17 +8188,18 @@ if ( uFx > 0.5 ) {
     }
     /* floor paint round the bay: two worn yellow lines and hatching round the lift posts */
     {
-      const line = (len, wd, x, z, rz) => { const gg = new T.PlaneGeometry(len, wd), u = gg.attributes.uv; for (let i = 0; i < u.count; i++) u.setXY(i, u.getX(i) * len / 3, u.getY(i)); const m = new T.Mesh(gg, M.yellowPaint); m.rotation.x = -PI / 2; m.rotation.z = rz || 0; m.position.set(x, 0.003, z); g.add(m); return m; };
+      const bayG27 = new T.Group(); bayG27.rotation.y = -PI / 2; g.add(bayG27);
+      const line = (len, wd, x, z, rz) => { const gg = new T.PlaneGeometry(len, wd), u = gg.attributes.uv; for (let i = 0; i < u.count; i++) u.setXY(i, u.getX(i) * len / 3, u.getY(i)); const m = new T.Mesh(gg, M.yellowPaint); m.rotation.x = -PI / 2; m.rotation.z = rz || 0; m.position.set(x, 0.003, z); bayG27.add(m); return m; };
       for (const z of [-2.25, 2.25]) line(9.2, 0.1, 0, z);
       for (const x of [-4.6, 4.6]) line(4.6, 0.1, x, 0, PI / 2);
       const bayTex = canvasTex(512, 256, (c, w, h) => { c.clearRect(0, 0, w, h); c.fillStyle = '#FFFFFF'; c.font = '900 170px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('BAY 1', w / 2, h / 2 + 10); });
       const bm = new T.MeshStandardMaterial({ color: col('#BFA23A'), map: bayTex, alphaMap: TX.wear, transparent: true, depthWrite: false, roughness: 0.7, polygonOffset: true, polygonOffsetFactor: -1 });
       bayTex.encoding = T.LinearEncoding;
       const bayMark = new T.Mesh(new T.PlaneGeometry(1.5, 0.75), bm);
-      bayMark.rotation.x = -PI / 2; bayMark.rotation.z = PI / 2; bayMark.position.set(3.85, 0.004, 0); g.add(bayMark);
+      bayMark.rotation.x = -PI / 2; bayMark.rotation.z = PI / 2; bayMark.position.set(3.85, 0.004, 0); bayG27.add(bayMark);
       /* a drain grate in front of the bay */
       const grate = canvasTex(256, 64, (c, w, h) => { c.fillStyle = '#2A2C2D'; c.fillRect(0, 0, w, h); c.fillStyle = '#0B0C0C'; for (let x = 6; x < w; x += 12) c.fillRect(x, 8, 6, h - 16); });
-      const gm = new T.Mesh(new T.PlaneGeometry(3.0, 0.16), pbr('#FFFFFF', { map: grate, roughness: 0.6, metalness: 0.7 })); gm.rotation.x = -PI / 2; gm.position.set(5.6, 0.003, 0); gm.rotation.z = PI / 2; g.add(gm);
+      const gm = new T.Mesh(new T.PlaneGeometry(3.0, 0.16), pbr('#FFFFFF', { map: grate, roughness: 0.6, metalness: 0.7 })); gm.rotation.x = -PI / 2; gm.position.set(5.6, 0.003, 0); gm.rotation.z = PI / 2; bayG27.add(gm);
     }
     /* walls: painted blockwork to 3 m (darker below 1 m), steel liner cladding above, a flashing where they meet */
     const BLOCK_UV = [1.8, 0.9], CLAD_UV = [2.0, 1.0];
@@ -8314,6 +8466,7 @@ if ( uFx > 0.5 ) {
     }
     try { fitOut26(g); } catch (e) { window.__fit26Err = String(e && e.message || e); }
     g.traverse(o => { if (o.isMesh && o.parent !== g && !o.material.transparent) o.castShadow = true; });
+    g.rotation.y = PI / 2;
     scene.add(g); roomG = g;
   }
   /* ---- build 20: a proper two-post lift. Powder-coated columns on base plates, a chequer-plate cover over the hoses between
@@ -8820,6 +8973,7 @@ if ( uFx > 0.5 ) {
   const liteBlobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 6, 64, 64, 64); gr.addColorStop(0, 'rgba(0,0,0,.55)'); gr.addColorStop(0.7, 'rgba(0,0,0,.25)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new T.CanvasTexture(c); })();
   const liteBlobMat = new T.MeshBasicMaterial({ map: liteBlobTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
   const liteBlobGeo = new T.PlaneGeometry(1, 1); liteBlobGeo.rotateX(-PI / 2);
+  const litePlinth27 = new T.BoxGeometry(0.544, 0.134, 0.05);
   let LITE_FAR = false;
   function liteGeo(name, far) {
     const key26 = far ? name + '~far' : name;
@@ -8835,6 +8989,8 @@ if ( uFx > 0.5 ) {
     const deck = x => { const pts = [[0.80, 0.93]].concat(s.upper); for (let i = 0; i < pts.length - 1; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[i + 1]; if (x <= x1 && x >= x2 && x1 !== x2) return y1 + (x - x1) / (x2 - x1) * (y2 - y1); } return 0.95; };
     /* build 24: the body, glass, roof and wheel housings are one lofted skin */
     const SKL = skin24(s, { lod: far ? 2 : 1 });
+    /* build 27: trim laid on the surface is kept apart from the rest, which is still swept as a whole afterwards */
+    const seated = [], seatL = (kind, geo, mtx, front, lift, rigid) => { const g = geo.index ? geo.toNonIndexed() : geo.clone(); if (mtx) g.applyMatrix4(mtx); seated.push([kind, seatGeo27(SKL, g, front, null, lift, rigid, far ? 0.17 : 0.09)]); };
     const sh = new T.Shape();
     sh.moveTo(R + 0.05, 0.30); sh.lineTo(s.rx - 0.38, 0.30); sh.absarc(s.rx, 0.30, 0.38, PI, 0, true);
     sh.lineTo(0.97, 0.30); sh.absarc(1.35, 0.30, 0.38, PI, 0, true);
@@ -8866,14 +9022,14 @@ if ( uFx > 0.5 ) {
     /* bumpers, grille, lights, mirrors, door shut lines and handles */
     const bump = s.classic ? 'chrome' : 'paint';
     const lowXL = s.classic ? 2.185 : SKL.faceX(true, 0.36) + 0.004;
-    if (s.classic) { add(bump, RB(0.12, 0.17, 1.82, 0.05), M4(2.16, 0.37, 0)); add(bump, RB(0.12, 0.18, 1.82, 0.05), M4(R - 0.03, 0.40, 0)); }
-    else { add('dark', RB(0.09, 0.10, 1.56, 0.03), M4(2.07, 0.235, 0)); for (const sd of [-1, 1]) add('lamp', new T.BoxGeometry(0.02, 0.05, 0.07), M4(lowXL, 0.36, sd * 0.49)); }
-    add(s.classic ? 'chrome' : 'dark', RB(0.03, s.classic ? 0.09 : 0.15, 0.78, 0.02), M4(2.166, s.classic ? 0.585 : 0.575, 0)); add('dark', RB(0.02, 0.06, 0.70, 0.02), M4(lowXL, 0.36, 0));
+    if (s.classic) { seatL(bump, RB(0.12, 0.17, 1.82, 0.05), M4(2.16, 0.37, 0), true, -0.07); seatL(bump, RB(0.12, 0.18, 1.82, 0.05), M4(R - 0.03, 0.40, 0), false, -0.07); }
+    else { for (const fr of [true, false]) seated.push(['paint', skirt27(SKL, fr, far ? 8 : 14)]); for (const sd of [-1, 1]) seatL('lamp', new T.BoxGeometry(0.02, 0.05, 0.07), M4(lowXL, 0.36, sd * 0.49), true, 0.004, true); }
+    seatL(s.classic ? 'chrome' : 'dark', RB(0.03, s.classic ? 0.09 : 0.15, 0.78, 0.02), M4(2.166, s.classic ? 0.585 : 0.575, 0), true, -0.012); seatL('dark', RB(0.02, 0.06, 0.70, 0.02), M4(lowXL, 0.36, 0), true, -0.008);
     const tailX = SKL.faceX(false, s.van ? 1.08 : s.tailY) + 0.014;
     for (const sd of [-1, 1]) {
-      if (s.classic) { const lp = new T.CylinderGeometry(0.055, 0.055, 0.03, 20); lp.rotateZ(PI / 2); add('lamp', lp, M4(2.168, 0.64, sd * 0.60)); const ring = new T.TorusGeometry(0.058, 0.01, 6, 20); ring.rotateY(PI / 2); add('chrome', ring, M4(2.183, 0.64, sd * 0.60)); }
-      else { add('lamp', RB(0.05, 0.085, 0.33, 0.024), M4(2.148, 0.635, sd * 0.5)); add('chrome', RB(0.01, 0.06, 0.08, 0.02), M4(2.165, 0.638, sd * 0.43)); }
-      if (s.van) add('tail', RB(0.05, 0.30, 0.12, 0.02), M4(tailX, 1.08, sd * 0.74)); else add('tail', RB(0.05, 0.085, 0.36, 0.02), M4(tailX, s.tailY, sd * 0.5));
+      if (s.classic) { const lp = new T.CylinderGeometry(0.055, 0.055, 0.03, 20); lp.rotateZ(PI / 2); seatL('lamp', lp, M4(2.168, 0.64, sd * 0.60), true, 0, true); const ring = new T.TorusGeometry(0.058, 0.01, 6, 20); ring.rotateY(PI / 2); seatL('chrome', ring, M4(2.183, 0.64, sd * 0.60), true, 0.02, true); }
+      else { seatL('lamp', RB(0.05, 0.085, 0.33, 0.024), M4(2.148, 0.635, sd * 0.5), true, -0.03); seatL('chrome', RB(0.01, 0.06, 0.08, 0.02), M4(2.165, 0.638, sd * 0.43), true, 0.018, true); }
+      if (s.van) seatL('tail', RB(0.05, 0.30, 0.12, 0.02), M4(tailX, 1.08, sd * 0.74), false, -0.03); else seatL('tail', RB(0.05, 0.085, 0.36, 0.02), M4(tailX, s.tailY, sd * 0.5), false, -0.03);
       { const mg = RB(0.12, 0.08, 0.16, 0.03); mg.applyMatrix4(M4(0.66, s.van ? 1.08 : 1.0, sd * 0.97)); add('paint', bend(mg)); const gg = new T.BoxGeometry(0.004, 0.06, 0.11); gg.applyMatrix4(M4(0.598, s.van ? 1.08 : 1.0, sd * 0.97)); add('glass', bend(gg)); }
       const seams = s.seams || [0.78, -0.35].concat(s.doors > 1 ? [-1.15] : []);
       (far ? [] : seams).forEach((x, i) => {
@@ -8900,9 +9056,11 @@ if ( uFx > 0.5 ) {
       if (!far) P.dark.push([disc, M4(x, 0.31, z + sd * 0.035)]);
     }
     const out = { len: 2.2 - R, rear: R, tailX, plateY: s.plateY, scale: s.scale || 1, wide: s.wide || 1, tall: s.van ? 1.95 : s.roof ? s.roof[2] : 1.3 };
+    out.plateF27 = plateFit27(SKL, true, 0.44, 0.52, 0.11, s.classic ? 0.056 : 0.006); out.plateR27 = plateFit27(SKL, false, s.plateY, 0.52, 0.11, 0.006);
     for (const k of Object.keys(P)) if (P[k].length) out[k] = mergeGeo(P[k]);
     /* everything fixed to the body follows the sweep of its nose and tail; then the skin itself goes in */
     for (const k of ['paint', 'glass', 'dark', 'chrome', 'lamp', 'tail']) if (out[k]) { const q = out[k].attributes.position; for (let i = 0; i < q.count; i++) q.setX(i, q.getX(i) + bow24(q.getX(i), q.getZ(i), R, s.rx, s.van)); }
+    { const by = {}; for (const [k, g] of seated) (by[k] || (by[k] = [])).push([g, null]); for (const k of Object.keys(by)) { const old = out[k]; out[k] = mergeGeo((old ? [[old, null]] : []).concat(by[k])); if (old) old.dispose(); by[k].forEach(e => e[0].dispose()); } }
     for (const k of ['paint', 'glass', 'dark', 'well']) if (SKL[k]) { const old = out[k]; out[k] = old ? mergeGeo([[old, null], [SKL[k], null]]) : SKL[k]; if (old) { old.dispose(); SKL[k].dispose(); } }
     made.forEach(g => g.dispose());
     LITE[key26] = out;
@@ -8925,7 +9083,7 @@ if ( uFx > 0.5 ) {
     if (o.plates) {
       for (const rear of [false, true]) {
         const p = new T.Mesh(new T.PlaneGeometry(0.52, 0.11), new T.MeshBasicMaterial({ toneMapped: false })); p.userData.ownMat = true;
-        if (rear) { p.position.set(geo.rear - 0.056, geo.plateY, 0); p.rotation.y = -PI / 2; } else { p.position.set(2.2, 0.44, 0); p.rotation.y = PI / 2; }
+        { const pf = rear ? geo.plateR27 : geo.plateF27; p.position.set(pf.x, pf.y, 0); p.quaternion.set(pf.q[0], pf.q[1], pf.q[2], pf.q[3]); const pb = new T.Mesh(litePlinth27, LM.dark); pb.userData.shared = true; pb.position.z = -0.0265; p.add(pb); }
         setPlate(p, c.reg || 'BU19 NUP', rear); g.add(p);
       }
     }
@@ -9030,7 +9188,7 @@ if ( uFx > 0.5 ) {
     { const trunks = [], cores = [], cards = []; for (const x of [-27, -7.5, 9, 28]) tree20(trunks, cores, cards, x, 0, D + 29.8, 1.15, rnd20);
       const tm = new T.Mesh(mergeGeo(trunks), bark); tm.castShadow = true; O.add(tm); crownMeshes(cores, cards, O); }
     for (const x of [-20, 0, 20]) { O.add(cyl(0.08, 6.5, pole, x, 3.25, D + 18.6)); O.add(box(0.12, 0.08, 1.4, pole, x, 6.45, D + 19.2)); O.add(box(0.3, 0.12, 0.6, M.light, x, 6.38, D + 19.8)); }
-    parkedG = new T.Group(); O.add(parkedG);
+    parkedG = new T.Group(); O.add(parkedG); O.rotation.y = PI / 2;
   }
   /* the queue in reception and the cars on the forecourt follow the job board */
   let queueSig = null;
@@ -9243,7 +9401,7 @@ if ( uFx > 0.5 ) {
     const inv = new T.Matrix4().copy(car.matrixWorld).invert();
     PART.engine.std.forEach(o => o.traverse(m => { if (m.isMesh && m.geometry) { m.geometry.computeBoundingBox(); bb.union(m.geometry.boundingBox.clone().applyMatrix4(new T.Matrix4().multiplyMatrices(inv, m.matrixWorld))); } }));
     const ctr = bb.isEmpty() ? new T.Vector3(1.40, 0.70, -0.03) : bb.getCenter(new T.Vector3());
-    g.scale.set(s, s, s); g.position.set(STAND.x - ctr.x * s, 1.08 - ctr.y * s, STAND.z - ctr.z * s);
+    g.scale.set(s, s, s); g.rotation.y = PI / 2; g.position.set(STAND.z - ctr.z * s, 1.08 - ctr.y * s, -STAND.x + ctr.x * s);
     scene.add(g); standGroup = g;
   }
 
@@ -9268,7 +9426,7 @@ if ( uFx > 0.5 ) {
     }));
   }
   /* ---- camera: orbit around the car (tested rig above) ---- */
-  const camCfg = { pivot: { x0: -4.6, x1: 4.2, y0: 0.05, y1: 3.6, z0: -2.4, z1: 2.4 }, room: { x: ROOM.W - 1.0, z: ROOM.D - 1.0, y0: 0.22, y1: ROOM.H - 0.6 }, distMin: 0.8, distMax: 8.5, pitchMin: -1.25, pitchMax: 1.45 };
+  const camCfg = { pivot: { x0: -4.6, x1: 4.2, y0: 0.05, y1: 3.6, z0: -2.4, z1: 2.4 }, room: { x: ROOM.D - 1.0, z: ROOM.W - 1.0, y0: 0.22, y1: ROOM.H - 0.6 }, distMin: 0.8, distMax: 8.5, pitchMin: -1.25, pitchMax: 1.45 };
   const cam = makeRig(camCfg);
   const HOME_YAW = 0.82;
   const st = { lift: 0, bonnet: 0, xray: 0, carX: 0, door: 0 };
@@ -9373,7 +9531,7 @@ if ( uFx > 0.5 ) {
   const v3 = new T.Vector3(), occl = new T.Raycaster(), mkState = {};
   let doorVis = null, doorFlip = null;
   function placeDoorMarker(w, h) {
-    v3.set(DOOR_BTN.x, DOOR_BTN.y + 0.62, -ROOM.D + 0.1);
+    v3.set(-ROOM.D + 0.1, DOOR_BTN.y + 0.62, -DOOR_BTN.x);
     const world = v3.clone(); v3.project(camera);
     let vis = !selId && v3.z < 1 && Math.abs(v3.x) < 0.9 && Math.abs(v3.y) < 0.88;
     if (vis && car && st.xray < 0.5) {
@@ -9508,8 +9666,13 @@ if ( uFx > 0.5 ) {
     else if (!booth && dprNow < DPR_MAX) { clearTimeout(dprIdle22); dprIdle22 = setTimeout(() => { if (!raf && !drv && !fp && !ext && !booth) { setDpr22(DPR_MAX); kick(); } }, 450); }
     if (moving || G.count || liftHold || dyn || (booth && booth.wait)) kick(); else { last = 0; if ((wk || pa22) && !document.hidden) setTimeout(kick, pa22 && !wk ? 42 : 66); }
   }
+  let sizeW27 = 0, sizeH27 = 0, sizeN27 = 0;
+  /* the page can move the 3D stage to a holder of another size in the same frame it last measured it (walking in from outside did): nothing then says the size changed, and the picture is drawn the old shape and stretched. So the walking and driving views measure again as they start, and now and then while they run */
+  function sizeCheck27(now) { if (!now && (++sizeN27 % 20)) return; const w = stage.clientWidth, h = stage.clientHeight; if (w && h && (w !== sizeW27 || h !== sizeH27 || Math.abs(camera.aspect - w / h) > 1e-3)) resize(); }
+  window.__asp27 = () => ({ stage: [stage.clientWidth, stage.clientHeight], buf: [renderer.domElement.width, renderer.domElement.height], cam: +camera.aspect.toFixed(3), proj: +(camera.projectionMatrix.elements[5] / camera.projectionMatrix.elements[0]).toFixed(3), want: +(stage.clientWidth / Math.max(1, stage.clientHeight)).toFixed(3) });
   function resize() {
     const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+    sizeW27 = w; sizeH27 = h;
     renderer.setSize(w, h, false); aspect = w / h;
     landscape = isLandscape();
     camera.aspect = aspect; camera.fov = baseFov = aspect < 1 ? 50 : 40; applyView(); kick();
@@ -9520,7 +9683,7 @@ if ( uFx > 0.5 ) {
      Drag on the left to walk, drag on the right to look, tap things to use them: the car, the other ramps, the door switch,
      the reception window, the tool chest and the notice board. Walk out of the open roller door to go outside. */
   let fp = null, fpBoxes = [], sideG = null, sideSig = null;
-  const FP_EYE = 1.64, SIDE_X = [7.6, -7.6];
+  const FP_EYE = 1.64, SIDE_X = [7.6, -7.6], SIDE_Z27 = [-7.6, 7.6];
   /* the other ramps: their cars sit on lifts either side of yours */
   function setSideCars(list) {
     const sig = (list || []).map(c => [c.no, c.car.paint, c.car.style, c.lift || 0].join(':')).join('|');
@@ -9529,17 +9692,17 @@ if ( uFx > 0.5 ) {
     if (sideG) { scene.remove(sideG); sideG.traverse(o => { if (o.isMesh && !o.userData.shared) { o.geometry.dispose(); if (o.userData.ownMat && o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); } } }); }
     sideG = new T.Group(); scene.add(sideG);
     (list || []).slice(0, 2).forEach((c, k) => {
-      const x = SIDE_X[k], lift = c.lift || 0, g = new T.Group(); g.position.set(x, 0, 0); sideG.add(g);
+      const x = 0, zb = SIDE_Z27[k], lift = c.lift || 0, g = new T.Group(); g.position.set(0, 0, zb); sideG.add(g);
       { const L = liftModel(); g.add(L.posts); L.rig.position.y = lift; g.add(L.rig); }
       const lc = liteCar(c.car, { plates: true }); lc.position.set(-0.05, lift, 0); g.add(lc);
       lc.traverse(o => { if (o.isMesh) o.userData.fpBay = c.idx; });
-      const b = new T.Box3().setFromObject(lc); g.userData = { idx: c.idx, x, lift, box: [b.min.x + x - 0.15, b.max.x + x + 0.15, b.min.z - 0.15, b.max.z + 0.15] };
+      const b = new T.Box3().setFromObject(lc); g.userData = { idx: c.idx, x: 0, z: zb, lift, box: [b.min.x - 0.15, b.max.x + 0.15, b.min.z + zb - 0.15, b.max.z + zb + 0.15] };
     });
     kick();
   }
   /* ---- the mechanics you've hired: at work beside their car, or waiting at the back with a brew ---- */
   let workerG = null, workerSig = '', workers = [], workerT = 0, workerLast = 0;
-  const IDLE_SPOTS = [[-3.5, -2.9, -PI / 2 + 0.35], [3.6, -3.1, -PI / 2 - 0.35], [-1.4, -3.6, -PI / 2]];
+  const IDLE_SPOTS = [[-5.2, 3.3, 0.3], [-5.4, -3.5, -0.3], [-6.1, 0.5, 0]];
   function setWorkers(list) {
     const sig = (list || []).map(w => [w.id, w.bay, w.active ? 1 : 0, w.side, w.look.top].join(':')).join('|');
     if (sig === workerSig) return;
@@ -9552,7 +9715,7 @@ if ( uFx > 0.5 ) {
       const p = person(Object.assign({}, w.look, { topDo: 'overalls', bottom: 'trousers', shoes: '#1E2120', legs: w.look.top }));
       const u = { p, id: w.id, ph: i * 1.7, mode: 'idle' };
       if (w.active) { p.position.set(1.45, 0, 1.5); p.rotation.y = PI / 2; u.mode = 'work'; u.bx = 0; u.side = -1; }
-      else if (w.side >= 0 && w.side < SIDE_X.length) { p.position.set(SIDE_X[w.side] + 1.45, 0, 1.5); p.rotation.y = PI / 2; u.mode = 'work'; u.bx = SIDE_X[w.side]; u.side = w.side; }
+      else if (w.side >= 0 && w.side < SIDE_Z27.length) { p.position.set(1.45, 0, SIDE_Z27[w.side] + 1.5); p.rotation.y = PI / 2; u.mode = 'work'; u.bx = 0; u.bz = SIDE_Z27[w.side]; u.side = w.side; }
       else { const s = IDLE_SPOTS[idle++ % IDLE_SPOTS.length]; p.position.set(s[0], 0, s[1]); p.rotation.y = s[2]; posePerson(p, idle % 2 ? 'fold' : 'phone'); }
       p.traverse(o => { if (o.isMesh) { o.castShadow = true; o.userData.fpStaff = w.id; } });
       workerG.add(p); workers.push(u);
@@ -9568,7 +9731,8 @@ if ( uFx > 0.5 ) {
     return st.lift || 0;
   }
   const POSE_KEYS = ['hips', 'chestY', 'chestZ', 'legL', 'legR', 'kneeL', 'kneeR', 'armL', 'elbowL', 'armR', 'elbowR', 'head'];
-  function workPose(L, t, u) {
+  function workPose(L, t, u) { const q = workPose0(L, t, u); if (u.bz) q.z += u.bz; return q; }
+  function workPose0(L, t, u) {
     const ratchet = Math.sin(t * 6.5), bx = u.bx || 0;
     const stand = { hips: 0.952, chestY: 1.022, legL: 0.12, legR: -0.08, kneeL: -0.05, kneeR: 0 };
     if (L < 0.35) {
@@ -9627,7 +9791,7 @@ if ( uFx > 0.5 ) {
       if (o === outside || o === boothG || o === dynoG) return;
       v.setFromObject(o); if (v.isEmpty()) return;
       v.getSize(sz);
-      const inside = v.max.x > -ROOM.W && v.min.x < ROOM.W && v.max.z > -ROOM.D + 0.02 && v.min.z < ROOM.D;
+      const inside = v.max.z > -ROOM.W && v.min.z < ROOM.W && v.max.x > -ROOM.D + 0.02 && v.min.x < ROOM.D;
       if (!inside || v.min.y > 1.5) return;
       const small = sz.x * sz.z < 7 && sz.x < 3.6 && sz.z < 3.6 && v.max.y < 3.4 && sz.y > 0.12;
       if (small) { out.push([v.min.x - 0.22, v.max.x + 0.22, v.min.z - 0.22, v.max.z + 0.22, v.max.y]); return; }
@@ -9636,14 +9800,15 @@ if ( uFx > 0.5 ) {
     if (roomG) roomG.children.forEach(visit);
     props.forEach(visit);
     for (const s of [-1, 1]) out.push([-0.25, 0.25, s * 1.28 - 0.25, s * 1.28 + 0.25, 3]);
-    if (sideG) sideG.children.forEach(g => { const u = g.userData; for (const s of [-1, 1]) out.push([u.x - 0.25, u.x + 0.25, s * 1.28 - 0.25, s * 1.28 + 0.25, 3]); if (u.lift < 1.6) out.push(u.box); });
+    if (sideG) sideG.children.forEach(g => { const u = g.userData; for (const s of [-1, 1]) out.push([u.x - 0.25, u.x + 0.25, u.z + s * 1.28 - 0.25, u.z + s * 1.28 + 0.25, 3]); if (u.lift < 1.6) out.push(u.box); });
     if (standGroup && standGroup.visible) { v.setFromObject(standGroup); out.push([v.min.x - 0.2, v.max.x + 0.2, v.min.z - 0.2, v.max.z + 0.2, 2]); }
-    return out;
+    /* scene to room: x is -z, z is x */
+    return out.map(b => [-b[3], -b[2], b[0], b[1], b[4]]);
   }
   function carBoxNow() {
     if (!car || st.lift > 1.55) return null;
     car.updateMatrixWorld(true); const b = new T.Box3().setFromObject(car);
-    return [b.min.x - 0.2, b.max.x + 0.2, Math.max(b.min.z, -1.2) - 0.2, Math.min(b.max.z, 1.2) + 0.2];
+    return [-(Math.min(b.max.z, 1.2) + 0.2), -(Math.max(b.min.z, -1.2) - 0.2), b.min.x - 0.2, b.max.x + 0.2];
   }
   function fpOk(x, z) {
     const W2 = ROOM.W - 0.4, D2 = ROOM.D - 0.4;
@@ -9688,6 +9853,7 @@ if ( uFx > 0.5 ) {
     raf = 0;
     const dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016; last = now;
     const f = fp; f.t += dt;
+    sizeCheck27();
     /* the roller door still opens and closes while you walk about */
     { const dd = tgt.door - st.door; st.door = Math.abs(dd) < 0.0008 ? tgt.door : st.door + clampN(dd, -0.38 * dt, 0.38 * dt);
       const sh = Math.max(0.002, 1 - st.door), HH = ROOM.H - 0.5; shutter.scale.y = sh; shutter.position.y = HH - HH * sh / 2; shutTexR.repeat.y = 4 * sh; doorBar.position.y = HH * (1 - sh) + 0.04; outside.visible = st.door > 0.002; hemi.intensity = HEMI0 + 0.14 * st.door; }
@@ -9708,8 +9874,8 @@ if ( uFx > 0.5 ) {
     if (f.cool > 0) f.cool -= dt;
     if (f.z > ROOM.D + 0.3 && !(f.cool > 0) && api.onFpOut) { const cb = api.onFpOut, pose = { x: f.x + P26.OX, z: f.z + P26.OZ, yaw: f.yaw, pitch: f.pitch, bob: f.bob, joy: f.joy, keys: f.keys, ptr: Object.assign({}, FPP) }; fpEnd(); cb(pose); return; }
     const bob = f.v ? Math.sin(f.bob) * 0.028 : 0;
-    camera.position.set(f.x, FP_EYE + bob, f.z);
-    camera.lookAt(f.x + fx * 4 * Math.cos(f.pitch), FP_EYE + bob + Math.sin(f.pitch) * 4, f.z + fz * 4 * Math.cos(f.pitch));
+    camera.position.set(f.z, FP_EYE + bob, -f.x);
+    camera.lookAt(f.z + fz * 4 * Math.cos(f.pitch), FP_EYE + bob + Math.sin(f.pitch) * 4, -f.x - fx * 4 * Math.cos(f.pitch));
     camera.fov = landscape ? 62 : 74; camera.clearViewOffset(); camera.updateProjectionMatrix();
     /* what you're looking at */
     f.pT += dt;
@@ -9742,7 +9908,7 @@ if ( uFx > 0.5 ) {
       }
     }
   }
-  api.fpStart = o => fpStart(o);
+  api.fpStart = o => { const r = fpStart(o); if (r) sizeCheck27(true); return r; };
   api.fpEnd = () => fpEnd();
   api.fpOn = () => !!fp;
   api.fpState = () => fp;
@@ -9846,7 +10012,7 @@ if ( uFx > 0.5 ) {
     if (fresh && !booth) {
       Object.assign(st, tgt);
       cam.animate(overviewView()); cam.snap();
-      if (arriving && !reduced) st.carX = -6;
+      if (arriving && !reduced) st.carX = 6.5;
     }
     updateStand(job);
     for (const z of ZONES) {
@@ -9951,7 +10117,7 @@ if ( uFx > 0.5 ) {
     Sfx.liftFor(2.5);
     const lab = doorOpen ? 'Close the door' : 'Open the door';
     doorMk.querySelector('.mk-label').textContent = lab; doorMk.setAttribute('aria-label', lab.replace('the door', 'the garage door'));
-    if (doorOpen) cam.animate({ yaw: -PI / 2 + 0.24, pitch: 0.14, dist: 7.2, px: 0.4, py: 1.4, pz: 2.4 });
+    if (doorOpen) cam.animate({ yaw: -PI + 0.24, pitch: 0.14, dist: 7.2, px: 2.4, py: 1.4, pz: -0.4 });
     kick();
   };
   api.dyno = ms => { dynoUntil = performance.now() + (ms || 1500); kick(); };
@@ -10346,7 +10512,7 @@ if ( uFx > 0.5 ) {
     /* everything below is drawn three times so it joins up where the picture repeats */
     const wrap = fn => { for (const oy of [-h, 0, h]) { c.save(); c.translate(0, oy); fn(); c.restore(); } };
     /* two patches where the road has been dug up, edged with tar */
-    for (const [x0, y0, pw, ph, sh] of [[4.1, 2.6, 1.5, 3.1, 'rgba(22,24,26,.34)'], [0.5, 11.2, 1.9, 1.3, 'rgba(120,122,124,.12)']]) wrap(() => { c.fillStyle = sh; c.fillRect(x0 * mx, y0 * my, pw * mx, ph * my); c.strokeStyle = 'rgba(8,8,9,.75)'; c.lineWidth = 3; c.strokeRect(x0 * mx, y0 * my, pw * mx, ph * my); });
+    for (const [x0, y0, pw, ph, sh] of [[4.1, 2.6, 1.5, 3.1, 'rgba(22,24,26,.34)'], [0.5, 11.2, 1.9, 1.3, 'rgba(120,122,124,.12)']]) wrap(() => { c.fillStyle = sh; c.fillRect(x0 * mx, y0 * my, pw * mx, ph * my); c.strokeStyle = 'rgba(14,14,15,.2)'; c.lineWidth = 2; c.strokeRect(x0 * mx, y0 * my, pw * mx, ph * my); });
     /* cracks, some sealed with a line of tar */
     for (let i = 0; i < 6; i++) { const sx = rn() * w, sy = rn() * h, sealed = i < 2, pts = []; let x = sx, y = sy; for (let k = 0; k < 9; k++) { x += (rn() - 0.5) * 0.6 * mx; y += (0.25 + rn() * 0.5) * my; pts.push([x, y]); }
       wrap(() => { c.strokeStyle = sealed ? "rgba(8,8,9,.6)" : "rgba(10,10,11,.36)"; c.lineWidth = sealed ? 2.2 : 1.1; c.lineJoin = 'round'; c.beginPath(); c.moveTo(sx, sy); pts.forEach(p => c.lineTo(p[0], p[1])); c.stroke(); }); }
@@ -11802,6 +11968,7 @@ if ( uFx > 0.5 ) {
       if (fxx.drip && !dW.drip.visible) { const p = carPt(1.0, 0.02, 0); dW.drip.position.set(p.x, (d.y || 0.02) + 0.01, p.z); dW.drip.visible = true; }
     }
     road22(d, dt);
+    sizeCheck27();
     if (d.mode !== 'route') P26.traffic(dt);
     if (api.onDriveTick) api.onDriveTick(d, dt);
     if (!drv) { kick(); return; }
@@ -11870,7 +12037,7 @@ if ( uFx > 0.5 ) {
       if (type === 'up' && !DP.moved && performance.now() - DP.t < 450) driveTap(e.clientX, e.clientY);
     }
   }
-  api.driveStart = o => driveStart(o || {});
+  api.driveStart = o => { const d = driveStart(o || {}); if (d) sizeCheck27(true); return d; };
   api.driveEnd = () => driveEnd();
   api.driving = () => drv;
   api.driveCam = () => { if (!drv || drv.mode === 'walk') return; const order = drv.mode === 'park' ? ['park', 'chase', 'bonnet'] : ['chase', 'far', 'bonnet']; drv.cam = order[(order.indexOf(drv.cam) + 1) % order.length]; drv.camP = null; };
@@ -12060,6 +12227,7 @@ if ( uFx > 0.5 ) {
       const real = !!gl && ((typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext) || (typeof WebGLRenderingContext !== 'undefined' && gl instanceof WebGLRenderingContext));
       P26.ok = real && !window.__noPortal && !!(renderer.clearDepth && renderer.setScissor && renderer.setScissorTest && renderer.getClearColor && T.Vector4 && T.PerspectiveCamera && new T.Matrix4().invert);
       if (P26.ok) P26.cam = new T.PerspectiveCamera();
+      P26.qOut27 = new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), -PI / 2); P26.qIn27 = new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), PI / 2);
     } catch (e) { P26.ok = false; }
   })();
   {
@@ -12165,11 +12333,11 @@ if ( uFx > 0.5 ) {
       if (!live) return null;
       outside.visible = false;
       const dt = tick();
-      camera.updateMatrixWorld(); camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
-      const rect = camera.position.z > ROOM.D - 0.02 ? FULL : P26.doorRect(camera, 0, 0);
-      if (!rect) return null;
       const W = dW, c2 = P26.cam;
-      c2.copy(camera, false); c2.position.x += P26.OX; c2.position.z += P26.OZ; c2.near = 0.3; c2.far = 520; c2.updateProjectionMatrix(); c2.updateMatrixWorld(true);
+      camera.updateMatrixWorld();
+      c2.copy(camera, false); c2.position.set(-camera.position.z + P26.OX, camera.position.y, camera.position.x + P26.OZ); c2.quaternion.premultiply(P26.qOut27); c2.near = 0.3; c2.far = 520; c2.updateProjectionMatrix(); c2.updateMatrixWorld(true);
+      const rect = c2.position.z - P26.OZ > ROOM.D - 0.02 ? FULL : P26.doorRect(c2, P26.OX, P26.OZ);
+      if (!rect) return null;
       W.gar.visible = false;
       W.dome.position.set(c2.position.x, 0, c2.position.z);
       P26.moodSync();
@@ -12191,7 +12359,7 @@ if ( uFx > 0.5 ) {
       if (!rect) return null;
       if (roomGround26) roomGround26.visible = false; outside.visible = false;
       const c2 = P26.cam;
-      c2.copy(camera, false); c2.position.x -= P26.OX; c2.position.z -= P26.OZ; c2.near = 0.3; c2.far = 140; c2.layers.mask = camera.layers.mask | 5; c2.updateProjectionMatrix(); c2.updateMatrixWorld(true);
+      c2.copy(camera, false); c2.position.set(camera.position.z - P26.OZ, camera.position.y, -(camera.position.x - P26.OX)); c2.quaternion.premultiply(P26.qIn27); c2.near = 0.3; c2.far = 140; c2.layers.mask = camera.layers.mask | 5; c2.updateProjectionMatrix(); c2.updateMatrixWorld(true);
       let wk = false; try { wk = !!stepWorkers(performance.now()); } catch (e) { wk = false; }
       const bs = P26.inShadow || wk; P26.inShadow = false;
       return { back: scene, backCam: c2, rect, clear: bgOf(), backShadow: bs, view: 'out' };
@@ -12242,6 +12410,8 @@ if ( uFx > 0.5 ) {
   { const s0 = api.fpStart; api.fpStart = o => { const r = s0(o); if (r) { P26.prep(); P26.feed(); } return r; }; }
   { const d0 = api.driveStart; api.driveStart = o => { const d = d0(o); if (d) { P26.prep(); P26.door(); P26.inShadow = true; P26.last = 0; } return d; }; }
   api.portal = () => ({ ok: P26.ok, ready: P26.ready, failed: P26.failed, err: P26.err || null, stat: P26.stat, door: st.door });
+  window.__carBits = (x0, x1, y1) => { const out = [], b = new T.Box3(); if (!car) return out; car.updateMatrixWorld(true); car.traverse(o => { if (!o.isMesh || !o.visible) return; for (let q = o.parent; q && q !== car; q = q.parent) if (!q.visible) return; b.setFromObject(o); if (b.max.x < x0 || b.min.x > x1 || b.min.y > y1) return; const m = o.material; let par = ''; for (let q = o; q && q !== car && !par; q = q.parent) par = q.userData.part || q.userData.zone || q.name || ''; out.push([par, o.userData.zone || '', m && m.color ? m.color.getHexString() : '', [b.min.x, b.max.x, b.min.y, b.max.y, b.min.z, b.max.z].map(n => +n.toFixed(2)).join(' ')]); }); return out; };
+  window.__hero2 = (w, h, o) => (api.heroShot ? api.heroShot(w, h, o) : null);
   window.__p26 = () => api.portal();
   api.tris26 = n => { const out = []; if (!dW) return null; dW.scene.traverse(o => { if (!o.isMesh || !o.geometry) return; for (let q = o; q; q = q.parent) if (!q.visible) return; const g = o.geometry, t = g.index ? g.index.count / 3 : (g.attributes.position ? g.attributes.position.count / 3 : 0); let tag = ''; for (let q = o; q && !tag; q = q.parent) tag = q.name || (q.userData && (q.userData.lite ? 'lite' : q.userData.person ? 'person' : '')) || ''; out.push([Math.round(t), tag || (o.material && o.material.name) || o.type]); }); const by = {}; out.forEach(([t, k]) => { by[k] = (by[k] || 0) + t; }); out.sort((a, b) => b[0] - a[0]); return { total: out.reduce((s, x) => s + x[0], 0), n: out.length, by, top: out.slice(0, n || 12) }; };
   window.__tris26 = n => (api.tris26 ? api.tris26(n) : null);
@@ -12258,7 +12428,7 @@ if ( uFx > 0.5 ) {
     try {
       if (!renderer.capabilities || !renderer.capabilities.isWebGL2 || !T.WebGLMultisampleRenderTarget || !T.ShaderMaterial || !T.OrthographicCamera || !T.PlaneGeometry) return;
       const sz = new T.Vector2();
-      const main = new T.WebGLMultisampleRenderTarget(4, 4, { minFilter: T.LinearFilter, magFilter: T.LinearFilter, format: T.RGBAFormat, encoding: T.sRGBEncoding });
+      const main = new T.WebGLMultisampleRenderTarget(4, 4, { minFilter: T.LinearFilter, magFilter: T.LinearFilter, format: T.RGBAFormat, encoding: T.sRGBEncoding, stencilBuffer: true });
       const small = () => new T.WebGLRenderTarget(2, 2, { minFilter: T.LinearFilter, magFilter: T.LinearFilter, format: T.RGBAFormat, depthBuffer: false, stencilBuffer: false });
       const a = small(), b = small();
       const cam = new T.OrthographicCamera(-1, 1, 1, -1, 0, 1), sc = new T.Scene();
@@ -15799,9 +15969,9 @@ function miniOpen(kind, opts, onDone) {
   miniSay(def.how(MG, MG.st)); miniFoot();
   const pt = e => { const r = cv.getBoundingClientRect(); return [((e.clientX - r.left) - MG.ox) / MG.sc, ((e.clientY - r.top) - MG.oy) / MG.sc]; };
   let pid = null, moved = false, p0 = null, tdown = 0;
-  cv.addEventListener('pointerdown', e => { if (!MG || MG.ended) return; e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (_) { /* old browser */ } pid = e.pointerId; moved = false; p0 = pt(e); tdown = performance.now(); if (def.down) def.down(MG, MG.st, p0[0], p0[1]); });
-  cv.addEventListener('pointermove', e => { if (!MG || MG.ended || e.pointerId !== pid) return; const p = pt(e); if (Math.hypot(p[0] - p0[0], p[1] - p0[1]) > 6) moved = true; if (def.move) def.move(MG, MG.st, p[0], p[1]); });
-  const up = e => { if (!MG || e.pointerId !== pid) return; pid = null; const p = pt(e); if (def.up) def.up(MG, MG.st, p[0], p[1]); if (!moved && performance.now() - tdown < 500 && def.tap && !MG.ended) def.tap(MG, MG.st, p[0], p[1]); };
+  cv.addEventListener('pointerdown', e => { if (!MG || MG.ended) return; e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (_) { /* old browser */ } pid = e.pointerId; moved = false; MG.moved = false; p0 = pt(e); tdown = performance.now(); if (def.down) def.down(MG, MG.st, p0[0], p0[1]); });
+  cv.addEventListener('pointermove', e => { if (!MG || MG.ended || e.pointerId !== pid) return; const p = pt(e); if (Math.hypot(p[0] - p0[0], p[1] - p0[1]) > 10) { moved = true; MG.moved = true; } if (def.move) def.move(MG, MG.st, p[0], p[1]); });
+  const up = e => { if (!MG || e.pointerId !== pid) return; pid = null; const p = pt(e); if (def.up) def.up(MG, MG.st, p[0], p[1]); if (!moved && performance.now() - tdown < 800 && def.tap && !MG.ended) def.tap(MG, MG.st, p[0], p[1]); };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', e => { if (e.pointerId === pid) pid = null; if (MG && def.up) def.up(MG, MG.st, -1, -1); });
   MG.ro = window.ResizeObserver ? new ResizeObserver(miniLayout) : null; if (MG.ro) MG.ro.observe(el.querySelector('.mg-stage'));
   MG.raf = requestAnimationFrame(miniLoop);
@@ -17821,7 +17991,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 26</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 27</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -18302,7 +18472,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 26;
+const BUILD = 27;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -20687,6 +20857,10 @@ function m3Open(G, build) {
 const m3Client = (G, x, y) => { const r = G.cv.getBoundingClientRect(); return [r.left + G.ox + x * G.sc, r.top + G.oy + y * G.sc]; };
 const m3Hit = (G, x, y, objs) => { const [cx, cy] = m3Client(G, x, y); return Car3D.extHit(cx, cy, objs); };
 const m3Ray = (G, x, y) => { const [cx, cy] = m3Client(G, x, y); return Car3D.extRayAt(cx, cy); };
+/* build 27: where a point of the open scene is on the 2D layer, in the layer's own units: [x, y, in front of the camera] */
+const m3At = (G, v) => { const p = Car3D.extScreen ? Car3D.extScreen(v.x, v.y, v.z) : null; if (!p) return null; const r = G.cv.getBoundingClientRect(); return [(p.x - r.left - G.ox) / G.sc, (p.y - r.top - G.oy) / G.sc, p.ok]; };
+/* the 2D layer's visible width in its own units (the 3D picture fills the whole stage, not just the middle of it) */
+const m3Span = G => [-G.ox / G.sc, G.W + G.ox / G.sc];
 /* the HUD: a little panel at the top of the 2D layer */
 function m3Hud(G, c, title, sub, k) {
   mgRR(c, 14, 10, G.W - 28, 46, 12); c.fillStyle = 'rgba(12,16,14,.72)'; c.fill();
@@ -20903,10 +21077,13 @@ function bulletScene(L, G) {
   const glowT = m3Glow(L), dust = [];
   for (let i = 0; i < 24; i++) { const sp = new T.Sprite(new T.SpriteMaterial({ map: glowT, color: L.col('#E8DCCB'), transparent: true, opacity: 0, depthWrite: false })); sp.scale.setScalar(0.05); scene.add(sp); dust.push({ sp, life: 0, v: new T.Vector3() }); }
   s.dust = p => { const q = dust.find(d => d.life <= 0) || dust[0]; q.sp.position.copy(p); q.v.set((Math.random() - 0.5) * 0.6, Math.random() * 0.4, 0.3 + Math.random() * 0.4); q.life = 0.5; };
+  s.halfW = Math.tan(20 * PI / 180) * 2.25; s.panMax = Math.max(0, 1.2 - s.halfW);
   return {
     scene, camera,
-    fit: a => { camera.position.z = a < 0.75 ? 3.9 : a < 1.1 ? 2.9 : 2.25; },
+    /* build 27: close enough to see the holes; the panel slides sideways (s.panX) to reach the ones off the edge */
+    fit: a => { const z = a < 0.75 ? 2.3 : a < 1.1 ? 2.35 : 2.25; camera.position.z = z; s.halfW = Math.tan(20 * PI / 180) * z * a; s.panMax = Math.max(0, 1.2 - s.halfW); s.panT = clamp(s.panT || 0, -s.panMax, s.panMax); },
     tick(dt) {
+      s.panX = (s.panX || 0) + ((s.panT || 0) - (s.panX || 0)) * Math.min(1, dt * 9); camera.position.x = s.panX; camera.lookAt(s.panX, 0, 0);
       for (const h of H) {
         if (h.st === 'filled' || h.st === 'sanding') { h.blob.scale.z += ((0.45 * h.h) - h.blob.scale.z) * Math.min(1, dt * 10); }
         if (h.st === 'flat' && s.paintK != null) { h.patch.material = paintM; }
@@ -20918,36 +21095,72 @@ function bulletScene(L, G) {
 }
 MINIS.bullets = {
   label: 'Bodywork', title: 'Fill the bullet holes', W: 360, H: 480,
-  how: (G, s) => s.phase === 'fill' ? 'Tap every hole to fill it with body filler.' : s.phase === 'sand' ? 'Now sand the filler flush: rub your finger back and forth over each lump.' : s.phase === 'spray' ? 'Smooth as glass. Spray it to finish.' : 'Lovely.',
+  how: (G, s) => s.phase === 'fill' ? (s.ok3 && s.panMax > 0.05 ? 'Tap every hole to fill it. Slide the panel sideways to find the rest.' : 'Tap every hole to fill it with body filler.') : s.phase === 'sand' ? 'Now sand the filler flush: rub your finger back and forth over each lump.' : s.phase === 'spray' ? 'Smooth as glass. Spray it to finish.' : 'Lovely.',
   setup(G, s) {
-    s.n = G.opts.n || 8; s.phase = 'fill'; s.filled = 0; s.sanded = 0; s.miss = 0; s.t0 = null;
+    s.n = G.opts.n || 8; s.phase = 'fill'; s.filled = 0; s.sanded = 0; s.miss = 0; s.t0 = null; s.panX = 0; s.panT = 0; s.idle = 0; s.arrows = [];
     s.ok3 = m3Open(G, bulletScene);
     if (!s.ok3) s.H = Array.from({ length: s.n }, (_, i) => ({ x: 50 + (i % 4) * 85, y: 150 + Math.floor(i / 4) * 120, st: 'hole', h: 1 }));
   },
+  /* build 27: the holes that still want something doing, where each is on the screen, and which is nearest the finger */
+  todo: s => s.H.filter(h => s.phase === 'fill' ? h.st === 'hole' : s.phase === 'sand' ? h.st === 'filled' || h.st === 'sanding' : false),
+  where: (G, s, h) => s.ok3 ? m3At(G, h.g.position) : [h.x, h.y, true],
+  hitHole(G, s, x, y, R) {
+    let best = null, bd = R || 32;
+    for (const h of this.todo(s)) { const q = this.where(G, s, h); if (!q || !q[2]) continue; const d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = h; } }
+    return best;
+  },
+  /* slide along to the nearest hole on one side that is out of view */
+  slide(G, s, dir) {
+    const out = this.todo(s).filter(h => (h.x - s.panX) * dir > s.halfW - 0.12); if (!out.length) return;
+    const h = out.reduce((a, b) => Math.abs(a.x - s.panX) < Math.abs(b.x - s.panX) ? a : b);
+    s.panT = clamp(h.x + dir * Math.min(0.3, s.halfW * 0.4), -s.panMax, s.panMax);
+  },
+  tick(G, s, dt) {
+    if (!s.ok3 || s.drag || !(s.panMax > 0)) { s.idle = 0; return; }
+    /* nothing left in view: glide along to the nearest one that is */
+    const left = this.todo(s); if (!left.length || left.some(h => Math.abs(h.x - s.panT) < s.halfW - 0.1)) { s.idle = 0; return; }
+    s.idle += dt; if (s.idle < 0.4) return; s.idle = 0;
+    const h = left.reduce((a, b) => Math.abs(a.x - s.panX) < Math.abs(b.x - s.panX) ? a : b);
+    s.panT = clamp(h.x, -s.panMax, s.panMax);
+  },
   draw(G, s, c) {
     if (!s.ok3) { c.fillStyle = G.opts.paint || '#2D4C78'; c.fillRect(0, 60, G.W, 360); for (const h of s.H) { c.fillStyle = h.st === 'hole' ? '#0B0C0D' : h.st === 'flat' ? '#9CA3A6' : '#BCAE9E'; c.beginPath(); c.arc(h.x, h.y, 14 + (h.st === 'filled' || h.st === 'sanding' ? 6 * h.h : 0), 0, 7); c.fill(); } }
+    /* a ring on each one left in view, and an arrow with a count for the ones that are not */
+    const [x0, x1] = m3Span(G), pulse = 1 + Math.sin(G.t * 6) * 0.1; let nl = 0, nr = 0;
+    for (const h of this.todo(s)) {
+      const q = this.where(G, s, h); if (!q) continue;
+      if (q[0] < x0 + 8) { nl++; continue; } if (q[0] > x1 - 8) { nr++; continue; }
+      c.strokeStyle = 'rgba(242,183,5,.9)'; c.lineWidth = 2; c.beginPath(); c.arc(q[0], q[1], (s.phase === 'fill' ? 21 : 27) * pulse, 0, 7); c.stroke();
+    }
+    s.arrows = [];
+    const chip = (n, dir) => {
+      if (!n) return; const w = 58, hh = 46, x = dir > 0 ? x1 - w - 6 : x0 + 6, y = G.H / 2 - hh / 2 + Math.sin(G.t * 5) * 2;
+      mgRR(c, x, y, w, hh, 12); c.fillStyle = '#F2B705'; c.fill(); c.strokeStyle = 'rgba(12,16,14,.5)'; c.lineWidth = 1.5; c.stroke();
+      mgText(c, dir > 0 ? `${n} ▶` : `◀ ${n}`, x + w / 2, y + hh / 2 + 1, { s: 18, w: 900, c: '#17201B' });
+      s.arrows.push([x - 8, y - 14, w + 16, hh + 28, dir]);
+    };
+    chip(nl, -1); chip(nr, 1);
     const k = s.phase === 'fill' ? s.filled / s.n : s.phase === 'sand' ? s.sanded / s.n : 1;
-    m3Hud(G, c, s.phase === 'fill' ? `Filled ${s.filled} of ${s.n}` : s.phase === 'sand' ? `Sanded ${s.sanded} of ${s.n}` : 'Ready to spray', s.t0 == null ? 'A small disagreement on the M25' : `${(G.t - s.t0).toFixed(1)} s`, k);
-  },
-  hitHole(G, s, x, y) {
-    if (!s.ok3) return s.H.find(h => Math.hypot(h.x - x, h.y - y) < 26) || null;
-    const hits = m3Hit(G, x, y, s.H.map(h => [h.hole, h.blob]).flat()); const o = hits[0] && hits[0].object; if (!o || o.userData.hole == null) return null; return s.H[o.userData.hole];
+    m3Hud(G, c, s.phase === 'fill' ? `Filled ${s.filled} of ${s.n}` : s.phase === 'sand' ? `Sanded ${s.sanded} of ${s.n}` : 'Ready to spray', nl + nr ? `${nl + nr} more out of view: slide the panel` : s.t0 == null ? 'A small disagreement on the M25' : `${(G.t - s.t0).toFixed(1)} s`, k);
   },
   tap(G, s, x, y) {
+    for (const a of s.arrows || []) if (x >= a[0] && x <= a[0] + a[2] && y >= a[1] && y <= a[1] + a[3]) { this.slide(G, s, a[4]); Sfx.pop(); return; }
     if (s.phase !== 'fill') return;
-    const h = this.hitHole(G, s, x, y);
-    if (!h || h.st !== 'hole') { s.miss++; return; }
+    const h = this.hitHole(G, s, x, y, 34);
+    if (!h) { if (!this.hitHole(G, s, x, y, 90)) s.miss++; return; }
     if (s.t0 == null) s.t0 = G.t;
     h.st = 'filled'; s.filled++; Sfx.twist(); buzz(8);
     if (h.blob) { h.blob.visible = true; h.blob.scale.z = 0.05; }
     if (s.filled >= s.n) { s.phase = 'sand'; miniSay(this.how(G, s)); miniFoot(); Sfx.good(); }
   },
-  down(G, s, x, y) { s.drag = [x, y]; },
+  down(G, s, x, y) { s.drag = [x, y]; s.mode = s.phase === 'sand' && this.hitHole(G, s, x, y, 38) ? 'sand' : 'pan'; },
   move(G, s, x, y) {
-    if (s.phase !== 'sand' || !s.drag) return;
-    const d = Math.hypot(x - s.drag[0], y - s.drag[1]); s.drag = [x, y]; if (d < 1) return;
-    const h = this.hitHole(G, s, x, y); if (!h || (h.st !== 'filled' && h.st !== 'sanding')) return;
-    h.st = 'sanding'; h.h = Math.max(0, h.h - d / (110 * (1 + toolBoost('hammer') * 0)));
+    if (!s.drag) return;
+    const dx = x - s.drag[0], d = Math.hypot(dx, y - s.drag[1]); s.drag = [x, y];
+    if (s.mode === 'pan') { if (s.ok3 && s.panMax > 0 && G.moved) { const [x0, x1] = m3Span(G); s.panX = s.panT = clamp(s.panX - dx * 2 * s.halfW / (x1 - x0), -s.panMax, s.panMax); } return; }
+    if (s.phase !== 'sand' || d < 1) return;
+    const h = this.hitHole(G, s, x, y, 38); if (!h) return;
+    h.st = 'sanding'; h.h = Math.max(0, h.h - d / 110);
     if (s.ok3 && Math.random() < 0.5) s.dust(h.g.position.clone().setZ(h.g.position.z + 0.05));
     if ((G.t * 10 | 0) % 2) Sfx.twist();
     if (h.h <= 0.02) { h.st = 'flat'; s.sanded++; if (h.blob) { h.blob.visible = false; h.patch.visible = true; } Sfx.pop(); if (s.sanded >= s.n) { s.phase = 'spray'; miniSay(this.how(G, s)); miniFoot(); } }
@@ -20956,8 +21169,8 @@ MINIS.bullets = {
   ui: (G, s) => s.phase === 'spray' ? '<button class="btn primary big" data-mg="spray">Spray it</button>' : '',
   act(G, s, a) {
     if (a !== 'spray' || s.phase !== 'spray') return;
-    s.phase = 'done'; s.paintK = 0; Sfx.whoosh(); miniFoot();
-    const tt = G.t - (s.t0 == null ? G.t : s.t0), par = s.n * 3.2;
+    s.phase = 'done'; s.paintK = 0; s.panT = 0; Sfx.whoosh(); miniFoot();
+    const tt = G.t - (s.t0 == null ? G.t : s.t0), par = s.n * 3.6;
     setTimeout(() => { if (MG && !MG.ended) miniFinish(100 - Math.max(0, tt - par) * 1.2 - s.miss * 2, tt <= par ? 'You’d never know. Not that anyone was ever shooting at it.' : 'Holes gone. The Ministry thanks you. Officially, it doesn’t.'); }, 1300);
   },
 };
@@ -21194,6 +21407,7 @@ Object.assign(MINI_GOOD, { critters: 'No more chittering! I can hear the radio a
 Object.assign(MINI_BAD, { critters: 'Still a bit of a smell, to be honest.', bullets: 'I can still see where they were, if I squint.', jet: 'It works, but it coughs.', chrono: 'It flickers. Is it meant to flicker?', bass: 'It’s loud, but it’s not quite in time.' });
 /* test hooks */
 window.__ext3dScreen = (x, y, z) => (Car3D.extScreen ? Car3D.extScreen(x, y, z) : null);
+window.__mg27 = () => (MG ? { kind: MG.kind, st: MG.st, W: MG.W, H: MG.H, sc: MG.sc, ox: MG.ox, oy: MG.oy, ended: MG.ended, score: MG.score, at: v => m3At(MG, v), span: m3Span(MG) } : null);
 window.__ext3dHit = (x, y) => (Car3D.extHit ? Car3D.extHit(x, y).slice(0, 4).map(h => [h.object.type, Object.keys(h.object.userData || {}).join(','), +h.distance.toFixed(2)]) : null);
 window.__miniOpen = (k, o) => miniOpen(k, o || {}, () => { render(); });
 
@@ -21232,7 +21446,7 @@ function bayModel(L, paint, good) {
   g.add(L.rbox(0.16, 0.16, 0.12, 0.03, std('#E9ECEA', { roughness: 0.3, transparent: true, opacity: 0.85 }), -0.5, 0.15, -0.3));
   g.add(cyl(0.03, 0.03, std('#C9437C', { roughness: 0.4 }), -0.5, 0.25, -0.3, 'y', 10));
   g.add(cyl(0.03, 0.03, std('#2F6DB3', { roughness: 0.4 }), 0.42, 0.33, 0.45, 'y', 10)); g.add(L.rbox(0.14, 0.24, 0.12, 0.03, std('#DDE3E6', { roughness: 0.4 }), 0.42, 0.18, 0.45));
-  const bat = new T.Group(); bat.position.set(0.32, 0.03, -0.38); g.add(bat);
+  const bat = new T.Group(); bat.position.set(0.32, 0.03, -0.38); bat.scale.setScalar(1.45); g.add(bat);
   bat.add(box(0.36, 0.26, 0.24, std(good ? '#2F6DB3' : '#3A4140', { roughness: 0.5 }), 0, 0.13, 0));
   const pos = cyl(0.03, 0.05, std('#C8261E', { roughness: 0.4 }), -0.1, 0.285, 0.05, 'y', 12), neg = cyl(0.03, 0.05, std('#2A2D2F', { roughness: 0.4 }), 0.1, 0.285, 0.05, 'y', 12);
   bat.add(pos, neg);
@@ -21255,7 +21469,7 @@ function jumpScene(L, G) {
   /* the leads: four clamp ends on the ground */
   const red = std('#C8261E', { roughness: 0.5 }), blk = std('#1E2120', { roughness: 0.5 });
   s.cl = ['r1', 'r2', 'b1', 'b2'].map((id, i) => {
-    const g = new T.Group(); g.position.set(-0.45 + i * 0.3, 0.06, 0.95); scene.add(g);
+    const g = new T.Group(); g.position.set(-0.6 + i * 0.4, 0.06, 0.95); scene.add(g);
     const m = id[0] === 'r' ? red : blk;
     g.add(cyl(0.035, 0.12, m, 0, 0.05, 0, 'y', 10)); const j1 = L.box(0.02, 0.05, 0.08, std('#C9CED2', { roughness: 0.3, metalness: 0.9 }), 0, 0.12, 0.02); g.add(j1);
     g.traverse(o => { o.userData.clamp = i; });
@@ -21271,48 +21485,102 @@ function jumpScene(L, G) {
   let far = 1;
   return {
     scene, camera,
-    fit: a => { far = a < 0.6 ? 1.55 : a < 0.9 ? 1.35 : 1; camera.position.set(0, 2.9 * far, 2.0 * far); camera.lookAt(0, 0.45, 0.2); },
+    /* build 27: looks a little further back than it did, so the far battery sits clear of the panel at the top */
+    fit: a => { far = Math.max(1.08, 0.86 / a); const dz = -0.36; camera.position.set(0, 2.9 * far, 2.0 * far + dz); camera.lookAt(0, 0.45, 0.2 + dz); },
     tick(dt) {
       for (const q of sparks) { if (q.life <= 0) continue; q.life -= dt; q.v.y -= 6 * dt; q.sp.position.addScaledVector(q.v, dt); q.sp.material.opacity = Math.max(0, q.life * 3); }
-      s.cl.forEach((c, i) => { c.g.scale.setScalar(s.pickC === i ? 1.25 + Math.sin(G.t * 10) * 0.08 : 1); });
+      s.cl.forEach((c, i) => { c.g.scale.setScalar((s.pickC === i ? 1.25 + Math.sin(G.t * 10) * 0.08 : 1) * 1.7); });
+      if (s.cableDirty) { s.cableDirty = false; s.reCable(); }
       if (s.running) { flat.g.position.y = 0.55 + Math.sin(G.t * 60) * 0.004; }
     },
   };
 }
 const JUMP2D = MINIS.jump;
+const JUMP_TAG = { fp: ['+', '#C8261E'], fn: ['−', '#1E2120'], gp: ['+', '#C8261E'], gn: ['−', '#1E2120'], earth: ['BOLT', '#4E5A61'] };
 MINIS.jump = {
   label: 'Flat battery', title: 'Jump-start it', W: 360, H: 480,
-  how: (G, s) => s.flat2d ? JUMP2D.how(G, s) : s.ph === 'leads' ? (s.pickC == null ? `${JUMP_SAY[s.n]} Tap a clamp, then where it goes.` : JUMP_SAY[s.n]) : s.ph === 'crank' ? 'Leads on. Hold the key to crank it over.' : s.ph === 'off' ? 'It’s running! Now take the leads off in reverse: the black on the bolt first.' : 'Done.',
+  how: (G, s) => s.flat2d ? JUMP2D.how(G, s) : s.ph === 'leads' ? `${JUMP_SAY[s.n]} Tap where it goes, or drag the clamp there.` : s.ph === 'crank' ? 'Leads on. Hold the key to crank it over.' : s.ph === 'off' ? 'It’s running! Now take the leads off in reverse: the black on the bolt first.' : 'Done.',
   setup(G, s) {
     s.ok3 = m3Open(G, jumpScene);
     if (!s.ok3) { s.flat2d = true; return JUMP2D.setup(G, s); }
-    s.ph = 'leads'; s.n = 0; s.err = 0; s.pickC = null; s.crankT = 0; s.t0 = null; s.offN = 0;
+    s.ph = 'leads'; s.n = 0; s.err = 0; s.pickC = null; s.dragC = null; s.crankT = 0; s.t0 = null; s.offN = 0;
   },
   tick(G, s, dt) { if (s.flat2d) { if (JUMP2D.tick) JUMP2D.tick(G, s, dt); return; } if (s.ph === 'crank' && G.hold.key) { s.crankT += dt; if (s.crankT > 1.4 && !s.running) { s.running = true; s.ph = 'off'; Sfx.good(); try { Sfx.thump(); } catch (e) { /* fine */ } miniSay(this.how(G, s)); miniFoot(); } } },
-  draw(G, s, c) { if (s.flat2d) return JUMP2D.draw(G, s, c); m3Hud(G, c, s.ph === 'leads' ? `Lead ${s.n + 1} of 4` : s.ph === 'crank' ? 'Crank it' : s.ph === 'off' ? `Leads off ${s.offN} of 4` : 'Running!', s.err ? `${s.err} spark${s.err > 1 ? 's' : ''}` : 'Red to red, black to bare metal', s.ph === 'leads' ? s.n / 4 : s.ph === 'off' ? 0.5 + s.offN / 8 : s.ph === 'crank' ? Math.min(1, s.crankT / 1.4) : 1); },
+  /* build 27: the nearest clamp or terminal to the finger, on the screen */
+  at(G, s, k) { return m3At(G, s.wpos(s.tg[k])); },
+  clampAt(G, c) { const p = c.g.position; return m3At(G, { x: p.x, y: p.y + 0.1, z: p.z }); },
+  nearTgt(G, s, x, y, R, only) { let best = null, bd = R; for (const k of Object.keys(s.tg)) { if (only && !only(k)) continue; const q = this.at(G, s, k); if (!q || !q[2]) continue; const d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = k; } } return best == null ? null : [best, bd]; },
+  nearClamp(G, s, x, y, R) { let best = null, bd = R; s.cl.forEach((c, i) => { if (c.at != null) return; const q = this.clampAt(G, c); if (!q || !q[2]) return; const d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = i; } }); return best == null ? null : [best, bd]; },
+  /* the picked clamp (or, with none picked, the next one of the right colour) goes on a terminal */
+  put(G, s, tgt) {
+    if (s.pickC == null) { const red = s.n < 2, i = s.cl.findIndex(c => c.at == null && (c.id[0] === 'r') === red); if (i < 0) return; s.pickC = i; }
+    const want = JUMP_TGT[s.n], c = s.cl[s.pickC], colOk = (want === 'fp' || want === 'gp') === (c.id[0] === 'r');
+    if (tgt === want && colOk) {
+      c.at = want; const w = s.wpos(s.tg[want]); c.g.position.copy(w).setY(w.y + 0.07); s.reCable(); s.spark(w); Sfx.clunk(); buzz(10); s.n++; s.pickC = null;
+      if (s.n >= 4) { s.ph = 'crank'; miniFoot(); }
+      miniSay(this.how(G, s)); return;
+    }
+    s.err++; s.spark(s.wpos(s.tg[tgt])); Sfx.bad(); buzz([30, 30, 30]); c.g.position.copy(c.home); s.reCable();
+    miniSay(tgt === 'fn' ? 'Not on the flat battery’s negative! It can spark right by the battery. Use the bare metal bolt.' : colOk ? `Not there. ${JUMP_SAY[s.n]}` : 'Wrong colour: red goes on positive (+), black on negative (−) or bare metal.');
+    if (!colOk) s.pickC = null;
+  },
+  draw(G, s, c) {
+    if (s.flat2d) return JUMP2D.draw(G, s, c);
+    const pulse = 1 + Math.sin(G.t * 6) * 0.12;
+    if (s.ph === 'leads' || s.ph === 'off') {
+      /* a tag on every terminal, and a ring on the ones that can be tapped now */
+      for (const k of Object.keys(s.tg)) {
+        const q = this.at(G, s, k); if (!q || !q[2]) continue;
+        const on = s.cl.some(cl => cl.at === k), tag = JUMP_TAG[k], w = tag[0].length > 1 ? 44 : 24;
+        if (s.ph === 'leads' ? !on : on) { c.strokeStyle = 'rgba(255,255,255,.9)'; c.lineWidth = 2; c.beginPath(); c.arc(q[0], q[1], 17 * pulse, 0, 7); c.stroke(); }
+        mgRR(c, q[0] - w / 2, q[1] - 48, w, 22, 11); c.fillStyle = tag[1]; c.fill(); c.strokeStyle = 'rgba(255,255,255,.92)'; c.lineWidth = 1.5; c.stroke();
+        mgText(c, tag[0], q[0], q[1] - 36.5, { s: tag[0].length > 1 ? 11 : 16, w: 900, c: '#FFFFFF' });
+      }
+      for (const [a, b, t] of [['fp', 'fn', 'FLAT'], ['gp', 'gn', 'GOOD']]) {
+        const p = this.at(G, s, a), q = this.at(G, s, b); if (!p || !q || !p[2] || !q[2]) continue;
+        mgText(c, t, (p[0] + q[0]) / 2, Math.min(p[1], q[1]) - 62, { s: 12, w: 900, d: true, c: 'rgba(255,255,255,.92)' });
+      }
+    }
+    if (s.ph === 'leads') s.cl.forEach((cl, i) => {
+      if (cl.at != null) return; const need = (s.n < 2) === (cl.id[0] === 'r'), q = this.clampAt(G, cl); if (!q || !q[2]) return;
+      if (s.pickC === i || (s.pickC == null && need)) { c.strokeStyle = s.pickC === i ? '#F2B705' : 'rgba(242,183,5,.7)'; c.lineWidth = s.pickC === i ? 3.5 : 2; c.beginPath(); c.arc(q[0], q[1], 24 * pulse, 0, 7); c.stroke(); }
+    });
+    m3Hud(G, c, s.ph === 'leads' ? `Lead ${s.n + 1} of 4` : s.ph === 'crank' ? 'Crank it' : s.ph === 'off' ? `Leads off ${s.offN} of 4` : 'Running!', s.err ? `${s.err} spark${s.err > 1 ? 's' : ''}` : 'Red to red, black to bare metal', s.ph === 'leads' ? s.n / 4 : s.ph === 'off' ? 0.5 + s.offN / 8 : s.ph === 'crank' ? Math.min(1, s.crankT / 1.4) : 1);
+  },
   tap(G, s, x, y) {
     if (s.flat2d) return JUMP2D.tap(G, s, x, y);
     if (s.t0 == null) s.t0 = G.t;
-    const objs = s.cl.map(c => c.g).concat(Object.values(s.tg));
-    const h = m3Hit(G, x, y, objs)[0]; if (!h) return;
-    const u = h.object.userData;
     if (s.ph === 'leads') {
-      if (u.clamp != null && s.cl[u.clamp].at == null) { s.pickC = u.clamp; Sfx.pop(); miniSay(this.how(G, s)); return; }
-      if (u.tgt && s.pickC != null) {
-        const want = JUMP_TGT[s.n], c = s.cl[s.pickC], colOk = (want === 'fp' || want === 'gp') === (c.id[0] === 'r');
-        if (u.tgt === want && colOk) { c.at = want; const w = s.wpos(s.tg[want]); c.g.position.copy(w).setY(w.y + 0.06); s.reCable(); s.spark(w); Sfx.clunk(); buzz(10); s.n++; s.pickC = null; if (s.n >= 4) { s.ph = 'crank'; miniFoot(); } }
-        else { s.err++; s.spark(s.wpos(s.tg[u.tgt])); Sfx.bad(); buzz([30, 30, 30]); miniSay(u.tgt === 'fn' ? 'Not on the flat battery’s negative! It can spark right by the battery. Use the bare metal bolt.' : colOk ? 'Not there yet: follow the order.' : 'Wrong colour: red goes on positive (+), black on negative (−) or bare metal.'); }
-        miniSay(this.how(G, s));
-      }
-    } else if (s.ph === 'off' && u.tgt) {
+      const ci = this.nearClamp(G, s, x, y, 42), tk = this.nearTgt(G, s, x, y, 46, k => !s.cl.some(cl => cl.at === k));
+      if (ci && (!tk || ci[1] <= tk[1])) { s.pickC = ci[0]; Sfx.pop(); miniSay(this.how(G, s)); return; }
+      if (tk) this.put(G, s, tk[0]);
+    } else if (s.ph === 'off') {
+      const tk = this.nearTgt(G, s, x, y, 46, k => s.cl.some(cl => cl.at === k)); if (!tk) return;
       const order = ['earth', 'gn', 'gp', 'fp'], want = order[s.offN];
-      if (u.tgt === want) { const c = s.cl.find(q => q.at === want); if (c) { c.at = null; c.g.position.copy(c.home); s.reCable(); } s.offN++; Sfx.pop(); if (s.offN >= 4) { s.ph = 'done'; miniFoot(); const tt = G.t - s.t0; miniFinish(100 - s.err * 12 - Math.max(0, tt - 25) * 1.2, s.err ? 'It’s running, but you made a few sparks.' : 'Textbook. It started first time and nothing went bang.'); } }
+      if (tk[0] === want) { const c = s.cl.find(q => q.at === want); if (c) { c.at = null; c.g.position.copy(c.home); s.reCable(); } s.offN++; Sfx.pop(); if (s.offN >= 4) { s.ph = 'done'; miniFoot(); const tt = G.t - s.t0; miniFinish(100 - s.err * 12 - Math.max(0, tt - 25) * 1.2, s.err ? 'It’s running, but you made a few sparks.' : 'Textbook. It started first time and nothing went bang.'); } }
       else { s.err++; Sfx.bad(); miniSay('Reverse order: black off the bolt first, then black off the good battery, then the reds.'); }
     }
   },
-  move(G, s, x, y) { if (s.flat2d && JUMP2D.move) JUMP2D.move(G, s, x, y); },
-  down(G, s, x, y) { if (s.flat2d && JUMP2D.down) JUMP2D.down(G, s, x, y); },
-  up(G, s, x, y) { if (s.flat2d && JUMP2D.up) JUMP2D.up(G, s, x, y); },
+  /* or drag a clamp: it comes up off the ground under the finger and goes on whatever it is let go over */
+  down(G, s, x, y) {
+    if (s.flat2d) { if (JUMP2D.down) JUMP2D.down(G, s, x, y); return; }
+    if (s.ph !== 'leads') return; const hit = this.nearClamp(G, s, x, y, 42); if (!hit) return;
+    s.dragC = hit[0]; s.pickC = hit[0]; if (s.t0 == null) s.t0 = G.t;
+  },
+  move(G, s, x, y) {
+    if (s.flat2d) { if (JUMP2D.move) JUMP2D.move(G, s, x, y); return; }
+    if (s.dragC == null || !G.moved) return;
+    const ray = m3Ray(G, x, y - 24); if (!ray || ray.direction.y > -0.05) return;
+    const t = (0.98 - ray.origin.y) / ray.direction.y, c = s.cl[s.dragC];
+    c.g.position.set(clamp(ray.origin.x + ray.direction.x * t, -1.7, 1.7), 0.98, clamp(ray.origin.z + ray.direction.z * t, -1, 1.2)); s.cableDirty = true;
+  },
+  up(G, s, x, y) {
+    if (s.flat2d) { if (JUMP2D.up) JUMP2D.up(G, s, x, y); return; }
+    const i = s.dragC; s.dragC = null; if (i == null) return;
+    const c = s.cl[i]; if (c.at != null || !G.moved) return;
+    const q = x < 0 || s.ph !== 'leads' ? null : this.clampAt(G, c), hit = q ? this.nearTgt(G, s, q[0], q[1] + 10, 52, k => !s.cl.some(cl => cl.at === k)) : null;
+    if (hit) { s.pickC = i; this.put(G, s, hit[0]); } else { c.g.position.copy(c.home); s.reCable(); }
+  },
   ui: (G, s) => s.flat2d ? (JUMP2D.ui ? JUMP2D.ui(G, s) : '') : s.ph === 'crank' ? '<button class="btn primary big mg-hold" data-mghold="key">Hold: turn the key</button>' : '',
   act(G, s, a, b) { if (s.flat2d && JUMP2D.act) JUMP2D.act(G, s, a, b); },
   hold(G, s, k, on) { if (s.flat2d) { if (JUMP2D.hold) JUMP2D.hold(G, s, k, on); return; } if (k === 'key') { try { if (on) Sfx.crankStart(false); else Sfx.crankStop(); } catch (e) { /* audio */ } } },
@@ -22946,6 +23214,19 @@ function showWhatsNew26(had25) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 27: what's new */
+function showWhatsNew27(had26) {
+  showModal(`<div><span class="label">Build 27</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Bays face the door.</b> All three bays are turned a quarter round, so cars drive in nose-first through the roller door.</li>
+      <li><b>No more black bar on the bumpers.</b> Grilles, lamps and bumpers now follow the curve of the body, and number plates sit on it properly.</li>
+      <li><b>The picture keeps its shape.</b> Walking out of the workshop and back in no longer leaves everything stretched.</li>
+      <li><b>Jump leads you can press.</b> Bigger clamps and labelled terminals: tap near where a lead goes, or drag the clamp there.</li>
+      <li><b>Bullet holes you can reach.</b> Slide the panel sideways to find them all; arrows count the ones out of view.</li>
+      ${had26 ? '' : '<li><b>One street, inside and out.</b> What you see through the roller door is the real street: walk out and you are standing in it.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -22953,8 +23234,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen26) { const had25 = !!S.seen25; S.seen24 = true; S.seen25 = true; S.seen26 = true; save(); setTimeout(() => showWhatsNew26(had25), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen27) { const had26 = !!S.seen26; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; save(); setTimeout(() => showWhatsNew27(had26), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
