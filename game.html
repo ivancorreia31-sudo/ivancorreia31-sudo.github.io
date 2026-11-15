@@ -2484,7 +2484,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -3302,11 +3302,18 @@ function engineSound(job) {
   const exhaustUp = ['silencer', 'midpipe', 'frontpipe', 'cat'].filter(up).length, tuned = !!(job.tune && job.tune.done);
   const bpl = E.bhp / Math.max(0.8, E.disp);
   return {
+    /* build 30: the firing pattern, a voice of its own for every model, what state the exhaust and filter are in */
+    fire: E.rotary ? 'rot' : E.cyl >= 12 ? 'v12' : E.cyl >= 10 ? 'v10' : E.cyl === 8 ? (E.sporty && E.disp <= 4.2 && !E.classic ? 'v8f' : 'v8x') : E.cyl === 6 ? (E.vee ? (E.classic ? 'v6o' : 'v6') : 'i6') : E.cyl === 5 ? 'i5' : E.cyl === 3 ? 'i3' : E.cyl <= 2 ? 'i2x' : (['fenwick', 'ashby'].includes(E.make) ? 'i4u' : E.sporty ? 'i4s' : ['bramble', 'morrow'].includes(E.make) ? 'i4b' : 'i4'),
+    voice: (() => { let h = 2166136261; for (const ch of String(job.car.model || '')) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1009) / 1009; })(),
+    voice2: ({ calder: 0.42, hartwell: 0.78, vance: 0.2, morrow: 0.08, bramble: 0.6, ridgeback: 0.3, solent: 0.95, fenwick: 0.68, larkspur: 0.52, ashby: 0.86, stallion: 1 })[E.make] == null ? 0.5 : ({ calder: 0.42, hartwell: 0.78, vance: 0.2, morrow: 0.08, bramble: 0.6, ridgeback: 0.3, solent: 0.95, fenwick: 0.68, larkspur: 0.52, ashby: 0.86, stallion: 1 })[E.make],
+    gruff: !E.ev && !E.sporty && (E.van || ['pickup', 'offroader'].includes(E.style) || (E.style === 'suv' && E.disp >= 2)),
+    blown: (P.silencer && P.silencer.state === 'fitted' && !P.silencer.isNew && P.silencer.cond < 30 ? 0.3 : 0) + (P.frontpipe && P.frontpipe.state === 'fitted' && !P.frontpipe.isNew && P.frontpipe.cond < 30 ? 0.2 : 0),
     cyl: E.soundCyl || E.cyl, vee: E.vee, cross: !!E.cross, disp: E.disp, bhp: E.bhp, red: E.red, classic: E.classic, van: E.van, sporty: E.sporty, twin: E.twin, rotary: !!E.rotary, ev: !!E.ev,
     turbo: E.ev ? 0 : Math.min(1.5, (0.2 + Math.max(0, bpl - 45) / 80) * (up('turbo') ? 1.5 : 1) * (turboGain22(job) ? 1.6 : 1) * (E.classic ? 0.5 : 1)),
-    exhaust: E.ev ? 0 : Math.min(1, (E.sporty ? 0.3 : 0.08) + (E.cyl >= 8 ? 0.15 : 0) + exhaustUp * 0.22 + (md.sidepipes ? 0.3 : 0) + (tuned ? 0.08 : 0) + (E.rotary ? 0.25 : 0)),
+    exhaust: E.ev ? 0 : Math.min(1, (E.sporty ? 0.3 : 0.08) + (E.cyl >= 8 ? 0.15 : 0) + exhaustUp * 0.22 + (md.sidepipes ? 0.3 : 0) + (tuned ? 0.08 : 0) + (E.rotary ? 0.25 : 0)
+      + (P.silencer && P.silencer.state === 'fitted' && !P.silencer.isNew && P.silencer.cond < 30 ? 0.3 : 0) + (P.frontpipe && P.frontpipe.state === 'fitted' && !P.frontpipe.isNew && P.frontpipe.cond < 30 ? 0.2 : 0)),
     pops: !E.ev && (exhaustUp >= 1 || tuned || (E.sporty && E.bhp >= 300)),
-    induction: up('airfilter') ? 1.1 : 0.3,
+    induction: (up('airfilter') ? 1.1 : 0.3) * (P.airfilter && !P.airfilter.isNew && P.airfilter.cond < 30 ? 0.45 : 1) * (up('throttle') ? 1.2 : 1),
     blower: !!md.blower,
     idle: E.cyl >= 8 ? 680 : E.cyl === 3 ? 880 : E.van ? 760 : 780,
     lumpy: (E.cross ? 0.5 : 0) + (tuned ? 0.25 : 0) + (E.classic ? 0.35 : 0) + (exhaustUp >= 2 ? 0.15 : 0),
@@ -4076,7 +4083,7 @@ const Sfx = (() => {
   let prof = null, scriptN = 0;
   const WAVES = {};
   const WV = { tau: 0.035, tauC: 0.045, suck: 0.55, H: 320, lp0: 1100, lpR: 1100, lpL: 600, shelf: 0.2, g1: 1, g2: 1.6, hs: -7, vol: 1.15 };
-  const defProf = () => ({ cyl: 4, vee: false, cross: false, disp: 1.6, bhp: 120, red: 6500, classic: false, van: false, sporty: false, turbo: 0.35, twin: false, exhaust: 0.1, pops: false, induction: 0.3, blower: false, idle: 800, lumpy: 0, horn: 1 });
+  const defProf = () => ({ fire: 'i4', voice: 0.5, gruff: false, cyl: 4, vee: false, cross: false, disp: 1.6, bhp: 120, red: 6500, classic: false, van: false, sporty: false, turbo: 0.35, twin: false, exhaust: 0.1, pops: false, induction: 0.3, blower: false, idle: 800, lumpy: 0, horn: 1 });
   function engWave(c, P) {
     const key = [P.cyl, P.vee ? 1 : 0, P.cross ? 1 : 0, P.classic ? 1 : 0, P.rotary ? 1 : 0].join('|');
     if (WAVES[key]) return WAVES[key];
@@ -4145,6 +4152,9 @@ const Sfx = (() => {
   /* build a voice: one engine's worth of sources and filters */
   function voiceOf(c, P, dest) {
     if (P.ev) return evVoiceOf(c, P, dest);
+    return window.__eng22 ? voiceOf22(c, P, dest) : voiceOf30(c, P, dest);
+  }
+  function voiceOf22(c, P, dest) {
     const v = { P, boost: 0, load: 0, t: c.currentTime, t0: c.currentTime, lastPop: 0, bovT: -9 };
     const G = val => { const g = c.createGain(); g.gain.value = val; return g; }, F = (type, f, q, gain) => { const b = c.createBiquadFilter(); b.type = type; b.frequency.value = f; if (q != null) b.Q.value = q; if (gain != null) b.gain.value = gain; return b; };
     const FM = formants(P);
@@ -4193,9 +4203,164 @@ const Sfx = (() => {
       s.connect(f); f.connect(g); g.connect(v.dest); s.start(t, Math.random() * 0.5); s.stop(t + 0.55);
     } catch (e) { /* audio refused */ }
   }
+  /* ======================= build 30: engines that differ =======================
+     What a car sounds like is built from four things, each taken from what the car is and what is bolted to it.
+     1. The firing pattern: how many cylinders, and how the crank and the manifold space their pulses. Even pulses hum
+        (a straight six, a V12); pulses that arrive in uneven pairs burble (a cross-plane V8, unequal headers); three
+        or five cylinders leave a beat that neither a four nor a six has.
+     2. The size of each cylinder: a pulse lasts a few thousandths of a second whatever the revs, longer and heavier
+        from a big cylinder. So at idle you hear separate thumps, and near the red line they run together into a note.
+        (The old voice stretched its pulses with the revs, which is why every engine had the same buzz.)
+     3. The exhaust: how much it lets through (a standard silencer swallows the top, a sports system does not), where
+        its pipe and box resonate, which never moves with the revs, and whether it is blowing.
+     4. The intake and the turbo: the same pulses heard through the airbox, far louder with an open filter; a turbo
+        whistles, hisses on boost, and evens the exhaust pulses out. Vans and trucks have a clatter of their own. */
+  const FIRE30 = {
+    i2x: [[0, 1, 0], [0.375, 0.84, 0]],
+    i3: [[0, 1, 0], [1 / 3, 0.8, 0], [2 / 3, 0.92, 0]],
+    i4: [[0, 1, 0], [0.25, 0.93, 1], [0.5, 0.98, 0], [0.75, 0.91, 1]],
+    i4u: [[0, 1, 0], [0.25, 0.5, 1], [0.5, 0.96, 0], [0.75, 0.46, 1]],
+    i4s: [[0, 1, 0], [0.25, 0.99, 0], [0.5, 1, 0], [0.75, 0.98, 0]],
+    i4b: [[0, 1, 0], [0.25, 0.72, 1], [0.5, 0.85, 0], [0.75, 0.95, 1]],
+    i5: [[0, 1, 0], [0.2, 0.82, 0], [0.4, 0.95, 0], [0.6, 0.78, 0], [0.8, 0.9, 0]],
+    i6: [[0, 1, 0], [1 / 6, 0.95, 1], [2 / 6, 0.98, 0], [3 / 6, 0.94, 1], [4 / 6, 0.97, 0], [5 / 6, 0.95, 1]],
+    v6: [[0, 1, 0], [1 / 6, 0.76, 1], [2 / 6, 0.97, 0], [3 / 6, 0.78, 1], [4 / 6, 0.95, 0], [5 / 6, 0.74, 1]],
+    v6o: [[0, 1, 0], [150 / 720, 0.8, 1], [240 / 720, 0.96, 0], [390 / 720, 0.78, 1], [480 / 720, 0.94, 0], [630 / 720, 0.8, 1]],
+    v8x: 'LRLLRRRL'.split('').map((b, i) => [i / 8, b === 'R' ? 0.7 : 1, b === 'R' ? 1 : 0]),
+    v8f: [0, 1, 2, 3, 4, 5, 6, 7].map(i => [i / 8, i % 2 ? 0.9 : 1, i % 2]),
+    v10: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => [i / 10, [1, 0.8, 0.95, 0.84, 0.9][i % 5], i % 2]),
+    v12: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => [i / 12, i % 2 ? 0.95 : 1, i % 2]),
+    rot: [[0, 1, 0], [0.25, 0.68, 1], [0.5, 0.94, 0], [0.75, 0.62, 1]],
+  };
+  function spec30(P) {
+    const cyl = P.rotary ? 2 : Math.max(1, P.cyl || 4);
+    const fire = P.fire && FIRE30[P.fire] ? P.fire : P.rotary ? 'rot' : cyl >= 12 ? 'v12' : cyl >= 10 ? 'v10' : cyl === 8 ? (P.cross === false ? 'v8f' : 'v8x') : cyl === 6 ? (P.vee ? (P.classic ? 'v6o' : 'v6') : 'i6') : cyl === 5 ? 'i5' : cyl === 3 ? 'i3' : cyl <= 2 ? 'i2x' : 'i4';
+    const per = Math.max(0.2, Math.min(1.1, (P.disp || 1.6) / cyl)), red = Math.max(3500, P.red || 6500);
+    const exh = Math.max(0, Math.min(1, P.exhaust == null ? 0.1 : P.exhaust)), tb = Math.max(0, Math.min(1.5, P.turbo || 0));
+    return { fire, per, exh, tb, red, vz: P.voice == null ? 0.5 : Math.max(0, Math.min(1, P.voice)), gruff: !!P.gruff, classic: !!P.classic,
+      pw: (0.0004 + 0.0009 * per) * (P.classic ? 1.25 : 1) * (P.rotary ? 0.7 : 1), mk: P.voice2 == null ? 0.5 : Math.max(0, Math.min(1, P.voice2)), bands: [900, Math.round(red * 0.38), Math.round(red * 0.82)] };
+  }
+  const WAVES30 = {};
+  function waves30(c, P) {
+    const X = spec30(P), key = [X.fire, Math.round(X.per * 20), Math.round(X.exh * 4), Math.round(X.tb * 2), X.classic ? 1 : 0, X.gruff ? 1 : 0, Math.round(X.vz * 8), Math.round(X.mk * 8), X.red].join('|');
+    if (WAVES30[key]) return WAVES30[key];
+    /* this car's own unevenness: no two manifolds are quite alike. A turbo in the way evens the pulses out */
+    let seed = Math.floor(X.vz * 9973) + 17; const rnd = () => { seed = (seed * 16807 + 11) % 2147483647; return seed / 2147483647; };
+    const even = (1 - 0.55 * Math.min(1, X.tb)) * (0.55 + 1.1 * X.mk), unev = (X.classic ? 0.2 : 0.08) * even;
+    const ev = FIRE30[X.fire].map(e => [e[0] + (e[2] ? 0.012 : 0) + (rnd() - 0.5) * 0.008, (1 - (1 - e[1]) * even) * (1 - unev / 2 + rnd() * unev)]);
+    const N = 2048, cs = new Float32Array(N), sn = new Float32Array(N);
+    for (let k = 0; k < N; k++) { cs[k] = Math.cos(2 * Math.PI * k / N); sn[k] = Math.sin(2 * Math.PI * k / N); }
+    const lvl = [];
+    const make = (tauF, H, suck, riseK) => {
+      const s = new Float32Array(N), rise = tauF * riseK, tau2 = tauF * 2.2, lag = tauF * 2.6;
+      const pulse = (t, k) => (t <= 0 ? 0 : (1 - Math.exp(-t / rise)) * Math.exp(-t / k));
+      for (const [a0, A] of ev) for (let k = 0; k < N; k++) { let t = k / N - a0; t -= Math.floor(t); s[k] += A * (pulse(t, tauF) - suck * pulse(t - lag, tau2)); }
+      let mean = 0; for (let k = 0; k < N; k++) mean += s[k]; mean /= N;
+      let pk = 1e-9, e = 0; for (let k = 0; k < N; k++) { s[k] -= mean; pk = Math.max(pk, Math.abs(s[k])); e += s[k] * s[k]; }
+      /* the browser scales a wave so its peak is 1; this is what to turn it up by so each band is as loud as the next */
+      lvl.push(pk / Math.sqrt(e / N || 1e-9));
+      const re = new Float32Array(H + 1), im = new Float32Array(H + 1);
+      for (let h = 1; h <= H; h++) {
+        let a = 0, b = 0; for (let k = 0; k < N; k++) { const j = (h * k) % N; a += s[k] * cs[j]; b += s[k] * sn[j]; }
+        const g = h > H * 0.7 ? 0.5 + 0.5 * Math.cos(Math.PI * (h - H * 0.7) / (H * 0.3)) : 1; re[h] = a / N * g; im[h] = b / N * g;
+      }
+      return c.createPeriodicWave(re, im);
+    };
+    /* one wave for each stretch of the rev range: the same pulse, a bigger share of a shorter cycle */
+    const suck = 0.38 + 0.3 * X.exh, riseK = (0.12 + 0.2 * Math.min(1, X.tb)) * (X.gruff ? 0.6 : 1);
+    const W = { spec: X, bands: X.bands, lvl };
+    /* the pulse itself shortens as the gas moves faster, but far less than the cycle does */
+    const pwAt = r => X.pw * Math.pow(900 / r, 0.6) * r / 120;
+    W.A = make(Math.min(0.2, pwAt(X.bands[0])), 240, suck, riseK);
+    W.B = make(Math.min(0.24, pwAt(X.bands[1])), 170, suck, riseK);
+    W.C = make(Math.min(0.3, pwAt(X.bands[2])), 110, suck, riseK);
+    W.lvl = lvl.slice(0, 3).map(x => 0.3 * x);
+    /* a click at each firing: what gates the clatter of a van's engine, or the tick of the valve gear */
+    { const keep = lvl.length; W.K = make(0.004, 400, 0, 0.2); lvl.length = keep; }
+    return (WAVES30[key] = W);
+  }
+  function voiceOf30(c, P, dest) {
+    const W = waves30(c, P), X = W.spec, v = { P, v30: true, W, boost: 0, load: 0, t: c.currentTime, t0: c.currentTime, lastPop: 0, bovT: -9, dest };
+    const G = val => { const g = c.createGain(); g.gain.value = val; return g; }, F = (type, fq, q, gain) => { const b = c.createBiquadFilter(); b.type = type; b.frequency.value = fq; if (q != null) b.Q.value = q; if (gain != null) b.gain.value = gain; return b; };
+    const big = Math.min(1, Math.max(0, ((P.disp || 1.6) - 1) / 4)), f0 = (P.idle || 800) / 120;
+    const osc = w => { const o = c.createOscillator(); o.setPeriodicWave(w); o.frequency.value = f0; return o; };
+    v.out = G(0.0001); v.out.connect(dest);
+    v.o = [W.A, W.B, W.C].map(osc); v.pre = G(0.6);
+    v.og = v.o.map((o, i) => { const g = G(i ? 0 : W.lvl[0]); o.connect(g); g.connect(v.pre); return g; });
+    v.sh = c.createWaveShaper(); v.sh.curve = curveOf(); try { v.sh.oversample = '2x'; } catch (e) { /* old browser */ }
+    v.low = F('lowshelf', 170, null, 0.5 + big * 2.5 + (X.fire === 'v8x' ? 1.5 : 0));
+    /* the silencer box booms low, the pipe sings in the middle, and only a loud system lets the rasp band out */
+    v.f1 = F('peaking', (150 - big * 55) * (0.9 + 0.25 * X.vz), 1.1, 2.5 + big * 2);
+    v.f2 = F('peaking', (X.fire === 'i3' ? 520 : X.fire === 'i5' ? 470 : X.fire[0] === 'v' ? 370 : X.fire === 'i6' ? 430 : X.fire === 'rot' ? 610 : 480) * (0.74 + 0.3 * X.vz + 0.34 * X.mk) * (X.gruff ? 0.85 : 1), 1.3, 3 + X.exh * 4 + X.mk * 2);
+    v.f3 = F('peaking', 1000 + 400 * X.vz + 500 * X.mk, 1.0, -3 + X.exh * 10 + (X.mk - 0.5) * 3);
+    v.lp = F('lowpass', 700, 0.7); v.lp2 = F('lowpass', 1200, 0.5);
+    v.pre.connect(v.sh); v.sh.connect(v.low); v.low.connect(v.f1); v.f1.connect(v.f2); v.f2.connect(v.f3); v.f3.connect(v.lp); v.lp.connect(v.lp2); v.lp2.connect(v.out);
+    /* exhaust rasp: noise let out in bursts by the firing pulses */
+    v.n = c.createBufferSource(); v.n.buffer = noiseBuf(c); v.n.loop = true;
+    v.nbp = F('bandpass', big > 0.6 ? 380 : 520, 0.8); v.nam = G(0); v.ng = G(0.0001); v.amg = G(0);
+    v.o[1].connect(v.amg); v.amg.connect(v.nam.gain); v.n.connect(v.nbp); v.nbp.connect(v.nam); v.nam.connect(v.ng); v.ng.connect(v.pre);
+    /* the intake: the same pulses from the other end, through the airbox, and the rush of air */
+    v.io = osc(W.B); v.ibp = F('bandpass', (430 - big * 150) * (0.9 + 0.2 * X.vz), 1.6); v.iog = G(0.0001); v.io.connect(v.ibp); v.ibp.connect(v.iog); v.iog.connect(dest);
+    v.inb = F('bandpass', 320, 0.7); v.ing = G(0.0001); v.n.connect(v.inb); v.inb.connect(v.ing); v.ing.connect(dest);
+    /* clatter, or the tick of the valve gear */
+    v.ko = osc(W.K); v.kg = G(0); v.kam = G(0); v.kbp = F('bandpass', X.gruff ? 1900 : 3400, X.gruff ? 0.7 : 1.4); v.kout = G(0.0001);
+    v.ko.connect(v.kg); v.kg.connect(v.kam.gain); v.n.connect(v.kbp); v.kbp.connect(v.kam); v.kam.connect(v.kout); v.kout.connect(dest);
+    /* turbo: a whistle and a hiss on boost */
+    v.tw = c.createOscillator(); v.tw.type = 'sine'; v.tw.frequency.value = 1400; v.twlp = F('lowpass', 4200, 0.5); v.twg = G(0.0001); v.tw.connect(v.twlp); v.twlp.connect(v.twg); v.twg.connect(dest);
+    v.thb = F('bandpass', 1700, 1.0); v.thg = G(0.0001); v.n.connect(v.thb); v.thb.connect(v.thg); v.thg.connect(dest);
+    if (P.blower) { v.bl = c.createOscillator(); v.bl.type = 'sawtooth'; v.blb = F('bandpass', 1100, 2); v.blg = G(0.0001); v.bl.connect(v.blb); v.blb.connect(v.blg); v.blg.connect(dest); }
+    /* no two turns of an engine are quite the same: a slow wander on the pitch, most of it at idle */
+    v.jlp = F('lowpass', 22, 0.5); v.jg = G(0); v.n.connect(v.jlp); v.jlp.connect(v.jg);
+    v.tuned = v.o.concat([v.io, v.ko]); v.tuned.forEach(o => v.jg.connect(o.frequency));
+    v.srcs = v.tuned.concat([v.n, v.tw], v.bl ? [v.bl] : []);
+    v.srcs.forEach(s => s.start());
+    return v;
+  }
+  function setVoice30(c, v, rpm, load, on, at) {
+    const P = v.P, W = v.W, X = W.spec, t = at != null ? at : c.currentTime, dt = Math.min(0.2, Math.max(0.001, t - v.t)); v.t = t;
+    const idle = P.idle || 800, since = t - v.t0, flare = since < 1.6 ? 550 * Math.exp(-since / 0.45) * Math.min(1, since / 0.12) : 0;
+    let r = Math.max(rpm, 0) + flare;
+    if (P.lumpy && r < idle * 1.4) r *= 1 + Math.sin(t * 5.3) * 0.025 * P.lumpy + Math.sin(t * 13.1) * 0.012 * P.lumpy;
+    const rr = Math.min(1.05, r / X.red), lim = rpm > X.red - 60 && load > 0.5, f = Math.max(2, r / 120), c01 = x => Math.max(0, Math.min(1, x));
+    v.tuned.forEach(o => o.frequency.setTargetAtTime(f, t, 0.025));
+    const x1 = c01((r - W.bands[0]) / (W.bands[1] - W.bands[0])), x2 = c01((r - W.bands[1]) / (W.bands[2] - W.bands[1])), mix = [1 - x1, x1 * (1 - x2), x2];
+    v.og.forEach((g, i) => g.gain.setTargetAtTime(mix[i] * W.lvl[i], t, 0.04));
+    /* the silencer lets more through as the gas flows faster; how far it opens is the exhaust that is fitted */
+    const fc = 800 + X.exh * 900 + rr * (750 + X.exh * 1500) + load * (500 + X.exh * 1700) + (P.sporty ? 150 : 0);
+    v.lp.frequency.setTargetAtTime(Math.min(6000, fc), t, 0.05); v.lp2.frequency.setTargetAtTime(Math.min(8500, fc * 1.7), t, 0.05);
+    v.pre.gain.setTargetAtTime(0.5 + load * 0.9 + X.exh * 0.5 + rr * 0.2, t, 0.05);
+    const base = (0.1 + Math.min(0.09, (P.disp || 1.6) * 0.012 + X.exh * 0.06 + ((P.bhp || 0) > 300 ? 0.015 : 0))) * WV.vol * V30, vol = base * (0.5 + 0.5 * load + 0.2 * rr);
+    v.out.gain.setTargetAtTime(on ? (lim && Math.random() < 0.5 ? vol * 0.3 : vol) : 0.0001, t, lim ? 0.01 : 0.06);
+    v.ng.gain.setTargetAtTime(on ? 0.002 + load * 0.03 * (0.15 + X.exh * 1.2) * (0.5 + rr) : 0.0001, t, 0.06); v.amg.gain.setTargetAtTime(on ? 2.4 : 0, t, 0.06);
+    const ind = P.induction == null ? 0.3 : P.induction;
+    v.iog.gain.setTargetAtTime(on ? Math.max(0.0001, Math.pow(load, 1.5) * (0.25 + rr) * 0.4 * ind * V30) : 0.0001, t, 0.07);
+    v.ing.gain.setTargetAtTime(on ? Math.max(0.0001, load * rr * 0.06 * ind) : 0.0001, t, 0.08);
+    v.inb.frequency.setTargetAtTime(260 + rr * 500, t, 0.08);
+    v.kg.gain.setTargetAtTime(on ? 1 : 0, t, 0.05);
+    v.kout.gain.setTargetAtTime(on ? (X.gruff ? 0.05 * (1.15 - 0.7 * rr) * (0.6 + 0.4 * load) : 0.006 * (1 - 0.5 * rr)) * V30 : 0.0001, t, 0.06);
+    v.jg.gain.setTargetAtTime(on ? f * 28 * (0.004 + (P.lumpy || 0) * 0.02 * Math.max(0, 1 - r / (idle * 2.2)) + (X.classic ? 0.004 : 0)) : 0, t, 0.1);
+    /* turbo spools with load and revs, and lets go through the blow-off valve when you lift */
+    const target = on ? c01((r - 1800) / 2600) * load : 0, tb = P.turbo || 0;
+    v.boost += (target - v.boost) * Math.min(1, dt * (target > v.boost ? 1.8 : 4.5));
+    if (on && v.load > 0.6 && load < 0.15 && v.boost > 0.45 && t - v.bovT > 0.6 && at == null) { v.bovT = t; bovOne(c, v, Math.min(1.4, tb * 1.6)); }
+    v.tw.frequency.setTargetAtTime(1250 + ((P.disp || 1.6) < 1.7 ? 500 : 0) + v.boost * 2800 * (P.twin ? 0.9 : 1), t, 0.05);
+    const bz = Math.max(0, v.boost - 0.15);
+    v.twg.gain.setTargetAtTime(on ? Math.max(0.0001, Math.pow(bz, 1.5) * 0.09 * tb) : 0.0001, t, 0.05);
+    v.thg.gain.setTargetAtTime(on ? Math.max(0.0001, bz * load * 0.1 * tb) : 0.0001, t, 0.06);
+    if (v.bl) { v.bl.frequency.setTargetAtTime(r / 60 * 6 * 2.4, t, 0.03); v.blg.gain.setTargetAtTime(on ? 0.003 + rr * 0.012 * (0.4 + load * 0.6) : 0.0001, t, 0.05); }
+    /* overrun: pops and crackles from a loud exhaust or a tuned map */
+    if (on && P.pops && load < 0.06 && r > 2700 && v.load < 0.3 && at == null) {
+      const rate = (r - 2500) / 600 * (X.exh > 0.5 ? 2.2 : 1.2);
+      if (Math.random() < rate * dt && t - v.lastPop > 0.03) { v.lastPop = t; popOne(c, v, 0.5 + X.exh * 0.7); }
+    }
+    v.load = load;
+  }
+  /* how loud the new voice is against the old one (measured, e2e/eng30.py) */
+  const V30 = 0.8;
   /* drive a voice: revs, how hard it's working (0..1), and whether it's running */
-  function setVoice(c, v, rpm, load, on) {
+  function setVoice(c, v, rpm, load, on, at) {
     if (v.ev) { evSet(c, v, rpm, load, on); return; }
+    if (v.v30) { setVoice30(c, v, rpm, load, on, at); return; }
     const P = v.P, t = c.currentTime, dt = Math.min(0.2, Math.max(0.001, t - v.t)); v.t = t;
     /* a flare of revs as it catches, a lumpy idle on big cams */
     const since = t - v.t0, flare = since < 1.6 ? 550 * Math.exp(-since / 0.45) * Math.min(1, since / 0.12) : 0;
@@ -4230,7 +4395,7 @@ const Sfx = (() => {
     v.load = load;
   }
   function stopVoice(c, v, fade) {
-    try { const t = c.currentTime, f = fade || 0.12; [v.out, v.ing, v.twg, v.thg, v.blg, v.g1, v.g2, v.g3, v.ng].forEach(g => { if (g) { g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0.0001, t, f); } }); v.srcs.forEach(s => s.stop(t + f * 5 + 0.05)); } catch (e) { /* already stopped */ }
+    try { const t = c.currentTime, f = fade || 0.12; [v.out, v.ing, v.twg, v.thg, v.blg, v.g1, v.g2, v.g3, v.ng, v.iog, v.kout].forEach(g => { if (g) { g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0.0001, t, f); } }); v.srcs.forEach(s => s.stop(t + f * 5 + 0.05)); } catch (e) { /* already stopped */ }
   }
   /* a short scripted run on its own voice: a start-up, or a pull on the dyno */
   function runScript(P, fn, dur) {
@@ -4433,6 +4598,13 @@ const Sfx = (() => {
       runScript(P, t => t < 0.45 ? [220, 0.3, true] : t < 0.7 ? [220 + (top - 220) * (t - 0.45) / 0.25, 0.6, true] : t < 1.9 ? [id + (top - id) * Math.exp(-(t - 0.7) / 0.28), 0.08, true] : [id, 0, false], 2.4);
     },
     setCar(p) { prof = p || null; },
+    /* build 30: render an engine to samples without playing it. steps = [[seconds, rpm, load], ...] */
+    render30(P, steps, secs) {
+      const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext, oc = new OC(1, Math.round(44100 * secs), 44100);
+      const v = voiceOf(oc, Object.assign(defProf(), P || {}), oc.destination); v.t0 = -9;
+      for (const [at, rpm, load] of steps) setVoice(oc, v, rpm, load, true, at);
+      return oc.startRendering().then(buf => buf.getChannelData(0));
+    },
     get car() { return prof; },
     /* a full-throttle pull on the dyno: up to the red line, then off the throttle (pops and the blow-off valve) */
     rev(dur, p) {
@@ -15069,6 +15241,10 @@ window.__econ28 = n => {
   out.level = levelOf(S.xp); out.rent = rentNow(); out.rate = rateNow();
   return out;
 };
+/* build 30: for the sound tests: every model's sound, and an engine rendered at given revs */
+window.__engCars = () => CARS.map(c => { try { return [c.model, engineSound({ car: Object.assign({ bhp: bhpOf(c.model) }, c), parts: {} })]; } catch (e) { return [c.model, null]; } });
+window.__sfx = () => Sfx;
+window.__eng30 = (P, steps, secs, old) => { window.__eng22 = !!old; let p; try { p = Sfx.render30(P, steps, secs); } finally { window.__eng22 = false; } return p.then(a => { let pk = 0; for (let i = 0; i < a.length; i++) pk = Math.max(pk, Math.abs(a[i])); const q = new Int16Array(a.length), k = pk > 1 ? 1 / pk : 1; for (let i = 0; i < a.length; i++) q[i] = Math.round(a[i] * k * 32767); let s = ''; const u = new Uint8Array(q.buffer); for (let i = 0; i < u.length; i += 8192) s += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return { peak: pk, b64: btoa(s) }; }); };
 window.__advance = m => { if (S && !S.over) advance(m); };
 window.__drv = () => (Car3D.ok && Car3D.driving ? Car3D.driving() : null);
 window.__route = () => (Car3D.ok && Car3D.routeInfo ? Car3D.routeInfo() : null);
@@ -18288,7 +18464,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 29</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 30</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -18777,7 +18953,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 29;
+const BUILD = 30;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -23556,6 +23732,18 @@ function showWhatsNew29(had28) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 30: what's new */
+function showWhatsNew30(had29) {
+  showModal(`<div><span class="label">Build 30</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Engines that sound like themselves.</b> Every engine’s note is now built from its own firing pattern: a three-cylinder’s off-beat, four kinds of four, a five, straight and V sixes, a burbling V8 and a howling one, a V12.</li>
+      <li><b>Size matters.</b> Big cylinders thump; small ones buzz. At idle you hear each pulse, and near the red line they run together into a note.</li>
+      <li><b>What’s fitted changes it.</b> A sports exhaust is louder and raspier; a blowing silencer is louder still. An open air filter roars under load. A bigger turbo whistles and hisses. Vans and trucks clatter.</li>
+      <li><b>Every make has its own voice.</b> Two 1.6s from different makers no longer sound the same.</li>
+      ${had29 ? '' : '<li><b>Shops and the auction.</b> Three shops across the road to walk into and buy from, and a drive to the car auction.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -23563,8 +23751,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen29) { const had28 = !!S.seen28; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; save(); setTimeout(() => showWhatsNew29(had28), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen30) { const had29 = !!S.seen29; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; save(); setTimeout(() => showWhatsNew30(had29), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
