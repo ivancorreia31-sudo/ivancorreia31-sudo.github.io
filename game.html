@@ -1580,6 +1580,7 @@ body.driving .hud,body.driving .tabbar,body.driving main,body.driving .drawer{vi
 .mg-stars span.on{color:var(--hazard);text-shadow:0 2px 0 rgba(0,0,0,.15)}
 .ov-yard{border:0;border-radius:999px;background:rgba(18,24,21,.82);color:#fff;font-weight:700;font-size:13px;padding:7px 12px;pointer-events:auto}
 .ov-yard b{color:var(--hazard)}
+.upg.shop29{max-height:52vh;overflow:auto;margin:10px 0}.upg.shop29 li{align-items:center}
 .tab.locked{opacity:.45}.tab.locked svg{filter:grayscale(1)}
 .tab.locked::after{content:"";position:absolute;top:7px;left:calc(50% + 6px);width:13px;height:13px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F2B705' stroke-width='3' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2' fill='%23F2B705'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center/contain no-repeat}
 .stab.locked{opacity:.55}.slock{font-style:normal;font-size:10px;font-weight:800;margin-left:6px;padding:1px 5px;border-radius:999px;background:rgba(242,183,5,.22);letter-spacing:.02em}
@@ -2362,6 +2363,15 @@ const AREAS = { daily: [2, 'Daily jobs and rewards'], awards: [2, 'Awards'], sta
 const areaOpen = k => !AREAS[k] || TEST28() || !!(S && S.open28) || levelOf(S.xp) >= AREAS[k][0];
 const areaSay = k => `${AREAS[k][1]}: opens at garage level ${AREAS[k][0]}. You’re level ${levelOf(S.xp)}.`;
 const opened28 = (a, b) => { const l = Object.values(AREAS).filter(v => v[0] > a && v[0] <= b).map(v => v[1]); return l.length ? 'Now open: ' + l.join(', ') + '.' : ''; };
+/* build 29: three shops across the road. Tools, tyre kit, spray kit and paint are bought over their counters; ramps,
+   staff and services are still arranged from the office (the Garage page). */
+const SHOPS = {
+  factors: { name: 'Unit 7 Motor Factors', who: 'Dez', line: 'Tools, testers and the trade counter. What are you after?', ids: ['meter', 'obd', 'pressure', 'impact', 'jack', 'torque', 'heater', 'diag', 'dyno', 'chest', 'aircon', 'machine', 'rollroad', 'trade', 'stock'] },
+  tyres: { name: 'Brickfield Tyres', who: 'Mo', line: 'Tyre machines, inflators, alignment. All in stock.', ids: ['inflator', 'tyremc', 'align', 'tyrehotel'] },
+  panel: { name: 'Panel Pro Bodyshop', who: 'Gail', line: 'Spray kit, paint, floor coatings and signs.', ids: ['gun', 'booth', 'neon', 'lights', 'floor', 'walls', 'branding'] },
+};
+const shopOf = id => { for (const k of Object.keys(SHOPS)) if (SHOPS[k].ids.includes(id)) return k; return null; };
+let SHOP_AT = null, AUCRUN = null;
 const styleOf = () => own('neon') + own('lights') + own('plants') + own('floor') + own('walls') + own('trophy') + own('arcade') + own('chest') + own('branding') + (own('museum') ? 3 : 0);
 const tipBoost = () => 1 + [0, 0.1, 0.2, 0.35][Math.min(3, own('lounge'))] + 0.04 * styleOf() + [0, 0.15, 0.25][Math.min(2, own('courtesy'))];
 const CONSUMABLE = ['oil', 'airfilter', 'plugs', 'pads', 'brakefluid', 'hose', 'bhose', 'fuelfilter', 'headlamp', 'taillamp', 'washer'];
@@ -2474,7 +2484,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -3779,8 +3789,65 @@ function acceptJob(no) {
 }
 /* the next thing you can buy for an upgrade: its only level, or the next level up */
 const nextUpg = u => { const n = own(u.id); return u.levels ? u.levels[n] || null : (n ? null : u); };
+/* build 29: at a shop's counter */
+function shopSheet(k) {
+  const sh = SHOPS[k]; if (!sh) return; SHOP_AT = k;
+  const L = levelOf(S.xp);
+  const rows = sh.ids.map(id => UPGRADES.find(u => u.id === id)).filter(Boolean).map(u => {
+    const n = own(u.id), nx = nextUpg(u); let act;
+    if (!nx) act = `<span class="ownedtag">${u.levels ? 'Maxed' : 'Owned'}</span>`;
+    else if (u.needs && !own(u.needs)) act = `<button class="btn" disabled>Needs the ${esc(lc(UPGRADES.find(x => x.id === u.needs).name))}</button>`;
+    else if (L < nx.lvl) act = `<button class="btn" disabled>Level ${nx.lvl}</button>`;
+    else act = `<button class="btn primary" data-a="shop-buy" data-id="${u.id}"${S.money >= nx.price ? '' : ' disabled'}>${money(nx.price)}</button>`;
+    return `<li class="${!nx ? 'owned' : ''}"><div><h3>${esc(u.name)}${u.levels && n ? ` <small class="muted">level ${n}</small>` : ''}</h3><p>${esc((nx && nx.desc) || u.desc || '')}</p></div>${act}</li>`;
+  }).join('');
+  showModal(`<div><span class="label">${esc(sh.name)} · you have ${money(S.money)}</span><h2 class="sheet-title">Over the counter</h2></div>
+    <p class="muted">${esc(sh.who)}: “${esc(sh.line)}”</p><ul class="upg shop29">${rows}</ul>
+    <button class="btn wide" data-a="shop-close">Done</button>`);
+  S.stats.shopVisits = (S.stats.shopVisits || 0) + 1;
+}
+function shopBuy(id) { const k = SHOP_AT || shopOf(id); if (!k) return; SHOP_AT = k; buy(id); shopSheet(k); }
+/* from the Garage page: over the road on foot where there is a road to walk on, straight to the counter where not */
+function shopGo(k) {
+  const sh = SHOPS[k]; if (!sh) return;
+  if (!canRoad() || BT || RT || MG) { shopSheet(k); return; }
+  if (FPW) fpClose();
+  if (!YW) openYard('garage');
+  if (YW) setTimeout(() => driveSay(`${sh.name} is across the road. Use the zebra crossing, to your right as you leave the garage.`, true), 400); else shopSheet(k);
+}
+/* build 29: the auction is held at the car park by the roundabout. Drive the van there once a day; then every lot is
+   yours to bid on until you close up */
+function aucGo(no) {
+  const lot = S.lots.find(l => l.no === no); if (!lot) return;
+  if (TEST28() || !canRoad() || S.aucDay === S.day) { startAuction(no); return; }
+  if (!S.bays.some(b => b === null) && !unitFree('s')) { toast('Your ramps and the unit are full. Sell a car or finish a job first.'); return; }
+  if (S.money < Math.max(50, Math.round(lot.price * 0.45 / 50) * 50)) { toast('You can’t cover the opening bid on that one.'); return; }
+  if (RT || DSP || MG) return;
+  let van = null; try { van = dispVan(); } catch (e) { van = null; }
+  if (!van) { startAuction(no); return; }
+  AUCRUN = { no, s: 0, arrived: false, chipT: 0, sayT: 3 };
+  if (!startDrive(van, 'fun') || !RT) { AUCRUN = null; startAuction(no); return; }
+  try { AUCRUN.s = Math.round(Car3D.routeTag('carpark') || 0); Car3D.routeMark(AUCRUN.s, { flag: true }); } catch (e) { /* no marker */ }
+  RT.auction = AUCRUN;
+  driveSay('The auction’s at the car park by the roundabout. Follow the arrow. Hold the key to start the van.', true);
+}
+function aucRunTick(D, dt) {
+  const A = AUCRUN; if (!A || !RT || RT.D !== D || A.arrived) return;
+  const L = RT.L || 1200, left = ((A.s - D.s) % L + L) % L;
+  A.chipT -= dt; A.sayT -= dt;
+  if (A.chipT <= 0) { A.chipT = 0.25; const el = document.querySelector('#drive .dv-togo-m'); if (el) el.textContent = left > L - 12 ? 'Here' : left >= 1000 ? (left / 1000).toFixed(1) + ' km' : Math.round(left / 10) * 10 + ' m'; }
+  if (A.sayT <= 0 && RT.running) { A.sayT = 7; driveSay(left > 80 ? `${Math.round(left / 10) * 10} m to the auction.` : 'There’s the auction board. Pull up and stop.', false); }
+  if ((left < 20 || left > L - 12) && (D.v < 4 || left < 6 || left > L - 12)) { A.arrived = true; setTimeout(aucArrive, 50); }
+}
+function aucArrive() {
+  const A = AUCRUN; if (!A) return; AUCRUN = null;
+  dispEndDrive(); S.aucDay = S.day; S.stats.aucTrips = (S.stats.aucTrips || 0) + 1; render();
+  toast('You’re at the auction. Every lot is yours to bid on today.');
+  startAuction(A.no);
+}
 function buy(id) {
   const u = UPGRADES.find(x => x.id === id); if (!u) return;
+  { const sk = shopOf(id); if (sk && !TEST28() && SHOP_AT !== sk) { toast(`${u.name}: sold at ${SHOPS[sk].name}, across the road.`); return; } }
   const nx = nextUpg(u); if (!nx) return;
   if (u.needs && !own(u.needs)) return;
   if (levelOf(S.xp) < nx.lvl || S.money < nx.price) return;
@@ -10906,25 +10973,82 @@ if ( uFx > 0.5 ) {
         for (const [gg, m, c] of cores) B.add('leaf', gg, m, c); for (const [gg, m, c] of cards) B.add('leafCard', gg, m, c); }
       B.add('metal', cylG(0.42, 0.42, 1.0, 12, true), at4(x, y + 0.5, z));
     });
-    /* -- the industrial units across the road from the garage, the ones you see through the roller door -- */
+    /* -- the industrial units across the road from the garage, the ones you see through the roller door --
+       build 29: each has a real doorway and a front room you can walk into: a counter with someone behind it, stock
+       on the walls. The rest of the unit stays a closed box. */
     {
-      const unitOpp = (x0, x1, hh, wallC, doorC, name, nameC) => {
-        const zf = 14, d = 11, cx = (x0 + x1) / 2, w = x1 - x0;
-        B.add('plainWall', new T.BoxGeometry(w, hh, d), at4(cx, hh / 2, zf + d / 2), wallC);
+      const inM = new T.MeshStandardMaterial({ color: 0xD9D5C9, emissive: 0x77736B, roughness: 0.95 }), floorM = new T.MeshStandardMaterial({ color: 0x9A968C, emissive: 0x3E3C38, roughness: 0.7 });
+      const darkM = new T.MeshStandardMaterial({ color: 0x2A2E30, emissive: 0x101213, roughness: 0.6, metalness: 0.3 }), topM = new T.MeshStandardMaterial({ color: 0xB58A56, emissive: 0x3A2C1B, roughness: 0.6 });
+      const lineM = new T.MeshBasicMaterial({ color: 0xE9E9E2, toneMapped: false });
+      const pl = (wd, ht, x, y, z, rx, ry) => { const g = new T.PlaneGeometry(wd, ht); g.applyMatrix4(new T.Matrix4().makeRotationFromEuler(new T.Euler(rx || 0, ry || 0, 0, 'YXZ')).setPosition(x, y, z)); return g; };
+      const bx = (wd, ht, dp, x, y, z) => { const g = new T.BoxGeometry(wd, ht, dp); g.translate(x, y, z); return g; };
+      const cy = (r, ht, x, y, z, seg) => { const g = new T.CylinderGeometry(r, r, ht, seg || 14); g.translate(x, y, z); return g; };
+      const add = (list, mat, shadow) => { const m = new T.Mesh(mergeGeo(list.map(g => [g, null])), mat); m.receiveShadow = true; if (shadow) m.castShadow = true; sc.add(m); return m; };
+      const lines = [];
+      const unitOpp = (x0, x1, hh, wallC, doorC, name, nameC, id, accent) => {
+        const zf = 14, d = 11, cx = (x0 + x1) / 2, w = x1 - x0, S29 = SHOPS29.find(s => s.id === id), dcx = S29.dcx, rx0 = S29.rx0, rx1 = S29.rx1, RD = 5.2, DW = 1.7, DH = 2.3, CH = 3.3;
+        B.add('plainWall', new T.BoxGeometry(w, hh, d - RD), at4(cx, hh / 2, zf + RD + (d - RD) / 2), wallC);
+        B.add('plainWall', new T.BoxGeometry(rx0 - x0, hh, RD), at4((x0 + rx0) / 2, hh / 2, zf + RD / 2), wallC);
+        B.add('plainWall', new T.BoxGeometry(x1 - rx1, hh, RD), at4((rx1 + x1) / 2, hh / 2, zf + RD / 2), wallC);
+        B.add('plainWall', new T.BoxGeometry(rx1 - rx0, hh - CH, RD), at4((rx0 + rx1) / 2, CH + (hh - CH) / 2, zf + RD / 2), wallC);
         B.add('roofDark', new T.BoxGeometry(w + 0.4, 0.3, d + 0.4), at4(cx, hh + 0.15, zf + d / 2));
+        /* the front: one picture over three panels, with the doorway left out of it */
+        const px = x => Math.round((0.5 - (x - cx) / w) * 512), py = y => Math.round((1 - y / hh) * 256);
         const f = signTex(512, 256, (c, cw, ch) => {
           c.fillStyle = wallC; c.fillRect(0, 0, cw, ch); c.strokeStyle = 'rgba(0,0,0,.12)'; c.lineWidth = 2; for (let xx = 0; xx < cw; xx += 10) { c.beginPath(); c.moveTo(xx, 50); c.lineTo(xx, ch); c.stroke(); }
           c.fillStyle = '#1D2521'; c.fillRect(30, 8, cw - 60, 38); c.fillStyle = nameC; c.font = '900 30px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(name, cw / 2, 28);
-          c.fillStyle = doorC; c.fillRect(60, 96, 210, ch - 96); c.fillStyle = 'rgba(0,0,0,.18)'; for (let yy = 100; yy < ch; yy += 9) c.fillRect(60, yy, 210, 2);
-          c.fillStyle = '#2C3E4A'; c.fillRect(310, 110, 70, 90); c.fillRect(400, 110, 70, 90); c.fillStyle = '#4A4F4D'; c.fillRect(330, 205, 40, ch - 205);
+          c.fillStyle = doorC; c.fillRect(60, 96, 200, ch - 96); c.fillStyle = 'rgba(0,0,0,.18)'; for (let yy = 100; yy < ch; yy += 9) c.fillRect(60, yy, 200, 2);
+          /* the shop end: a lit window, and a board over the door */
+          const wx0 = px(dcx - DW / 2 - 0.5), wx1 = px(dcx - DW / 2 - 3.0);
+          c.fillStyle = '#20303A'; c.fillRect(Math.min(wx0, wx1), py(2.5), Math.abs(wx1 - wx0), py(0.9) - py(2.5)); c.fillStyle = 'rgba(255,236,190,.55)'; c.fillRect(Math.min(wx0, wx1) + 4, py(2.5) + 4, Math.abs(wx1 - wx0) - 8, py(0.9) - py(2.5) - 8);
+          c.fillStyle = '#1D2521'; c.fillRect(px(dcx + 1.9), py(DH + 0.85), px(dcx - 1.9) - px(dcx + 1.9), py(DH + 0.25) - py(DH + 0.85));
+          c.fillStyle = '#FFFFFF'; c.font = '900 14px "Big Shoulders Display", Impact, sans-serif'; c.fillText('TRADE COUNTER', px(dcx), (py(DH + 0.85) + py(DH + 0.25)) / 2 + 1);
         });
-        const fm = new T.Mesh(new T.PlaneGeometry(w, hh), new T.MeshStandardMaterial({ map: f, roughness: 0.8 })); fm.position.set(cx, hh / 2, zf - 0.02); fm.rotation.y = PI; sc.add(fm);
+        const fmat = new T.MeshStandardMaterial({ map: f, roughness: 0.8 }), front = [];
+        const piece = (xa, xb, ya, yb) => { const g = new T.PlaneGeometry(xb - xa, yb - ya), uv = g.attributes.uv, u0 = (cx - xb) / w + 0.5, u1 = (cx - xa) / w + 0.5; for (let i = 0; i < uv.count; i++) uv.setXY(i, u0 + uv.getX(i) * (u1 - u0), ya / hh + uv.getY(i) * (yb - ya) / hh); g.applyMatrix4(new T.Matrix4().makeRotationY(PI).setPosition((xa + xb) / 2, (ya + yb) / 2, zf - 0.02)); front.push(g); };
+        piece(x0, dcx - DW / 2, 0, hh); piece(dcx + DW / 2, x1, 0, hh); piece(dcx - DW / 2, dcx + DW / 2, DH, hh);
+        sc.add(new T.Mesh(mergeGeo(front.map(g => [g, null])), fmat));
         B.add('paving', quadG([x0, 0.035, zf], [x1, 0.035, zf], [x1, 0.035, zf - 6], [x0, 0.035, zf - 6], [0, 0, w / 3, 2]));
+        /* inside: walls, a ceiling, a floor */
+        const zb = zf + RD, walls = [pl(rx1 - rx0, CH, (rx0 + rx1) / 2, CH / 2, zb - 0.02, 0, PI), pl(RD, CH, rx0 + 0.02, CH / 2, zf + RD / 2, 0, PI / 2), pl(RD, CH, rx1 - 0.02, CH / 2, zf + RD / 2, 0, -PI / 2), pl(rx1 - rx0, RD, (rx0 + rx1) / 2, CH - 0.02, zf + RD / 2, PI / 2, 0),
+          pl(dcx - DW / 2 - rx0, CH, (rx0 + dcx - DW / 2) / 2, CH / 2, zf + 0.02, 0, 0), pl(rx1 - dcx - DW / 2, CH, (dcx + DW / 2 + rx1) / 2, CH / 2, zf + 0.02, 0, 0), pl(DW, CH - DH, dcx, (DH + CH) / 2, zf + 0.02, 0, 0)];
+        add(walls, inM);
+        add([pl(rx1 - rx0, RD + 0.4, (rx0 + rx1) / 2, 0.045, zf + RD / 2 - 0.2, -PI / 2, 0)], floorM);
+        /* the counter, a till, a door frame, shelving down both sides */
+        const dark = [bx(3.0, 1.0, 0.6, dcx, 0.5, zf + 3.5), bx(0.34, 0.26, 0.3, dcx + 0.9, 1.16, zf + 3.5), bx(0.09, DH + 0.06, 0.2, dcx - DW / 2 - 0.045, (DH + 0.06) / 2, zf), bx(0.09, DH + 0.06, 0.2, dcx + DW / 2 + 0.045, (DH + 0.06) / 2, zf), bx(DW + 0.18, 0.09, 0.2, dcx, DH + 0.045, zf)];
+        for (const sx of [rx0 + 0.33, rx1 - 0.33]) { for (const y of [0.05, 0.75, 1.45, 2.15]) dark.push(bx(0.58, 0.05, 3.7, sx, y, zf + 2.95)); for (const z of [zf + 1.12, zf + 2.95, zf + 4.78]) dark.push(bx(0.58, 2.2, 0.05, sx, 1.1, z)); }
+        add(dark, darkM, true);
+        add([bx(3.1, 0.05, 0.7, dcx, 1.025, zf + 3.5)], topM);
+        /* what's on the shelves says what the place sells */
+        const goods = [], accM = new T.MeshStandardMaterial({ color: new T.Color(accent), emissive: new T.Color(accent).multiplyScalar(0.25), roughness: 0.6 });
+        for (const sx of [rx0 + 0.33, rx1 - 0.33]) for (let k = 0; k < 3; k++) for (let i = 0; i < 6; i++) {
+          const z = zf + 1.4 + i * 0.58, y = 0.075 + k * 0.7;
+          if (id === 'tyres') { const g = new T.CylinderGeometry(0.31, 0.31, 0.2, 16); g.rotateZ(PI / 2); g.translate(sx, y + 0.31, z); goods.push(g); }
+          else if (id === 'panel') goods.push(cy(0.11 + (i % 2) * 0.03, 0.24 + (i % 3) * 0.05, sx, y + 0.13 + (i % 3) * 0.025, z));
+          else goods.push(bx(0.4, 0.2 + (i % 3) * 0.1, 0.4, sx, y + 0.1 + (i % 3) * 0.05, z));
+        }
+        add(goods, id === 'tyres' ? darkM : accM);
+        const who = person({ skin: ['#E0AC85', '#8D5A3B', '#C68E63'][SHOPS29.indexOf(S29)], top: accent, legs: '#2A2E30', hair: ['#3B2A1F', '#1B1B1B', '#7A7A78'][SHOPS29.indexOf(S29)], h: 1, hairDo: 'short', topDo: 'shirt', bottom: 'trousers', glasses: id === 'factors', beard: id === 'tyres' });
+        who.position.set(dcx - 0.3, 0.045, zf + 4.3); who.rotation.y = PI / 2; sc.add(bake20(who));
+        /* bays marked out on the paving, clear of the path to the door */
+        for (let x = x0 + 0.8; x <= x1 - 0.5; x += 2.75) { if (Math.abs(x - dcx) < 2.4 || Math.abs(x - 2.75 - dcx) < 1.0) continue; lines.push(pl(0.1, 4.6, x, 0.05, 10.7, -PI / 2, 0)); }
       };
-      unitOpp(-11, 3, 6.5, '#7D8C99', '#B9BFC3', 'BRICKFIELD TYRES', '#F2B705');
-      unitOpp(4.5, 18.5, 7.2, '#A04B3A', '#C9C4BA', 'PANEL PRO BODYSHOP', '#FFFFFF');
-      unitOpp(20, 34, 6, '#5E7D63', '#AEB4B0', 'UNIT 7 · MOTOR FACTORS', '#F4F2EA');
-      for (const x of [-6, 11, 27]) { const p = liteCar({ paint: rpick(['#D8D7D2', '#2D4C78', '#B4392F', '#3F5E47', '#16191A']), style: rpick(['van', 'hatch', 'estate', 'pickup']) }); p.position.set(x, 0.03, 10.6); p.rotation.y = PI / 2 + (Math.random() - 0.5) * 0.2; sc.add(p); }
+      unitOpp(-11, 3, 6.5, '#7D8C99', '#B9BFC3', 'BRICKFIELD TYRES', '#F2B705', 'tyres', '#F2B705');
+      unitOpp(4.5, 18.5, 7.2, '#A04B3A', '#C9C4BA', 'PANEL PRO BODYSHOP', '#FFFFFF', 'panel', '#D9482B');
+      unitOpp(20, 34, 6, '#5E7D63', '#AEB4B0', 'UNIT 7 · MOTOR FACTORS', '#F4F2EA', 'factors', '#2F6DB5');
+      /* the zebra crossing, and its two beacons */
+      for (let z = -0.55; z < 7.6; z += 1.0) lines.push(pl(CROSS29[1] - CROSS29[0] + 0.2, 0.5, (CROSS29[0] + CROSS29[1]) / 2, 0.046, z + 0.25, -PI / 2, 0));
+      { const m = new T.Mesh(mergeGeo(lines.map(g => [g, null])), lineM); m.renderOrder = 2; sc.add(m); }
+      for (const z of [-1.0, 8.2]) { B.add('metal', cylG(0.05, 0.05, 2.6, 8), at4(CROSS29[0] - 0.5, 1.3, z)); const bl = new T.Mesh(new T.SphereGeometry(0.16, 12, 10), new T.MeshBasicMaterial({ color: 0xFFB300, toneMapped: false })); bl.position.set(CROSS29[0] - 0.5, 2.75, z); sc.add(bl); }
+      for (const [x, z] of SHOP_CARS29) { const p = liteCar({ paint: rpick(['#D8D7D2', '#2D4C78', '#B4392F', '#3F5E47', '#16191A']), style: rpick(['van', 'hatch', 'estate', 'pickup']) }); p.position.set(x, 0.03, z); p.rotation.y = PI / 2 + (Math.random() - 0.5) * 0.12; sc.add(p); }
+      /* the auction: a board on the roundabout, flags, and today's lots lined up round the car park */
+      {
+        const brd = signTex(512, 160, (c, cw, ch) => { c.fillStyle = '#16242E'; c.fillRect(0, 0, cw, ch); c.fillStyle = '#F2B705'; c.fillRect(0, ch - 14, cw, 14); c.fillStyle = '#FFFFFF'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '900 62px "Big Shoulders Display", Impact, sans-serif'; c.fillText('CAR AUCTION', cw / 2, 58); c.fillStyle = '#F2B705'; c.font = '800 30px "Big Shoulders Display", Impact, sans-serif'; c.fillText('BRICKFIELD · TODAY', cw / 2, 116); });
+        const bm = new T.MeshStandardMaterial({ map: brd, roughness: 0.6, emissive: 0x222222, side: T.DoubleSide });
+        for (const ry of [0, PI / 2]) { const m = new T.Mesh(new T.PlaneGeometry(6.4, 2.0), bm); m.position.set(RBT.x, 4.2, RBT.z); m.rotation.y = ry; sc.add(m); }
+        for (const [dx, dz] of [[-3.1, 0], [3.1, 0], [0, -3.1], [0, 3.1]]) B.add('metal', cylG(0.08, 0.08, 5.2, 8), at4(RBT.x + dx, 2.6, RBT.z + dz));
+        for (let k = 0; k < 4; k++) { const a = PI / 4 + k * PI / 2, r = RBT.ro + 1.6, p = liteCar({ paint: ['#B4392F', '#2D4C78', '#D8D7D2', '#3F5E47'][k], style: ['hatch', 'saloon', 'estate', 'coupe'][k] }); p.position.set(RBT.x + Math.cos(a) * r, 0.04, RBT.z + Math.sin(a) * r); p.rotation.y = -a + PI / 2; sc.add(p); }
+      }
     }
     /* -- parked cars, half on the pavement, the way everyone does it -- */
     {
@@ -11960,8 +12084,23 @@ if ( uFx > 0.5 ) {
   /* where you can walk outside: the forecourt and yard, the strip in front of the car wash and the unit, the wash bay,
      and inside the unit through its doors */
   const inBox = (x, z, a) => x > a[0] && x < a[1] && z > a[2] && z < a[3];
+  /* build 29: the shops across the road. Each unit's front is at z = 14; its door is at dcx, and the room behind it
+     runs 3.4 m either side and 5.2 m back. You cross the road on the zebra at CROSS29 */
+  const SHOPS29 = [['tyres', -6.84], ['panel', 8.66], ['factors', 24.16]].map(([id, dcx]) => ({ id, dcx, rx0: dcx - 3.4, rx1: dcx + 3.4 }));
+  const CROSS29 = [7.0, 10.3], SHOP_CARS29 = [[-1.2, 10.7], [14.4, 10.7], [30.2, 10.7]];
+  function walkShop29(x, z) {
+    if (z < 8.1) return x > CROSS29[0] && x < CROSS29[1];
+    if (z < 13.8) { if (x < -10.7 || x > 33.7) return false; for (const c of SHOP_CARS29) if (Math.abs(x - c[0]) < 1.3 && Math.abs(z - c[1]) < 2.5) return false; return true; }
+    for (const s of SHOPS29) {
+      if (z < 14.35) { if (Math.abs(x - s.dcx) < 0.55) return true; continue; }
+      if (x > s.rx0 + 0.35 && x < s.rx1 - 0.35) return z < 17.0 && (z < 14.95 || (x > s.rx0 + 1.0 && x < s.rx1 - 1.0));
+    }
+    return false;
+  }
   const WALK_A = [[-12.4, 43.5, -30.5, -1.2], [-47.6, -12.2, -13.95, -4.4], [-20.9, -14.9, -31.7, -13.9], [-47.6, -24.4, -37.6, -14.25]];
+  window.__walkOk = (x, z) => walkOk(x, z);
   function walkOk(x, z) {
+    if (z > -1.25) return walkShop29(x, z);
     let ok = false;
     for (const a of WALK_A) if (inBox(x, z, a)) { ok = true; break; }
     if (!ok && z > -14.45 && z < -13.75 && ((x > UNIT.walkDoor[0] + 0.25 && x < UNIT.walkDoor[1] - 0.25) || (x > UNIT.door[0] + 0.3 && x < UNIT.door[1] - 0.3))) ok = true;
@@ -12001,6 +12140,10 @@ if ( uFx > 0.5 ) {
       w.phase += dt * speed * 2.6;
     }
     w.v = L > 0.01 ? speed : 0;
+    /* build 29: indoors you see through your own eyes (the camera behind you would be in the wall), and walking up to
+       a counter is asking to be served */
+    if (w.z > 13.7 && !w.fp) { w.fp = true; w.fpShop = true; } else if (w.z < 13.2 && w.fpShop) { w.fp = false; w.fpShop = false; }
+    { let sh = null; if (w.z > 15.5) for (const s of SHOPS29) if (Math.abs(w.x - s.dcx) < 3.3) sh = s.id; if (sh !== w.shop) { w.shop = sh; if (sh) d.ev.push({ type: 'shop', id: sh }); } }
     w.me.position.set(w.x, inBox(w.x, w.z, WALK_A[3]) ? 0.03 : 0, w.z); w.me.rotation.y = -w.phi; animPerson(w.me, dt, w.v); w.me.visible = !w.fp;
     /* which car are you next to? */
     let near = null, nearK = null, best = 3.4;
@@ -12314,8 +12457,18 @@ if ( uFx > 0.5 ) {
   api.extCamInfo = () => (ext ? { p: ext.camera.position.toArray().map(v => +v.toFixed(2)), d: ext.camera.getWorldDirection(new T.Vector3()).toArray().map(v => +v.toFixed(2)), fov: ext.camera.fov, aspect: +ext.camera.aspect.toFixed(2) } : null);
   /* a breakdown on the test-drive roads: the stranded car on the verge, hazards flashing, a triangle and the arrow */
   let MARK22 = null, MARKGLOW = null;
+  api.routeTag = k => { buildDriveWorld(); return dW.R.tags[k]; };
   api.routeMark = (s, spec) => {
     if (!dW) return;
+    /* build 29: a place to drive to, not a breakdown: just the column of light and the arrow */
+    if (s != null && spec && spec.flag) {
+      if (MARK22) { if (MARK22.parent) MARK22.parent.remove(MARK22); MARK22 = null; }
+      const q = pathAt(dW.R, s, 0, {}), g = new T.Group(); g.position.set(q.x, q.y || 0, q.z);
+      const beam = new T.Mesh(new T.CylinderGeometry(0.6, 0.6, 22, 18, 1, true), new T.MeshBasicMaterial({ color: 0xFFD21E, transparent: true, opacity: 0.28, depthWrite: false, toneMapped: false, side: T.DoubleSide }));
+      beam.position.set(0, 11, 0); g.add(beam); g.userData.beam = beam; g.userData.haz = []; dW.scene.add(g); MARK22 = g;
+      dW.bayArrow.position.set(q.x, 2.6 + (q.y || 0), q.z); dW.bayArrow.visible = true;
+      return;
+    }
     if (MARK22) { if (MARK22.parent) MARK22.parent.remove(MARK22); MARK22 = null; }
     if (s == null) { dW.bayArrow.visible = false; return; }
     const q = pathAt(dW.R, s, LANE + 3.0, {}), g = new T.Group();
@@ -14577,8 +14730,8 @@ function driveUi(on) {
   if (mode === 'route') {
     const job = RT.job;
     el.innerHTML = `<div class="dv-host"></div><div class="dv-ui">
-      <div class="dv-top"><button class="dv-x" data-dv="end" aria-label="End the drive">×</button><div class="dv-title"><b>${DSP && !DSP.arrived ? 'Call-out' : RT.purpose === 'road' ? 'Road test' : RT.purpose === 'fun' ? 'Out for a spin' : 'Test drive'}</b><span>${esc(job.car.model)} · ${RT.P.bhp} bhp</span></div><button class="dv-cam" data-dv="cam" aria-label="Change the camera">${camIco}</button></div>
-      ${DSP && !DSP.arrived ? `<div class="dv-lapchip dv-togo" aria-label="Distance to the breakdown"><span>To go</span><b class="dv-togo-m">…</b><small>${esc(DISP_TYPES[DSP.m.type].name)}</small></div>` : RT.purpose === 'fun' ? `<div class="dv-lapchip" aria-label="Lap time"><span>Lap</span><b class="dv-lapt">0:00.0</b><small>${S.rec && S.rec.lap ? 'Record ' + lapText(S.rec.lap.v) : 'No record yet'}</small></div>` : `<ol class="dv-tests" aria-label="Tests on the route">${DTESTS.map(([k, n]) => `<li data-t="${k}">${esc(n)}</li>`).join('')}</ol>`}
+      <div class="dv-top"><button class="dv-x" data-dv="end" aria-label="End the drive">×</button><div class="dv-title"><b>${AUCRUN && !AUCRUN.arrived ? 'To the auction' : DSP && !DSP.arrived ? 'Call-out' : RT.purpose === 'road' ? 'Road test' : RT.purpose === 'fun' ? 'Out for a spin' : 'Test drive'}</b><span>${esc(job.car.model)} · ${RT.P.bhp} bhp</span></div><button class="dv-cam" data-dv="cam" aria-label="Change the camera">${camIco}</button></div>
+      ${AUCRUN && !AUCRUN.arrived ? '<div class="dv-lapchip dv-togo" aria-label="Distance to the auction"><span>To go</span><b class="dv-togo-m">…</b><small>Car auction</small></div>' : DSP && !DSP.arrived ? `<div class="dv-lapchip dv-togo" aria-label="Distance to the breakdown"><span>To go</span><b class="dv-togo-m">…</b><small>${esc(DISP_TYPES[DSP.m.type].name)}</small></div>` : RT.purpose === 'fun' ? `<div class="dv-lapchip" aria-label="Lap time"><span>Lap</span><b class="dv-lapt">0:00.0</b><small>${S.rec && S.rec.lap ? 'Record ' + lapText(S.rec.lap.v) : 'No record yet'}</small></div>` : `<ol class="dv-tests" aria-label="Tests on the route">${DTESTS.map(([k, n]) => `<li data-t="${k}">${esc(n)}</li>`).join('')}</ol>`}
       <div class="dv-say" aria-live="polite" hidden><i class="dv-face">${esc(RT.cust[0])}</i><p></p></div>
       <div class="dv-dash" aria-hidden="true"><span class="dv-speed"><b>0</b><small>mph</small></span><span class="dv-gear">N</span><span class="dv-wheel"><svg viewBox="-12 -12 24 24"><circle r="9.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M-9 0h18M0 0v9" stroke="currentColor" stroke-width="2.6"/></svg></span><div class="dv-rev"><i></i></div><span class="dv-temp"><i></i></span>
         <span class="dv-lamps"><i class="lp-abs">ABS</i><i class="lp-eng">ENG</i><i class="lp-bat">BAT</i><i class="lp-oil">OIL</i></span>${RT.purpose === 'fun' ? '' : '<button class="dv-notes" data-dv="notes" aria-label="What you’ve noticed so far">Noticed <b>0</b></button>'}</div>
@@ -14688,6 +14841,7 @@ Car3D.onDriveTick = (D, dt) => {
   if (YW) { yardTick(D, dt); return; }
   const R = RT; if (!R || R.D !== D) return;
   if (R.dispatch) dispTick(D, dt);
+  if (R.auction) aucRunTick(D, dt);
   R.tick += dt;
   const job = R.job, kinds = new Set(R.open.map(id => CAT[id].kind)), has = k => kinds.has(k);
   /* cranking */
@@ -14831,6 +14985,7 @@ document.addEventListener('click', e => {
 /* the drive is over: write up what you found, then back to the workshop */
 function driveFinish(early) {
   const R = RT; if (!R) return;
+  if (R.auction) { AUCRUN = null; dispEndDrive(); render(); toast('You turned back. The auction runs all day.'); return; }
   if (R.dispatch) { DSP = null; dispEndDrive(); render(); toast('Call-out abandoned. It’s still on the radio if you want it.'); return; }
   R.ended = true;
   /* things you only see once you stop: steam, drips, the coolant level */
@@ -14980,7 +15135,7 @@ function yardUiHtml() {
     <div class="dv-say" aria-live="polite" hidden><i class="dv-face">R</i><p></p></div>
     <div class="yd-joy" hidden aria-hidden="true"><i></i></div>
     <div class="yd-card" hidden></div>
-    <p class="dv-hint">Drag on the left to walk · drag on the right to look round · tap a car</p>`;
+    <p class="dv-hint">Drag on the left to walk · on the right to look round · tap a car · the shops are over the zebra crossing</p>`;
 }
 function yardHeadSync() {
   const el = document.querySelector('#drive.dv-walk .dv-title span'); if (!el) return;
@@ -15045,7 +15200,7 @@ function yardTick(D, dt) {
       setTimeout(() => yardParked(score), 350);
     }
   } else {
-    D.ev.forEach(e => { if (e.type === 'enterGarage') { const p = e.pose; yardClose(); if (p) fpOpen('door', p); else setTimeout(() => fpOpen('door'), 30); return; } if (e.type === 'doorKnock') { driveSay('The roller door’s coming up. Walk in when it’s open.', true); return; } if (e.type === 'near') { if (e.no != null) yardCard(e.no); else if (e.uno != null) unitCard(e.uno); else if (Y.card != null) { const el = document.querySelector('#drive .yd-card'); if (el) el.hidden = true; Y.card = null; } } });
+    D.ev.forEach(e => { if (e.type === 'shop') { shopSheet(e.id); return; } if (e.type === 'enterGarage') { const p = e.pose; yardClose(); if (p) fpOpen('door', p); else setTimeout(() => fpOpen('door'), 30); return; } if (e.type === 'doorKnock') { driveSay('The roller door’s coming up. Walk in when it’s open.', true); return; } if (e.type === 'near') { if (e.no != null) yardCard(e.no); else if (e.uno != null) unitCard(e.uno); else if (Y.card != null) { const el = document.querySelector('#drive .yd-card'); if (el) el.hidden = true; Y.card = null; } } });
   }
   if (Y.sayQ && Y.sayQ.length && performance.now() - Y.sayT > 2600) driveSay(Y.sayQ.shift(), true);
   else if (Y.say && performance.now() - Y.sayT > 6000) { const el = document.querySelector('#drive .dv-say'); if (el) el.hidden = true; Y.say = null; }
@@ -18044,7 +18199,7 @@ function renderJobs() {
     </article>`).join('')}</div>`;
   const L = levelOf(S.xp);
   if (L >= 2 && S.lotsDay !== S.day) genLots();
-  h += '</div><div data-sub="auctions"><h2 class="sh">Car auction</h2>';
+  h += '</div><div data-sub="auctions"><h2 class="sh">Car auction</h2>' + (!TEST28() && canRoad() && L >= 2 ? `<p class="sh-sub">${S.aucDay === S.day ? 'You’re at the auction today: bid on any lot.' : 'Held at the car park by the roundabout. Drive the van over once, then bid on any lot for the rest of the day.'}</p>` : '');
   if (L < 2) h += '<div class="quiet">Project cars unlock at level 2. Buy them cheap at auction, find out what’s wrong, fix them and sell them on.</div>';
   else if (!S.lots.length) h += '<div class="quiet">Nothing left at auction today. New lots arrive tomorrow morning.</div>';
   else h += `<div class="board">${S.lots.map(l => `<article class="ticket lot${l.legend ? ' legend' : ''}">${l.legend ? '<span class="t-legend">★ Legend</span>' : ''}
@@ -18058,7 +18213,7 @@ function renderJobs() {
         <div><dt>Guide price</dt><dd>${money(l.price)}</dd></div>
         <div><dt>Worth fixed up</dt><dd>about ${money(Math.round(l.value * 0.9 / 10) * 10)}</dd></div>
       </dl>
-      <button class="btn primary wide" data-a="auction" data-id="${l.no}"${(free || unitFree('s')) && S.money >= Math.round(l.price * 0.45 / 50) * 50 ? '' : ' disabled'}>${!(free || unitFree('s')) ? 'Ramps and unit full' : S.money < Math.round(l.price * 0.45 / 50) * 50 ? `You need ${money(Math.round(l.price * 0.45 / 50) * 50)} to bid` : `Bid at auction · guide ${money(l.price)}`}</button>
+      <button class="btn primary wide" data-a="auction" data-id="${l.no}"${(free || unitFree('s')) && S.money >= Math.round(l.price * 0.45 / 50) * 50 ? '' : ' disabled'}>${!(free || unitFree('s')) ? 'Ramps and unit full' : S.money < Math.round(l.price * 0.45 / 50) * 50 ? `You need ${money(Math.round(l.price * 0.45 / 50) * 50)} to bid` : (!TEST28() && canRoad() && S.aucDay !== S.day ? `Drive to the auction · guide ${money(l.price)}` : `Bid at auction · guide ${money(l.price)}`)}</button>
     </article>`).join('')}</div>`;
   h += docksHtml22() + '</div><div data-sub="yard">' + gateHtml22();
   if (L >= 2 || (S.yard || []).length) { const yl = S.yard || [], yo = yl.filter(j => j.offer).length; h += `<h2 class="sh">Your yard</h2><div class="closeup"><p><b>${yl.length ? `${yl.length} car${yl.length > 1 ? 's' : ''} for sale` : 'Nothing for sale yet'}</b> <span class="muted">${yo ? `${yo} offer${yo > 1 ? 's' : ''} waiting. ` : ''}Park finished project cars on the yard and buyers come to you.</span></p><button class="btn" data-a="yard">Walk out to the yard</button></div>`; }
@@ -18125,6 +18280,7 @@ function renderGarage() {
       if (!nx) act = `<span class="ownedtag">${u.levels ? 'Maxed' : 'Owned'}</span>`;
       else if (u.needs && !own(u.needs)) act = `<button class="btn" disabled>Needs the ${esc(lc(UPGRADES.find(x => x.id === u.needs).name))}</button>`;
       else if (L < nx.lvl) act = `<button class="btn" disabled>Unlocks at level ${nx.lvl}</button>`;
+      else if (shopOf(u.id) && !TEST28()) act = `<button class="btn" data-a="shop-go" data-id="${shopOf(u.id)}">${money(nx.price)} · at ${esc(SHOPS[shopOf(u.id)].name)}</button>`;
       else act = `<button class="btn primary" data-a="buy" data-id="${u.id}"${S.money >= nx.price ? '' : ' disabled'}>${n ? 'Upgrade' : 'Buy'} · ${money(nx.price)}</button>`;
       const title2 = u.levels ? `${esc(u.name)} ${pips}` : esc(u.name);
       const body = u.levels ? `${have ? `<p class="have">Now: <b>${esc(have.name)}</b>. ${esc(have.desc)}</p>` : ''}${nx ? `<p>${n ? 'Next' : 'Level 1'}: <b>${esc(nx.name)}</b>. ${esc(nx.desc)}</p>` : ''}` : `<p>${esc(u.desc)}</p>`;
@@ -18132,7 +18288,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 28</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 29</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -18476,7 +18632,7 @@ document.addEventListener('click', e => {
     }
     case 'turn': if (SHELL) { const r = SHELL.turn(); try { localStorage.setItem(TURN_TIP, '1'); } catch (e) {} toast(r ? 'Turned round. Wrong way up? Tap it again.' : 'Back to normal.'); } break;
     case 'buylot': buyLot(Number(id)); break;
-    case 'auction': startAuction(Number(id)); break;
+    case 'auction': aucGo(Number(id)); break;
     case 'booth-go': { const j = cur(); if (j && j.respray && !j.respray.done && assembled(j) && !BT) startRespray(j); break; }
     case 'booth-next': if (BT && !BT.locked && !BT.wait) { const tl = BOOTH_TOOLS[BT.stage]; if (BT.stage === 'mask' || (tl && tl.want && boothProgress() >= tl.min)) { BT.locked = true; boothNext(); } } break;
     case 'booth-peel-all': if (BT && BT.stage === 'peel' && !BT.locked) { BT.masked[BT.side].forEach(i2 => { const pc = boothPiece(i2); if (pc) BT.peels.push(Object.assign(pc, { t0: performance.now() })); }); BT.masked[BT.side].clear(); boothPaper(); Sfx.peel(); BT.locked = true; setTimeout(() => { if (BT) boothNext(); }, 500); } break;
@@ -18515,6 +18671,9 @@ document.addEventListener('click', e => {
     case 'pressure': pressure(); break;
     case 'locked': goGarage(); break;
     case 'accept': acceptJob(Number(id)); break;
+    case 'shop-go': shopGo(id); break;
+    case 'shop-buy': shopBuy(id); break;
+    case 'shop-close': closeModal(); SHOP_AT = null; break;
     case 'desk-go': deskGo(Number(id) || null); break;
     case 'desk-book': deskBook(Number(id)); break;
     case 'desk-no': deskNo(Number(id)); break;
@@ -18618,7 +18777,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 28;
+const BUILD = 29;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -23386,6 +23545,17 @@ function showWhatsNew28(had27) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 29: what's new */
+function showWhatsNew29(had28) {
+  showModal(`<div><span class="label">Build 29</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Three shops across the road.</b> Unit 7 Motor Factors, Brickfield Tyres and Panel Pro Bodyshop have real doors now. Use the zebra crossing, walk in, and go up to the counter.</li>
+      <li><b>Bought over the counter.</b> Tools and testers come from the Motor Factors, tyre kit from Brickfield Tyres, spray kit, paint and signs from Panel Pro. The Garage page shows the price and which shop; ramps, staff and services are still arranged from the office.</li>
+      <li><b>Drive to the auction.</b> The car auction is at the car park by the roundabout. Take the van over once, then bid on any lot for the rest of the day.</li>
+      ${had28 ? '' : '<li><b>Reception and a slower climb.</b> Walk into reception, man the desk in a new garage, and areas open as you level up.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -23393,8 +23563,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen28) { const had27 = !!S.seen27; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; save(); setTimeout(() => showWhatsNew28(had27), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen29) { const had28 = !!S.seen28; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; save(); setTimeout(() => showWhatsNew29(had28), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
