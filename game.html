@@ -1692,6 +1692,13 @@ body.mg-on{overflow:hidden}
 .story-card{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--panel);border-radius:14px;padding:14px;margin-top:12px}
 .story-card>div{flex:1;min-width:200px}
 .story-card b{font-family:var(--font-display);font-weight:900;font-size:22px;text-transform:uppercase}
+.set34{display:grid;gap:12px;width:100%;margin:4px 0 8px}
+.set34-row{display:grid;gap:5px}.set34-row b{font-size:14px}.set34-row small{color:var(--muted);font-size:12px;line-height:1.35}
+.seg34{display:flex;flex-wrap:wrap;gap:6px}.seg34-b{flex:1 1 auto;min-height:38px;padding:0 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);font-weight:700;font-size:13px;cursor:pointer}
+.seg34-b[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+body.lefty34 .dv-ctrl{flex-direction:row-reverse}body.lefty34 .dv-pedals{flex-direction:row-reverse}
+.title34{text-align:center;padding:6px 0 4px}.title34-h{font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:900;font-size:56px;line-height:.95;letter-spacing:.02em;text-transform:uppercase;margin:6px 0 4px}
+.title34-g{font-weight:800;font-size:18px;margin:0}.title34-s{color:var(--muted);margin:6px 0 14px}.title34-row{display:flex;gap:8px;margin-top:8px}.title34-row .btn{flex:1}
 </style>
 </head>
 <body>
@@ -2589,7 +2596,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5056,7 +5063,7 @@ function makeRig(cfg) {
     while (T.yaw - R.yaw < -Math.PI) T.yaw += 2 * Math.PI;
     constrain(T); animating = true;
   }
-  function orbit(dx, dy) { R.yaw += dx * 0.008; R.pitch += dy * 0.006; constrain(R); settle(); }
+  function orbit(dx, dy) { const k = (window.__camK34 || 1); R.yaw += dx * 0.008 * k; R.pitch += dy * 0.006 * k; constrain(R); settle(); }
   function zoom(f) { if (!(f > 0) || !isFinite(f)) return; R.dist *= cl(f, 0.5, 2); constrain(R); settle(); }
   function pan(dx, dy, viewH, fovDeg) {
     const wpp = 2 * R.dist * Math.tan(fovDeg * Math.PI / 360) / Math.max(1, viewH);
@@ -6833,6 +6840,29 @@ const Car3D = (() => {
     car.userData.lay32 = { cx: (xr + (rows.length ? rows[rows.length - 1] : seatX)) / 2 - 0.1, cy: seatY + 0.2, fx: xr - 0.15, fy: seatY + 0.3, d: Math.max(0.8, Math.min(1.05, xr - 0.15 - back32 - 0.12)) };
   }
 
+  /* ======================= build 34: the job board ======================= */
+  const BOARD34 = { data: { jobs: [], keys: [], sub: '' }, sig: '', tex: null, mesh: null, keys: null, kz: 0 };
+  function drawBoard34(c, w, h) {
+    const D34 = BOARD34.data;
+    c.fillStyle = '#B98B5A'; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 900; i++) { c.fillStyle = i % 3 ? 'rgba(90,55,25,0.25)' : 'rgba(255,230,190,0.18)'; c.fillRect((i * 97) % w, (i * 61 + (i >> 4)) % h, 3, 3); }
+    c.textBaseline = 'alphabetic'; c.textAlign = 'left'; c.fillStyle = '#1C1D1F';
+    c.font = '900 64px "Big Shoulders Display", Impact, sans-serif'; c.fillText('JOBS', 26, 70);
+    c.font = '700 30px Barlow, sans-serif'; c.textAlign = 'right'; c.fillText(D34.sub || '', w - 30, 64); c.textAlign = 'left';
+    const cards = (D34.jobs || []).slice(0, 8);
+    cards.forEach((j, i) => {
+      const cx = 26 + (i % 4) * 246, cy = 100 + Math.floor(i / 4) * 186, rot = ((i * 37) % 7 - 3) * 0.012;
+      c.save(); c.translate(cx + 110, cy + 80); c.rotate(rot);
+      c.fillStyle = 'rgba(0,0,0,0.25)'; c.fillRect(-104, -74, 220, 160);
+      c.fillStyle = j.col || '#F4E38A'; c.fillRect(-110, -80, 220, 160);
+      c.fillStyle = '#C8372D'; c.beginPath(); c.arc(0, -64, 9, 0, 7); c.fill();
+      c.fillStyle = '#1C1D1F'; c.textAlign = 'center';
+      c.font = '800 27px Barlow, sans-serif'; c.fillText(String(j.a || '').toUpperCase(), 0, -22, 200);
+      c.font = '600 23px Barlow, sans-serif'; c.fillText(String(j.b || ''), 0, 14, 200); c.fillText(String(j.c || ''), 0, 48, 200);
+      c.restore();
+    });
+    if (!cards.length) { c.fillStyle = '#1C1D1F'; c.font = '700 34px Barlow, sans-serif'; c.textAlign = 'center'; c.fillText('Nothing on. Take a job from the board.', w / 2, h / 2 + 20); }
+  }
   function buildTrim() {
     const R = sty.rear, fxF = y => SK24.faceX(true, y), fxR = y => SK24.faceX(false, y);
     const lowX = sty.classic ? 2.185 : fxF(0.36) + 0.002;
@@ -9183,6 +9213,16 @@ if ( uFx > 0.5 ) {
     });
     const face = new T.Mesh(new T.CircleGeometry(0.34, 40), pbr('#FFFFFF', { map: faceTex, roughness: 0.25 }));
     face.position.set(-4.0, 3.5, -D + 0.04); g.add(face);
+    /* build 34: the job board above the bench, and the key rack beside it */
+    {
+      const B = BOARD34;
+      B.tex = canvasTex(1024, 480, (c, w, h) => drawBoard34(c, w, h));
+      B.mesh = new T.Mesh(new T.PlaneGeometry(2.6, 1.22), pbr('#FFFFFF', { map: B.tex, roughness: 0.85 })); B.mesh.position.set(-7.0, 3.2, -D + 0.072); g.add(B.mesh);
+      g.add(box(2.7, 1.32, 0.036, pbr('#6B4A2E', { roughness: 0.7 }), -7.0, 3.2, -D + 0.052));
+      g.add(rbox(1.0, 0.34, 0.04, 0.015, pbr('#6B4A2E', { roughness: 0.7 }), -9.4, 2.05, -D + 0.05));
+      for (let i = 0; i < 6; i++) g.add(cyl(0.01, 0.07, M.zinc, -9.775 + i * 0.15, 2.12, -D + 0.1, 'z', 6));
+      B.keys = new T.Group(); g.add(B.keys); B.kz = -D + 0.115;
+    }
     { const rim = new T.Mesh(new T.TorusGeometry(0.35, 0.025, 8, 40), M.blackPlastic); rim.position.set(-4.0, 3.5, -D + 0.035); g.add(rim); }
     const hand = (len, wd) => { const geo = new T.BoxGeometry(wd, len, 0.006); geo.translate(0, len / 2 - 0.03, 0); const m = new T.Mesh(geo, M.dark); m.position.set(-4.0, 3.5, -D + 0.05); g.add(m); return m; };
     clockH = hand(0.19, 0.024); clockM = hand(0.28, 0.016);
@@ -10778,7 +10818,7 @@ if ( uFx > 0.5 ) {
   function fpPointer(type, e) {
     const f = fp; if (!f) return;
     const r = canvas.getBoundingClientRect();
-    if (type === 'down') { FPP.id = e.pointerId; FPP.x = e.clientX; FPP.y = e.clientY; FPP.lx = null; FPP.ly = null; FPP.t = performance.now(); FPP.moved = false; FPP.side = e.clientX - r.left < r.width * 0.45 ? 'joy' : 'look'; return; }
+    if (type === 'down') { FPP.id = e.pointerId; FPP.x = e.clientX; FPP.y = e.clientY; FPP.lx = null; FPP.ly = null; FPP.t = performance.now(); FPP.moved = false; FPP.side = (e.clientX - r.left < r.width * 0.45) !== PREF34.lefty ? 'joy' : 'look'; return; }
     if (e.pointerId !== FPP.id) return;
     const dx = e.clientX - FPP.x, dy = e.clientY - FPP.y;
     if (type === 'move') {
@@ -12692,7 +12732,7 @@ if ( uFx > 0.5 ) {
     if (d.shiftT > 0) d.shiftT -= dt;
     /* steering: lane assist keeps you in the left lane; your input adds to it; faults pull */
     const tgtIn = d.in.steerOn ? d.in.steer : (d.in.left ? 1 : 0) - (d.in.right ? 1 : 0);
-    d.steerIn += (tgtIn - d.steerIn) * Math.min(1, dt * 5);
+    d.steerIn += (tgtIn - d.steerIn) * Math.min(1, dt * 5 * PREF34.steer);
     const Ld = Math.max(4, 0.75 * d.v + 2), e = (LANE - d.d) - Ld * Math.sin(d.psi);
     const ff = Math.atan(LW * q.k), assist = ff + Math.atan(2 * LW * e / (Ld * Ld));
     const pull = d.mod.pull + d.mod.brakePull * d.in.brake;
@@ -12830,7 +12870,7 @@ if ( uFx > 0.5 ) {
   }
   function freeStep(d, dt) {
     const tgtIn = d.in.steerOn ? d.in.steer : (d.in.left ? 1 : 0) - (d.in.right ? 1 : 0);
-    d.steerIn += (tgtIn - d.steerIn) * Math.min(1, dt * 4);
+    d.steerIn += (tgtIn - d.steerIn) * Math.min(1, dt * 4 * PREF34.steer);
     d.delta = d.steerIn * DMAX * 0.85;
     const dir = d.in.rev ? -1 : 1, top = d.in.rev ? 2.4 : 5.5;
     let a = d.in.gas * 2.4 * dir - Math.sign(d.v) * (d.in.brake * 6 + 0.35);
@@ -12998,6 +13038,9 @@ if ( uFx > 0.5 ) {
     dW.dome.position.set(camera.position.x, 0, camera.position.z);
   }
   function driveFrame(now) {
+    /* battery saver: 30 frames a second while driving or walking */
+    if (PREF34.gfx === 'save' && PREF34.last && now - PREF34.last < 30) { raf = requestAnimationFrame(frame); return; }
+    PREF34.last = now;
     try { driveFrameIn(now); }
     catch (e) { const d = drv; try { driveEnd(); } catch (_) { drv = null; } if (api.onDriveError) api.onDriveError(e, d); }
   }
@@ -13028,6 +13071,8 @@ if ( uFx > 0.5 ) {
   }
   /* keep it smooth: drop the resolution a notch when frames run slow, raise it again when there's room */
   const DPR_MAX = Math.min(window.devicePixelRatio || 1, 1.75);
+  /* build 34: the player's preferences (Garage > Settings) */
+  const PREF34 = { steer: 1, lefty: false, gfx: 'auto', cap: DPR_MAX, last: 0 };
   let dprNow = DPR_MAX, dprT = 0, dprAvg = 1 / 60;
   function adaptDpr(dt) {
     if (window.__fixedDpr) return;
@@ -13036,7 +13081,8 @@ if ( uFx > 0.5 ) {
     dprT = 0;
     let next = dprNow;
     if (dprAvg > 1 / 40 && dprNow > 0.75) next = Math.max(0.75, dprNow - 0.25);
-    else if (dprAvg < 1 / 55 && dprNow < DPR_MAX) next = Math.min(DPR_MAX, dprNow + 0.25);
+    else if (dprAvg < 1 / 55 && dprNow < PREF34.cap) next = Math.min(PREF34.cap, dprNow + 0.25);
+    if (next > PREF34.cap) next = PREF34.cap;
     if (next !== dprNow) { dprNow = next; renderer.setPixelRatio(dprNow); const w = stage.clientWidth, h = stage.clientHeight; if (w && h) renderer.setSize(w, h, false); }
   }
   let dprMove22 = null, dprIdle22 = 0;
@@ -13070,7 +13116,7 @@ if ( uFx > 0.5 ) {
     const d = drv; if (!d) return;
     if (d.mode !== 'walk') return;
     const w = d.walk, r = canvas.getBoundingClientRect();
-    if (type === 'down') { DP.id = e.pointerId; DP.x = e.clientX; DP.y = e.clientY; DP.lx = null; DP.ly = null; DP.t = performance.now(); DP.moved = false; DP.side = e.clientX - r.left < r.width * 0.5 ? 'joy' : 'look'; return; }
+    if (type === 'down') { DP.id = e.pointerId; DP.x = e.clientX; DP.y = e.clientY; DP.lx = null; DP.ly = null; DP.t = performance.now(); DP.moved = false; DP.side = (e.clientX - r.left < r.width * 0.5) !== PREF34.lefty ? 'joy' : 'look'; return; }
     if (e.pointerId !== DP.id) return;
     const dx = e.clientX - DP.x, dy = e.clientY - DP.y;
     if (type === 'move') {
@@ -13540,6 +13586,44 @@ if ( uFx > 0.5 ) {
       POST.ok = true;
     } catch (e) { POST.ok = false; window.__postErr = String(e && e.message || e); }
   })();
+  api.prefs34 = o => {
+    PREF34.steer = { gentle: 0.55, normal: 1, quick: 1.7 }[o.steer] || 1; PREF34.lefty = o.hand === 'left';
+    window.__camK34 = { slow: 0.55, normal: 1, fast: 1.7 }[o.cam] || 1;
+    PREF34.gfx = o.gfx === 'save' || o.gfx === 'sharp' ? o.gfx : 'auto';
+    PREF34.cap = PREF34.gfx === 'save' ? Math.min(1, DPR_MAX) : PREF34.gfx === 'sharp' ? Math.min(window.devicePixelRatio || 1, 2) : DPR_MAX;
+    if (!window.__fixedDpr && dprNow > PREF34.cap) setDpr22(PREF34.cap);
+    POST.user = PREF34.gfx === 'save' ? false : o.fx !== false; shadowDirty = true; kick();
+    return Object.assign({}, PREF34);
+  };
+  api.prefsGet34 = () => Object.assign({ camK: window.__camK34 || 1, dpr: dprNow }, PREF34);
+  /* for the tests: a photo of the job board and key rack from in front of them */
+  api.boardShot34 = (w, h) => {
+    const B = BOARD34; if (!B.mesh) return null;
+    scene.updateMatrixWorld(true);
+    const p = B.mesh.getWorldPosition(new T.Vector3()), n = new T.Vector3(0, 0, 1).transformDirection(B.mesh.matrixWorld), cam = new T.PerspectiveCamera(50, w / h, 0.1, 100);
+    cam.position.copy(p).addScaledVector(n, 3.4); cam.position.y -= 0.35; cam.position.addScaledVector(new T.Vector3().crossVectors(n, new T.Vector3(0, 1, 0)), window.__shotSide34 || 0.9); cam.lookAt(p.x, p.y - 0.4, p.z);
+    const size = renderer.getSize(new T.Vector2()), pr = renderer.getPixelRatio();
+    renderer.setPixelRatio(1); renderer.setSize(w, h, false); renderer.render(scene, cam); const url = canvas.toDataURL('image/jpeg', 0.86);
+    renderer.setPixelRatio(pr); renderer.setSize(size.x, size.y, false); kick(); return url;
+  };
+  window.__boardShot34 = (w, h) => api.boardShot34(w, h);
+  api.board34 = data => {
+    const B = BOARD34; if (!B.tex || !data) return false;
+    const sig = JSON.stringify(data); if (sig === B.sig) return false;
+    B.sig = sig; B.data = data;
+    try { const cv = B.tex.image, ctx = fitText(cv.getContext('2d')); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); ctx.save(); drawBoard34(ctx, cv.width, cv.height); ctx.restore(); B.tex.needsUpdate = true; } catch (e) { /* the board stays as it was */ }
+    if (B.keys) {
+      B.keys.children.slice().forEach(k => { B.keys.remove(k); k.traverse(m => { if (m.geometry) m.geometry.dispose(); if (m.material && m.userData.own) m.material.dispose(); }); });
+      (data.keys || []).slice(0, 6).forEach(k => {
+        const kg = new T.Group(), x = -9.775 + k.slot * 0.15;
+        kg.add(at(new T.Mesh(new T.TorusGeometry(0.022, 0.005, 5, 12), M.zinc), 0, -0.022, 0));
+        kg.add(at(new T.Mesh(new T.BoxGeometry(0.016, 0.07, 0.005), M.zinc), 0, -0.08, 0));
+        const tagM = pbr(k.col || '#F2B705', { roughness: 0.6 }), tag = at(new T.Mesh(new T.BoxGeometry(0.07, 0.1, 0.008), tagM), 0.035, -0.12, 0.006); tag.userData.own = true; kg.add(tag);
+        kg.position.set(x, 2.12, B.kz); kg.rotation.z = (k.slot % 2 ? 0.08 : -0.06); B.keys.add(kg);
+      });
+    }
+    kick(); return true;
+  };
   api.post = v => { if (v != null) { POST.user = !!v; shadowDirty = true; } return { ok: POST.ok, user: POST.user, auto: POST.auto }; };
   window.__post = () => ({ ok: POST.ok, user: POST.user, auto: POST.auto, err: window.__postErr || null });
   api.stageEl = () => stage;
@@ -15553,7 +15637,7 @@ function driveUi(on) {
 function steerBind(el) {
   const pad = el.querySelector('[data-steer]'); if (!pad) return;
   const sw = pad.querySelector('.dv-sw'); let pid = null;
-  const set = e => { const D = RT ? RT.D : YW ? YW.D : null; if (!D) return; const r = pad.getBoundingClientRect(), k = clamp((e.clientX - (r.left + r.width / 2)) / (r.width * 0.4), -1, 1); D.in.steerOn = true; D.in.steer = -k; if (sw) sw.style.transform = `translateX(${(k * r.width * 0.32).toFixed(1)}px) rotate(${(k * 110).toFixed(0)}deg)`; };
+  const set = e => { const D = RT ? RT.D : YW ? YW.D : null; if (!D) return; const r = pad.getBoundingClientRect(), k = clamp((e.clientX - (r.left + r.width / 2)) / (r.width * 0.4 / steerK34()), -1, 1); D.in.steerOn = true; D.in.steer = -k; if (sw) sw.style.transform = `translateX(${(k * r.width * 0.32).toFixed(1)}px) rotate(${(k * 110).toFixed(0)}deg)`; };
   const off = () => { pid = null; pad.classList.remove('down'); const D = RT ? RT.D : YW ? YW.D : null; if (D) { D.in.steer = 0; D.in.steerOn = false; } if (sw) sw.style.transform = ''; };
   pad.addEventListener('pointerdown', e => { e.preventDefault(); pid = e.pointerId; try { pad.setPointerCapture(pid); } catch (_) { /* old browser */ } pad.classList.add('down'); set(e); });
   pad.addEventListener('pointermove', e => { if (e.pointerId === pid) set(e); });
@@ -19145,7 +19229,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 33</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 34</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -19340,7 +19424,7 @@ function render() {
   achCheck();
   const ae = document.activeElement;
   const key = ae && ae.dataset && ae.dataset.a ? ae.dataset.a + '|' + (ae.dataset.id || ae.dataset.z || ae.dataset.v || '') : null;
-  renderHud();
+  renderHud(); if (S) board34Sync();
   if (!areaOpen(S.view)) S.view = 'workshop';
   sizeStage(); wasLand = isLandscape();
   ['workshop', 'jobs', 'daily', 'collection', 'garage'].forEach(v => {
@@ -19635,7 +19719,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 33;
+const BUILD = 34;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -24341,8 +24425,9 @@ function showWhatsNew23() {
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
 /* build 24: the lighting-effects switch, and what's new */
-hookOn('ensure', () => { try { if (Car3D.ok && Car3D.post) Car3D.post(S.fx24 !== false); } catch (e) { /* no 3D */ } });
-act22('fx24', () => { S.fx24 = S.fx24 === false; save(); try { if (Car3D.ok && Car3D.post) Car3D.post(S.fx24); } catch (e) { /* no 3D */ } toast(S.fx24 ? 'Lighting effects on: glow, depth and richer colour.' : 'Lighting effects off: plainer, and a little quicker on older phones.'); render(); });
+hookOn('ensure', () => { try { if (Car3D.ok && Car3D.post) Car3D.post(S.fx24 !== false); } catch (e) { /* no 3D */ } try { apply34(); } catch (e) { /* settings later */ } });
+act22('set34', b => { const k = b.dataset.k, v = b.dataset.v; S.set34 = Object.assign(set34(), { [k]: v }); save(); apply34(); render(); toast(SET34.find(x => x[0] === k)[1] + ': ' + SET34.find(x => x[0] === k)[2].find(x => x[0] === v)[1]); });
+act22('fx24', () => { S.fx24 = S.fx24 === false; save(); try { apply34(); } catch (e) { /* settings later */ } try { if (Car3D.ok && Car3D.post) Car3D.post(S.fx24); } catch (e) { /* no 3D */ } toast(S.fx24 ? 'Lighting effects on: glow, depth and richer colour.' : 'Lighting effects off: plainer, and a little quicker on older phones.'); render(); });
 function showWhatsNew24() {
   showModal(`<div><span class="label">Build 24</span><h2 class="sheet-title">What’s new</h2></div>
     <ul class="news">
@@ -24466,6 +24551,53 @@ function showWhatsNew33(had32) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 34: comfort settings */
+const SET34 = [
+  ['hand', 'Driving controls', [['right', 'Right-handed'], ['left', 'Left-handed']], 'Left-handed puts the pedals on the left and the steering on the right, and walks with your right thumb.'],
+  ['steer', 'Steering', [['gentle', 'Gentle'], ['normal', 'Normal'], ['quick', 'Quick']], 'How fast the wheel turns, and how far you drag for full lock.'],
+  ['cam', 'Camera drag', [['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast']], 'How far the view turns when you drag round the car.'],
+  ['gfx', 'Graphics', [['save', 'Battery saver'], ['auto', 'Auto'], ['sharp', 'Sharp']], 'Battery saver: lower resolution, no lighting effects, 30 frames a second on the road. Sharp: full resolution.'],
+];
+const set34 = () => Object.assign({ hand: 'right', steer: 'normal', cam: 'normal', gfx: 'auto' }, S.set34 || {});
+function apply34() {
+  const o = set34();
+  document.body.classList.toggle('lefty34', o.hand === 'left');
+  try { if (Car3D.ok && Car3D.prefs34) Car3D.prefs34(Object.assign({ fx: S.fx24 !== false }, o)); } catch (e) { /* no 3D */ }
+}
+const steerK34 = () => ({ gentle: 0.7, normal: 1, quick: 1.35 })[set34().steer] || 1;
+function settingsHtml34() {
+  const o = set34();
+  return `<div class="set34">${SET34.map(([k, label, opts, help]) => `<div class="set34-row"><b>${label}</b><div class="seg34" role="group" aria-label="${label}">${opts.map(([v, t]) => `<button class="seg34-b" data-b="set34" data-k="${k}" data-v="${v}" aria-pressed="${o[k] === v}">${t}</button>`).join('')}</div><small>${help}</small></div>`).join('')}</div>`;
+}
+/* build 34: the title screen a returning player sees (not after a what's-new sheet, and not on the test pages) */
+function showTitle34() {
+  if (window.__noTitle34) return;
+  const m = document.getElementById('modal'); if (m && !m.hidden) return;
+  showModal(`<div class="title34"><span class="label">Welcome back</span><h2 class="title34-h">Bonnet Up</h2>${S.gname ? `<p class="title34-g">${esc(S.gname)}</p>` : ""}
+    <p class="title34-s">Day ${S.day} · ${money(S.money)} · garage level ${levelOf(S.xp)}</p></div>
+    <button class="btn primary wide" data-a="close-modal">Carry on</button>
+    <div class="title34-row"><button class="btn" data-a="intro">How to play</button><button class="btn" data-b="title34set">Settings</button></div>`);
+}
+act22('title34set', () => { closeModal(); S.view = 'garage'; S.sub.garage = 'settings'; render(); toTop(); });
+/* build 34: what's on the job board on the wall, and whose keys are on the rack */
+function board34Data() {
+  const jobs = [], keys = [], short = m => String(m || '').split(' ').slice(0, 2).join(' ');
+  (S.bays || []).forEach((j, i) => { if (!j || j.van22) return; jobs.push({ a: j.title || 'Job', b: short(j.car.model), c: j.project ? `Project · bay ${i + 1}` : `Bay ${i + 1}`, col: j.project ? '#B9E0A5' : '#9CC3E6' }); keys.push({ slot: i, col: j.car.paint || '#F2B705' }); });
+  (S.board || []).forEach(j => { if (!j || !j.car) return; jobs.push({ a: j.title || 'Job', b: short(j.car.model), c: j.dueIn === 0 ? 'Due today' : j.dueIn > 0 ? `Due in ${j.dueIn} day${j.dueIn > 1 ? 's' : ''}` : 'Waiting', col: '#F4E38A' }); });
+  return { jobs: jobs.slice(0, 8), keys, sub: `Day ${S.day}` };
+}
+function board34Sync() { try { if (Car3D.ok && Car3D.board34) Car3D.board34(board34Data()); } catch (e) { /* no board */ } }
+/* build 34: what's new */
+function showWhatsNew34(had33) {
+  showModal(`<div><span class="label">Build 34</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Settings that suit you.</b> Garage, Settings: left-handed controls (pedals on the left, steering on the right), gentle, normal or quick steering, how fast the camera turns when you drag, and graphics: battery saver, auto or sharp.</li>
+      <li><b>A title screen.</b> Come back to your garage and it greets you with its name, the day, your money and your level.</li>
+      <li><b>The job board and the key rack.</b> Above the bench, a card for every job in a bay or waiting, and a key on the rack for every car in.</li>
+      ${had33 ? '' : '<li><b>Drive the van to the shops.</b> Walk up to the yellow van on the forecourt, get in, cross the road and park outside a shop.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -24473,11 +24605,12 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen33) { const had32 = !!S.seen32; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; save(); setTimeout(() => showWhatsNew33(had32), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen34) { const had33 = !!S.seen33; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; save(); setTimeout(() => showWhatsNew34(had33), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
+  else if (S.seenIntro && !S.over) setTimeout(() => showTitle34(), 700);
   if (S.over) showDaySummary({ day: S.day - 1, jobs: 0, earned: 0, rent: rentNow() });
 }
 if (window.claude?.hot?.snapshot) window.claude.hot.snapshot(() => ({ S }));
