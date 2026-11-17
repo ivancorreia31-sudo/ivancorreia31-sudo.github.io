@@ -2484,7 +2484,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -11578,18 +11578,22 @@ if ( uFx > 0.5 ) {
       for (let i = 0; i < 16; i++) { const cx = rnd() * w, cy = h * (0.2 + rnd() * 0.24), n = 4 + (rnd() * 5 | 0), big = 14 + rnd() * 20; c.save(); c.beginPath(); c.rect(0, 0, w, cy + big * 0.28); c.clip(); for (let k = 0; k < n; k++) puff(cx + (k - n / 2) * big * 0.75 + rnd() * 8, cy - rnd() * big * 0.3, big * (0.7 + rnd() * 0.6), 0.5 + rnd() * 0.3); c.restore(); }
       const hz = c.createLinearGradient(0, h * 0.4, 0, h * 0.5); hz.addColorStop(0, 'rgba(255,255,255,0)'); hz.addColorStop(1, 'rgba(255,250,240,0.55)'); c.fillStyle = hz; c.fillRect(0, h * 0.4, w, h * 0.1);
     });
+    skyTex.generateMipmaps = false; skyTex.minFilter = T.LinearFilter; skyTex.anisotropy = 1;
     const dome = new T.Mesh(new T.SphereGeometry(390, 24, 12), new T.MeshBasicMaterial({ map: skyTex, side: T.BackSide, toneMapped: false, depthWrite: false, fog: false }));
     dome.renderOrder = -10; sc.add(dome); W.dome = dome;
     try {
       const sunTex = canvasTex(128, 128, (c, w, h) => { c.clearRect(0, 0, w, h); const g = c.createRadialGradient(64, 64, 2, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.09, 'rgba(255,252,235,1)'); g.addColorStop(0.16, 'rgba(255,240,200,0.5)'); g.addColorStop(0.45, 'rgba(255,225,170,0.14)'); g.addColorStop(1, 'rgba(255,220,160,0)'); c.fillStyle = g; c.fillRect(0, 0, w, h); });
+      sunTex.generateMipmaps = false; sunTex.minFilter = T.LinearFilter; sunTex.anisotropy = 1;
       const sd = new T.Sprite(new T.SpriteMaterial({ map: sunTex, transparent: true, depthWrite: false, fog: false, toneMapped: false, blending: T.AdditiveBlending }));
       sd.scale.set(120, 120, 1); sd.renderOrder = -9; sc.add(sd); W.sunDisc = sd;
     } catch (e) { /* no sprites here */ }
     /* clouds: a few soft sprites high up */
-    const cloudTex = canvasTex(256, 128, (c, w, h) => { for (let i = 0; i < 9; i++) { const x = 40 + Math.random() * (w - 80), y = 50 + Math.random() * 30, r = 22 + Math.random() * 26, g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); } });
+    const cloudTex = canvasTex(256, 128, (c, w, h) => { c.fillStyle = '#000000'; c.fillRect(0, 0, w, h); for (let i = 0; i < 9; i++) { const x = 40 + Math.random() * (w - 80), y = 50 + Math.random() * 30, r = 22 + Math.random() * 26, g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); } });
+    cloudTex.encoding = T.LinearEncoding; cloudTex.generateMipmaps = false; cloudTex.minFilter = T.LinearFilter; cloudTex.anisotropy = 1;
+    const cloudMat = new T.MeshBasicMaterial({ color: 0xffffff, alphaMap: cloudTex, transparent: true, depthWrite: false, toneMapped: false, fog: false });
     for (let i = 0; i < 9; i++) {
       const a = i / 9 * 2 * PI + Math.random() * 0.4, rr = 240 + Math.random() * 90;
-      const cl = new T.Mesh(new T.PlaneGeometry(120, 46), new T.MeshBasicMaterial({ map: cloudTex, transparent: true, depthWrite: false, toneMapped: false, fog: false }));
+      const cl = new T.Mesh(new T.PlaneGeometry(120, 46), cloudMat);
       cl.position.set(30 + Math.cos(a) * rr, 70 + Math.random() * 40, 130 + Math.sin(a) * rr); cl.lookAt(30, 20, 130); cl.renderOrder = -9; sc.add(cl);
     }
     /* the ground: grass that follows the hills, a touch below the road */
@@ -12142,6 +12146,8 @@ if ( uFx > 0.5 ) {
     if (v < 0.3 && gasEff < 0.05 && d.mod.hunt) rpm = 820 + Math.sin(d.t * 2.3) * 330 * d.mod.hunt + Math.sin(d.t * 5.1) * 90 * d.mod.hunt;
     d.rpm += (Math.min(red + 300, rpm) - d.rpm) * Math.min(1, dt * 9);
   }
+  /* build 31: what the tyres can hold sideways on a dry road, in m/s2 (it was 8.2) */
+  const GRIP31 = 9.6;
   function routeStep(d, dt) {
     const W = dW, R = W.R, q = pathAt(R, d.s, 0, d.q || (d.q = {}));
     const P = d.perf || null, bhp = (P && P.bhp) || (curJob && curJob.car.bhp) || 110, A0 = clampN(1.7 + bhp / 85, 2.2, 6), vmax = 34 + bhp / 14;
@@ -12152,7 +12158,10 @@ if ( uFx > 0.5 ) {
     const Ld = Math.max(4, 0.75 * d.v + 2), e = (LANE - d.d) - Ld * Math.sin(d.psi);
     const ff = Math.atan(LW * q.k), assist = ff + Math.atan(2 * LW * e / (Ld * Ld));
     const pull = d.mod.pull + d.mod.brakePull * d.in.brake;
-    let delta = assist * (1 - 0.82 * Math.abs(d.steerIn)) + d.steerIn * 0.44 + pull;
+    /* build 31: a full push on the wheel asks for a little more than the tyres have, whatever the speed: enough to
+       slide, never enough to throw the car */
+    const gripS = GRIP31 * d.mod.grip * (P ? P.grip : 1) * (dW.wet ? 0.8 : 1), lock = Math.min(0.44, Math.atan(LW * gripS * 1.3 / Math.max(9, d.v * d.v)));
+    let delta = assist * (1 - 0.82 * Math.abs(d.steerIn)) + d.steerIn * lock + pull;
     delta = clampN(delta, -DMAX, DMAX);
     d.delta += (delta - d.delta) * Math.min(1, dt * 8);
     /* speed */
@@ -12182,12 +12191,24 @@ if ( uFx > 0.5 ) {
     /* where it goes */
     const sd = d.v * Math.cos(d.psi) / Math.max(0.3, 1 - q.k * d.d);
     const prevS = d.s; d.s += sd * dt; d.d += d.v * Math.sin(d.psi) * dt;
-    d.psi += (d.v * Math.tan(d.delta) / LW - q.k * sd) * dt;
-    d.lat = d.v * d.v * Math.tan(d.delta) / LW;
-    const gripMax = 8.2 * d.mod.grip * (P ? P.grip : 1) * wetK;
-    if (Math.abs(d.lat) > gripMax) { d.ev.push({ type: 'skid' }); d.v *= 1 - 0.6 * dt; d.psi -= Math.sign(d.lat) * 0.4 * dt; }
+    /* build 31: the tyres give what they have and no more. Ask for more and the car runs wide and slides, scrubbing
+       a little speed, not most of it; hard braking or acceleration leaves less for cornering; power (most of all at
+       the rear wheels) or lifting off in a slide steps the tail out */
+    const gripMax = GRIP31 * d.mod.grip * (P ? P.grip : 1) * wetK;
+    const want = d.v * d.v * Math.tan(d.delta) / LW, longK = Math.min(1, Math.abs(d.acc) / 9), gripNow = gripMax * Math.sqrt(1 - 0.45 * longK * longK);
+    const latA = clampN(want, -gripNow, gripNow), over = Math.max(0, Math.abs(want) - gripNow) / gripNow;
+    d.slide = (d.slide || 0) + (Math.min(1, over * 1.6) - (d.slide || 0)) * Math.min(1, dt * (over > 0 ? 6 : 3));
+    d.psi += ((d.v > 0.5 ? latA / d.v : d.v * Math.tan(d.delta) / LW) - q.k * sd) * dt;
+    d.lat = latA;
+    if (d.slide > 0.02) {
+      d.v *= 1 - 0.13 * d.slide * dt;
+      const rwd = P && P.dr === 'R' ? 1 : P && P.dr === 'A' ? 0.6 : 0.25, lift = gasEff < 0.08 && d.v > 8 ? 0.5 : 0;
+      const tgt = Math.sign(want) * d.slide * (0.1 + 0.28 * rwd * gasEff + 0.12 * lift);
+      d.drift = (d.drift || 0) + (tgt - (d.drift || 0)) * Math.min(1, dt * 4);
+      d.skidT = (d.skidT || 0) - dt; if (d.slide > 0.3 && d.skidT <= 0) { d.skidT = 0.25; d.ev.push({ type: 'skid', k: d.slide }); }
+    } else d.drift = (d.drift || 0) * Math.max(0, 1 - dt * 5);
     const inRbt = inRange(d.s, W.sec.carpark[0], W.sec.carpark[1]), eHi = inRbt ? 4.1 : ROAD_W / 2 + 1.2, eLo = inRbt ? -0.85 : -(ROAD_W / 2 + 1.2);
-    if (d.d > eHi || d.d < eLo) { d.d = Math.min(eHi, Math.max(eLo, d.d)); d.psi *= 0.5; d.v *= 1 - 1.2 * dt; d.ev.push({ type: 'verge' }); }
+    if (d.d > eHi || d.d < eLo) { d.d = Math.min(eHi, Math.max(eLo, d.d)); d.psi *= 0.6; d.v *= 1 - 0.7 * dt; d.ev.push({ type: 'verge' }); }
     d.dist += d.v * dt;
     /* lap and features */
     if (d.s >= R.N) { d.s -= R.N; d.laps++; }
@@ -12203,7 +12224,7 @@ if ( uFx > 0.5 ) {
     engineStep(d, dt, gasEff);
     bodyStep(d, dt, d.acc, d.lat);
     const p = pathAt(R, d.s, d.d, d.p || (d.p = {}));
-    d.x = p.x; d.z = p.z; d.y = p.y + 0.03; d.phi = p.phi - d.psi; d.grade = p.g;
+    d.x = p.x; d.z = p.z; d.y = p.y + 0.03; d.phi = p.phi - d.psi - (d.drift || 0); d.grade = p.g;
     d.section = sectionAt(W, sNow);
     /* oncoming traffic: just keep it moving, and toot if you drift across */
     for (const tc of W.traffic) {
@@ -12882,11 +12903,11 @@ if ( uFx > 0.5 ) {
       const cam = new T.OrthographicCamera(-1, 1, 1, -1, 0, 1), sc = new T.Scene();
       const VS = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }';
       const mat = (fs, u) => new T.ShaderMaterial({ vertexShader: VS, fragmentShader: fs, uniforms: u, depthTest: false, depthWrite: false, toneMapped: false });
-      const mBright = mat('uniform sampler2D t; uniform vec2 px; uniform float thr; varying vec2 vUv; void main(){ vec3 c = (texture2D(t, vUv + px * vec2(-1.0, -1.0)).rgb + texture2D(t, vUv + px * vec2(1.0, -1.0)).rgb + texture2D(t, vUv + px * vec2(-1.0, 1.0)).rgb + texture2D(t, vUv + px * vec2(1.0, 1.0)).rgb) * 0.25; float l = max(c.r, max(c.g, c.b)); gl_FragColor = vec4(c * smoothstep(thr, thr + 0.2, l), 1.0); }',
+      const mBright = mat('uniform sampler2D t; uniform vec2 px; uniform float thr; varying vec2 vUv; void main(){ vec3 c = (texture2D(t, vUv + px * vec2(-1.0, -1.0)).rgb + texture2D(t, vUv + px * vec2(1.0, -1.0)).rgb + texture2D(t, vUv + px * vec2(-1.0, 1.0)).rgb + texture2D(t, vUv + px * vec2(1.0, 1.0)).rgb) * 0.25; float l = max(c.r, max(c.g, c.b)); c = mix(vec3(dot(c, vec3(0.2126, 0.7152, 0.0722))), c, 0.45); gl_FragColor = vec4(c * smoothstep(thr, thr + 0.2, l), 1.0); }',
         { t: { value: null }, px: { value: new T.Vector2() }, thr: { value: POST.thr } });
       const mBlur = mat('uniform sampler2D t; uniform vec2 d; varying vec2 vUv; void main(){ vec3 c = texture2D(t, vUv).rgb * 0.2270; c += (texture2D(t, vUv + d * 1.3846).rgb + texture2D(t, vUv - d * 1.3846).rgb) * 0.3162; c += (texture2D(t, vUv + d * 3.2308).rgb + texture2D(t, vUv - d * 3.2308).rgb) * 0.0703; gl_FragColor = vec4(c, 1.0); }',
         { t: { value: null }, d: { value: new T.Vector2() } });
-      const mOut = mat('uniform sampler2D t; uniform sampler2D g; uniform float bloom; uniform float vig; varying vec2 vUv; void main(){ vec3 c = texture2D(t, vUv).rgb; vec3 gl = texture2D(g, vUv).rgb; c = 1.0 - (1.0 - c) * (1.0 - gl * bloom); float l = dot(c, vec3(0.2126, 0.7152, 0.0722)); c = mix(vec3(l), c, 1.1); c = mix(c, c * c * (3.0 - 2.0 * c), 0.16); vec2 q = vUv - 0.5; c *= 1.0 - vig * smoothstep(0.32, 0.86, length(q) * 1.18); gl_FragColor = vec4(clamp(c, 0.0, 1.0), 1.0); }',
+      const mOut = mat('uniform sampler2D t; uniform sampler2D g; uniform float bloom; uniform float vig; varying vec2 vUv; void main(){ vec3 c = texture2D(t, vUv).rgb; vec3 gl = texture2D(g, vUv).rgb; c = 1.0 - (1.0 - c) * (1.0 - gl * bloom); float l = dot(c, vec3(0.2126, 0.7152, 0.0722)); c = mix(vec3(l), c, 1.1); c = mix(c, c * c * (3.0 - 2.0 * c), 0.16); vec2 q = vUv - 0.5; c *= 1.0 - vig * smoothstep(0.32, 0.86, length(q) * 1.18); float n = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))); c += (n - 0.5) / 255.0; gl_FragColor = vec4(clamp(c, 0.0, 1.0), 1.0); }',
         { t: { value: null }, g: { value: null }, bloom: { value: POST.bloom }, vig: { value: POST.vig } });
       const quad = new T.Mesh(new T.PlaneGeometry(2, 2), mOut); quad.frustumCulled = false; sc.add(quad);
       const base = renderer.render.bind(renderer);
@@ -18464,7 +18485,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 30</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 31</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -18953,7 +18974,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 30;
+const BUILD = 31;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -23744,6 +23765,18 @@ function showWhatsNew30(had29) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 31: what's new */
+function showWhatsNew31(had30) {
+  showModal(`<div><span class="label">Build 31</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Corners you can attack.</b> Turning no longer wipes off your speed. The tyres hold what they can; push past that and the car runs wide and slides, losing a little speed, not most of it.</li>
+      <li><b>Steering that suits the speed.</b> A full push on the wheel is always just past the limit of grip: enough to slide, never enough to throw the car.</li>
+      <li><b>Tail out.</b> Power in a slide steps the back out, most of all on rear-wheel drive; so does lifting off. Braking hard leaves less grip for turning.</li>
+      <li><b>Cleaner clouds.</b> The clouds and the sun’s glow are drawn a different way, to stop the coloured fringes some phones showed.</li>
+      ${had30 ? '' : '<li><b>Engines that sound like themselves.</b> Every engine’s note comes from its own firing pattern, size, exhaust, air filter and turbo.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -23751,8 +23784,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen30) { const had29 = !!S.seen29; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; save(); setTimeout(() => showWhatsNew30(had29), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen31) { const had30 = !!S.seen30; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; save(); setTimeout(() => showWhatsNew31(had30), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
