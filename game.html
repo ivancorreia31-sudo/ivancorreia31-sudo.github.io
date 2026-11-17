@@ -1718,6 +1718,14 @@ body.lefty34 .dv-ctrl{flex-direction:row-reverse}body.lefty34 .dv-pedals{flex-di
 .map36-row.off .map36-n{background:var(--muted)}.map36-row.off .map36-t b{color:var(--muted)}
 .map36-t{flex:1;min-width:0}.map36-t b{display:block;font-size:14px}.map36-t small{display:block;color:var(--muted);font-size:12px;line-height:1.3}
 .map36-go{flex:0 0 auto;min-height:36px;padding:0 14px}
+.bugle37{background:#F4F1E8;color:#1C1D1F;border-radius:10px;padding:12px 14px 14px;font-family:Georgia,'Times New Roman',serif;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.bugle37 header{display:flex;flex-direction:column;align-items:center;border-bottom:3px double #1C1D1F;padding-bottom:6px;margin-bottom:8px}
+.bugle37 header b{font-size:24px;letter-spacing:.02em;font-weight:900;line-height:1.05;text-align:center}.bugle37 header small{font:600 11px Barlow,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#55595E;margin-top:3px}
+.bugle37 h3{font:900 25px/1.05 'Big Shoulders Display',Impact,sans-serif;margin:4px 0 6px;letter-spacing:.01em}
+.bugle37 .b37-stand{font-size:15px;line-height:1.35;margin:0 0 10px;font-style:italic}
+.b37-cols{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.b37-cols section{border-top:1px solid #1C1D1F;padding-top:6px}.b37-cols h4{font:800 11px Barlow,sans-serif;letter-spacing:.12em;text-transform:uppercase;margin:0 0 4px}
+.b37-cols p{margin:0 0 6px;font-size:13.5px;line-height:1.38}.b37-q{font-size:15px!important}.b37-who{font:700 12px Barlow,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:#55595E}
 </style>
 </head>
 <body>
@@ -2616,7 +2624,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -3924,6 +3932,7 @@ function acceptJob(no) {
   job.due = S.day + job.dueIn; job.accepted = S.day;
   S.bays[bay] = job; S.activeBay = bay; S.view = 'workshop'; arriving = true; UI.sel = null; UI.bolt = null; UI.drawer = null;
   Sfx.engine();
+  try { if (Car3D.ok && Car3D.wantIn37) Car3D.wantIn37(job.no); } catch (e) { /* it just appears */ }
   render(); toTop();
   toast(`${job.car.model} is on the ramp in Bay ${bay + 1}.`);
 }
@@ -8847,6 +8856,7 @@ if ( uFx > 0.5 ) {
   }
   function buildCar(c) {
     if (LEAVE35) leaveEnd35();
+    if (ARR37) in37End(true);
     disposeCar();
     sty = STYLES[shape32(c)] || STYLES[c.style] || STYLES.saloon; car32 = c; inside32 = false;
     car = new T.Group(); PART = {}; GHOST = {}; WHEELS = []; CAPS = {};
@@ -10538,12 +10548,20 @@ if ( uFx > 0.5 ) {
     const k = reduced ? 1 : 1 - Math.exp(-dt * 6.5);
     if (liftHold) tgt.lift = clampN(tgt.lift + liftHold.dir * 0.8 * dt, LIFT_MIN, LIFT_MAX);
     tgt.xray = car && !booth && (xrayOn || (curZone === 'under' && tgt.lift < 1.0)) ? 1 : 0;
+    if (ARR37) {
+      if (!car) ARR37 = null;
+      else {
+        ARR37.t += dt;
+        tgt.carX = st.door < 0.75 && ARR37.t < 12 ? st.carX : 0;
+        if (Math.abs(st.carX) < 0.002 || ARR37.t > 20) { st.carX = tgt.carX = 0; in37End(true); }
+      }
+    }
     let moving = false;
     for (const key of Object.keys(tgt)) {
       const d = tgt[key] - st[key];
       if (Math.abs(d) < (key === 'lift' ? 0.0005 : 0.0008)) { st[key] = tgt[key]; continue; }
       moving = true;
-      st[key] += key === 'lift' ? (reduced ? d : clampN(d, -0.9 * dt, 0.9 * dt)) : key === 'door' ? (reduced ? d : clampN(d, -0.38 * dt, 0.38 * dt)) : d * k;
+      st[key] += key === 'lift' ? (reduced ? d : clampN(d, -0.9 * dt, 0.9 * dt)) : key === 'door' ? (reduced ? d : clampN(d, -0.38 * dt, 0.38 * dt)) : key === 'carX' && ARR37 ? clampN(d * Math.min(1, dt * 2.4), -4.2 * dt, 4.2 * dt) : d * k;
     }
     const sceneMv22 = moving;
     if (cam.step(dt, reduced)) moving = true;
@@ -10969,7 +10987,12 @@ if ( uFx > 0.5 ) {
       Object.assign(st, tgt);
       cam.animate(overviewView()); cam.snap();
       if (arriving && !reduced) st.carX = 6.5;
+      if (arriving && !reduced && WANT37 != null && WANT37 === job.no && !window.__noDriveIn37) {
+        ARR37 = { opened: false, t: 0 }; st.carX = tgt.carX = ROOM.D + 3.2; cam.animate(doorView37()); cam.snap();
+        if (tgt.door < 1) { ARR37.opened = true; doorOpen = true; tgt.door = 1; Sfx.liftFor(2.5); doorLab35(); }
+      }
     }
+    WANT37 = null;
     updateStand(job);
     for (const z of ZONES) {
       const el = markers[z.id], i = zoneInfo(job, z.id);
@@ -11072,6 +11095,18 @@ if ( uFx > 0.5 ) {
   /* build 35: the finished car drives out. It waits while a window's open over the workshop (the invoice), then
      comes down, starts up and rolls out of the door */
   let LEAVE35 = null;
+  /* build 37: the car driving in. WANT37 is the job number the app asked to drive in; ARR37 the drive in progress */
+  let WANT37 = null, ARR37 = null;
+  function in37End(close) {
+    const A = ARR37; ARR37 = null; if (!A) return;
+    if (close && A.opened && doorOpen) { doorOpen = false; tgt.door = 0; Sfx.liftFor(2.5); doorLab35(); }
+    if (close && car && !drv && !fp && !ext && !booth) cam.animate(overviewView());
+    kick();
+  }
+  /* looking out of the door, to watch a car come in or go */
+  const doorView37 = () => ({ yaw: -PI + 0.24, pitch: 0.14, dist: 7.2, px: 2.4, py: 1.4, pz: -0.4 });
+  api.wantIn37 = no => { WANT37 = no; };
+  api.arriving37 = () => ARR37 ? { x: +st.carX.toFixed(2), door: +st.door.toFixed(2), opened: ARR37.opened } : null;
   function doorLab35() { try { const lab = doorOpen ? 'Close the door' : 'Open the door'; doorMk.querySelector('.mk-label').textContent = lab; doorMk.setAttribute('aria-label', lab.replace('the door', 'the garage door')); } catch (e) { /* no label */ } }
   function leaveEnd35() {
     const L = LEAVE35; if (!L) return; LEAVE35 = null;
@@ -11080,6 +11115,7 @@ if ( uFx > 0.5 ) {
     L.car.traverse(o => { if (o.geometry) geos.add(o.geometry); if (o.userData.ownMat && o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); } });
     geos.forEach(g => g.dispose());
     if (L.shut && L.opened && !car) { doorOpen = false; tgt.door = 0; Sfx.liftFor(2.5); doorLab35(); }
+    if (L.cam && !car && !drv && !fp && !ext && !booth) cam.animate(overviewView());
     kick();
   }
   function leaveStep35(dt) {
@@ -11094,6 +11130,7 @@ if ( uFx > 0.5 ) {
       if (st.lift < 0.02 && st.bonnet < 0.06) {
         L.go = L.run + 0.9;
         if (tgt.door < 1) { L.opened = true; doorOpen = true; tgt.door = 1; Sfx.liftFor(2.5); doorLab35(); }
+        if (!G.count) { L.cam = true; cam.animate(doorView37()); }
         try { if (L.sound) L.sound(); } catch (e) { /* no sound */ }
       }
     } else if (L.run > L.go && st.door > 0.7) {
@@ -16572,6 +16609,7 @@ function weekNight(sum) {
   const w = S.wk; if (!w || S.day - w.start < 7) return;
   const prev = S.wkPrev || null;
   sum.week = { n: Math.max(1, Math.ceil(w.start / 7)), earned: w.earned, jobs: w.jobs, five: w.five, side: w.side || 0, prev: prev ? prev.earned : null };
+  try { paper37(sum.week); } catch (e) { /* no paper this week */ }
   S.wkPrev = w; S.wk = { start: S.day, earned: 0, jobs: 0, five: 0 };
 }
 /* what the business is worth: cash, kit at a fair resale value, side businesses at three months' takings */
@@ -19301,7 +19339,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 36</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 37</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -19791,7 +19829,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 36;
+const BUILD = 37;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -24706,8 +24744,10 @@ function phBadge35() {
 const when35 = x => (x.d === S.day ? 'Today' : x.d === S.day - 1 ? 'Yesterday' : `Day ${x.d}`) + ' · ' + hhmm(Math.min(x.c || 0, 24 * 60 - 1));
 function phone35Html() {
   const P = ph35(), un = P.un || 0, texts = P.list.filter(x => x.k === 't'), notes = P.list.filter(x => x.k !== 't').slice(0, 20);
-  const tab = UI.ph36 === 'map' ? 'map' : 'msgs';
-  const tabs = `<div class="seg34 ph36-tabs" role="group" aria-label="Phone"><button class="seg34-b" data-b="ph36tab" data-v="msgs" aria-pressed="${tab === 'msgs'}">Messages${un ? ` (${un})` : ''}</button><button class="seg34-b" data-b="ph36tab" data-v="map" aria-pressed="${tab === 'map'}">Town map</button></div>`;
+  const tab = UI.ph36 === 'map' ? 'map' : UI.ph36 === 'paper' && S.paper37 ? 'paper' : 'msgs';
+  if (tab === 'paper') S.paper37.read = true;
+  const tabs = `<div class="seg34 ph36-tabs" role="group" aria-label="Phone"><button class="seg34-b" data-b="ph36tab" data-v="msgs" aria-pressed="${tab === 'msgs'}">Messages${un ? ` (${un})` : ''}</button><button class="seg34-b" data-b="ph36tab" data-v="map" aria-pressed="${tab === 'map'}">Town map</button>${S.paper37 ? `<button class="seg34-b" data-b="ph36tab" data-v="paper" aria-pressed="${tab === 'paper'}">Paper${S.paper37.read ? '' : ' •'}</button>` : ''}</div>`;
+  if (tab === 'paper') { S.paper37.read = true; return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}<div class="ph35">${paper37Html()}</div><button class="btn primary wide" data-a="close-modal">Done</button>`; }
   if (tab === 'map') return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}<p class="ph36-wx">${wxLine36()}</p><div class="ph35 map36-wrap">${map36Html()}</div><button class="btn primary wide" data-a="close-modal">Done</button>`;
   return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}
     <p class="ph36-wx">${wxLine36()}</p>
@@ -24794,7 +24834,7 @@ act22('map36shops', () => {
   if (canRoad() && !RT && !YW && !MG && !BT) { S.view = 'workshop'; render(); try { vanWalk33(vanAt33()); return; } catch (e) { /* fall through */ } }
   S.view = 'garage'; render(); toTop(); toast('Tools, tyre kit and paint come from the shops over the road.');
 });
-act22('ph36tab', b => { UI.ph36 = b.dataset.v === 'map' ? 'map' : 'msgs'; const sh = $('#sheet'); if (sh) { sh.innerHTML = phone35Html(); const t = sh.querySelector('[data-b="ph36tab"][aria-pressed="true"]'); if (t) t.focus(); } });
+act22('ph36tab', b => { UI.ph36 = b.dataset.v === 'map' ? 'map' : b.dataset.v === 'paper' ? 'paper' : 'msgs'; const sh = $('#sheet'); if (sh) { sh.innerHTML = phone35Html(); const t = sh.querySelector('[data-b="ph36tab"][aria-pressed="true"]'); if (t) t.focus(); } });
 /* build 36: tomorrow's weather is decided a day ahead, so the phone can tell you */
 const wx36 = () => (S.wx36 === 'rain' || S.wx36 === 'dry' ? S.wx36 : (S.wx36 = chance(0.2) ? 'rain' : 'dry'));
 const wxLine36 = () => wx36() === 'rain' ? 'Rain tomorrow: wet roads, and the cars come in dirtier.' : 'Dry tomorrow.';
@@ -24814,6 +24854,50 @@ function showWhatsNew36(had35) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* for the tests: take the first job on the board and watch it drive in */
+window.__in37 = cmd => {
+  if (cmd === 'take') { const j = (S.board || []).find(x => x && x.car && !x.desk && !x.char22); if (!j) return false; if (cur()) { S.bays[S.activeBay] = null; } acceptJob(j.no); return j.no; }
+  return Car3D.ok && Car3D.arriving37 ? Car3D.arriving37() : null;
+};
+/* build 37: the Brickfield Bugle, out once a week (S.paper37) */
+const TOWN37 = ['Roadworks on the high street until Friday. Allow extra time.', 'Brickfield Tyres say they’ve never sold so many winter tyres.', 'Panel Pro Bodyshop wins the town’s tidiest forecourt award again.', 'The motor factors are open late on Thursdays now.', 'A lost tortoise was found sunning itself on the bypass. It’s fine.', 'The car boot sale moves to the rugby club field.', 'Learner drivers are back on the roundabout. Be patient.', 'The bakery’s new sausage roll has a queue round the block.', 'Council promises to fill the pothole outside the station. Again.', 'The vintage car run passes through town on Sunday morning.'];
+function paper37(w) {
+  const G = S.gname || 'the garage', GU = String(S.gname || 'local garage').toUpperCase(), pl = n => (n === 1 ? '' : 's');
+  let head, stand;
+  if (!w.jobs) { head = 'GARAGE DOORS STAY SHUT'; stand = `Not a single car fixed at ${G} this week. Locals wonder what’s going on.`; }
+  else if (w.prev != null && w.earned > w.prev * 1.2 && w.jobs >= 3) { head = `RECORD WEEK FOR ${GU}`; stand = `${w.jobs} car${pl(w.jobs)} fixed and ${money(w.earned)} taken, up from ${money(w.prev)} last week.`; }
+  else if (w.five >= Math.max(2, w.jobs * 0.6)) { head = 'FIVE STARS ALL ROUND'; stand = `${w.five} of ${w.jobs} customers gave ${G} five stars this week.`; }
+  else if (w.jobs <= 2) { head = `QUIET WEEK AT ${GU}`; stand = `Just ${w.jobs} car${pl(w.jobs)} through the doors at ${G} this week${w.earned > 0 ? `, and ${money(w.earned)} taken` : ''}.`; }
+  else if (w.prev != null && w.earned < w.prev * 0.8) { head = `QUIETER WEEK AT ${GU}`; stand = `${w.jobs} car${pl(w.jobs)} fixed and ${money(w.earned)} taken, down on last week’s ${money(w.prev)}.`; }
+  else { head = `BUSY WEEK AT ${GU}`; stand = `${w.jobs} car${pl(w.jobs)} fixed and ${money(w.earned)} taken.`; }
+  const said = ((S.ph35 && S.ph35.list) || []).find(x => x.k === 't' && /^Picked up the /.test(x.m));
+  const lot = areaOpen('auctions') && (S.lots || [])[0];
+  const town = shuffle(TOWN37.slice()).slice(0, 2);
+  S.paper37 = { n: w.n, day: S.day, head, stand, quote: said ? { who: said.f, m: said.m.replace(/^Picked up the .*?\.\s+/, '') } : null, lot: lot && lot.car ? { model: lot.car.model, price: lot.price } : null, wx: wxLine36(), town, read: false };
+  text35('The Brickfield Bugle', `This week’s paper is out, and ${G} is on the front page. Read it on your phone, under Paper.`);
+}
+function paper37Html() {
+  const P = S.paper37; if (!P) return '<p class="muted">No paper yet. It comes out at the end of each week.</p>';
+  return `<article class="bugle37">
+    <header><b>The Brickfield Bugle</b><small>Week ${P.n} · Day ${P.day} · 40p</small></header>
+    <h3>${esc(P.head)}</h3><p class="b37-stand">${esc(P.stand)}</p>
+    <div class="b37-cols">
+      ${P.quote ? `<section><h4>What the customers say</h4><p class="b37-q">“${esc(P.quote.m)}”</p><p class="b37-who">${esc(P.quote.who)}</p></section>` : ''}
+      <section><h4>Around town</h4>${(P.town || []).map(t => `<p>${esc(t)}</p>`).join('')}${P.lot ? `<p><b>Under the hammer:</b> ${esc(P.lot.model)}, guide ${money(P.lot.price)}.</p>` : ''}<p><b>Weather:</b> ${esc(P.wx)}</p></section>
+    </div>
+  </article>`;
+}
+window.__paper37 = cmd => { if (cmd === 'make') { paper37({ n: 1, earned: 1200, jobs: 4, five: 3, side: 0, prev: 900 }); return S.paper37; } if (cmd === 'open') { UI.ph36 = 'paper'; phone35(); return true; } return S.paper37 || null; };
+/* build 37: what's new */
+function showWhatsNew37(had36) {
+  showModal(`<div><span class="label">Build 37</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Cars drive in.</b> Take a job and the door goes up, the customer’s car comes in off the forecourt and stops on the ramp, and the door comes down behind it.</li>
+      <li><b>The Brickfield Bugle.</b> The local paper comes out every week with your garage on the front page, a word from a customer, what’s up for auction and the town’s news. Read it on your phone, under Paper.</li>
+      ${had36 ? '' : '<li><b>A town map and the forecast.</b> On your phone: a map of everywhere in town with a button to go there, and whether it’ll rain tomorrow.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -24821,8 +24905,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen36) { const had35 = !!S.seen35; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; save(); setTimeout(() => showWhatsNew36(had35), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen37) { const had36 = !!S.seen36; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; save(); setTimeout(() => showWhatsNew37(had36), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
