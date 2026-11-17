@@ -2589,7 +2589,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -3937,7 +3937,7 @@ function aucGo(no) {
   if (RT || DSP || MG) return;
   let van = null; try { van = dispVan(); } catch (e) { van = null; }
   if (!van) { startAuction(no); return; }
-  AUCRUN = { no, s: 0, arrived: false, chipT: 0, sayT: 3 };
+  AUCRUN = { no, s: 0, arrived: false, chipT: 0, sayT: 3 }; S.van33 = { at: 'yard' };
   if (!startDrive(van, 'fun') || !RT) { AUCRUN = null; startAuction(no); return; }
   try { AUCRUN.s = Math.round(Car3D.routeTag('carpark') || 0); Car3D.routeMark(AUCRUN.s, { flag: true }); } catch (e) { /* no marker */ }
   RT.auction = AUCRUN;
@@ -4145,6 +4145,26 @@ function abandon() {
 const Sfx = (() => {
   let ctx = null, out = null, on = true, nb = null, hum = null, loop = null, eng = null, crank = null, held = false, pmute = false;
   const voices = {};
+  let amb33 = null;
+  function compressor33(sec) {
+    const c = ac(); if (!c) return;
+    try {
+      const t = c.currentTime, o = c.createOscillator(), o2 = c.createOscillator(), fl = c.createBiquadFilter(), g = c.createGain();
+      o.type = 'sawtooth'; o.frequency.value = 49 + Math.random() * 3; o2.type = 'square'; o2.frequency.value = 24.6; fl.type = 'lowpass'; fl.frequency.value = 190;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.022, t + 0.9); g.gain.setValueAtTime(0.022, t + sec - 1.2); g.gain.exponentialRampToValueAtTime(0.0001, t + sec);
+      o.connect(fl); o2.connect(fl); fl.connect(g); g.connect(out); o.start(t); o2.start(t); o.stop(t + sec + 0.1); o2.stop(t + sec + 0.1);
+      noise(0.7, 0.012, 4800, 0.8, sec - 0.2, 'highpass');
+    } catch (e) { /* audio refused */ }
+  }
+  function ambTick33(a) {
+    if (a.wait > 0) { a.wait--; return; }
+    const r = Math.random();
+    if (r < 0.03) { a.wait = 9; compressor33(6 + Math.random() * 3); }
+    else if (r < 0.07) { const n = 5 + Math.floor(Math.random() * 10); for (let i = 0; i < n; i++) noise(0.035, 0.016, 2300 + Math.random() * 500, 3, i * 0.055); a.wait = 2; }
+    else if (r < 0.095) { const f0 = 1300 + Math.random() * 900; tone(f0, 0.38, 'sine', 0.011); tone(f0 * 2.71, 0.22, 'sine', 0.006, 0.003); noise(0.02, 0.018, 3200, 2); a.wait = 1; }
+    else if (r < 0.11) { noise(0.9, 0.009, 5200, 0.7, 0, 'highpass'); }
+    else if (r < 0.125) { for (let i = 0; i < 3; i++) tone(420 + i * 30, 0.06, 'triangle', 0.006, i * 0.18); }
+  }
   try { on = localStorage.getItem('bonnet-up.sound') !== 'off'; } catch (e) { /* storage unavailable */ }
   function ac() {
     if (!on || held || pmute) return null;
@@ -4717,6 +4737,27 @@ const Sfx = (() => {
       RADIO.duck('dyno', 0.25); setTimeout(() => RADIO.duck('dyno', null), (d + 2) * 1000);
       runScript(P, t => t < 0.25 ? [id, 0.05, true] : t < 0.25 + d ? [id + (P.red - id) * Math.pow((t - 0.25) / d, 0.85), 1, true] : [id + (P.red - id) * Math.exp(-(t - 0.25 - d) / 0.35), 0, t < d + 1.5], d + 1.7);
     },
+    /* build 33: switch the workshop's background on or off (asked every second; cheap when nothing changes) */
+    amb(want) {
+      want = !!want && on && !held && !pmute;
+      if (!want) {
+        if (amb33) { const a = amb33; amb33 = null; clearInterval(a.iv); try { const t = ctx.currentTime; a.g.gain.cancelScheduledValues(t); a.g.gain.setValueAtTime(Math.max(0.0001, a.g.gain.value), t); a.g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6); a.s.stop(t + 0.7); } catch (e) { /* already stopped */ } }
+        return false;
+      }
+      if (amb33) return true;
+      const c = ac(); if (!c || c.state !== 'running') return false;
+      try {
+        const s = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
+        s.buffer = noiseBuf(c); s.loop = true; fl.type = 'lowpass'; fl.frequency.value = 320; fl.Q.value = 0.4;
+        g.gain.setValueAtTime(0.0001, c.currentTime); g.gain.exponentialRampToValueAtTime(0.016, c.currentTime + 1.5);
+        s.connect(fl); fl.connect(g); g.connect(out); s.start();
+        const a = { s, g, iv: 0, wait: 3 };
+        a.iv = setInterval(() => { if (amb33 !== a || !ctx || ctx.state !== 'running') return; ambTick33(a); }, 1000);
+        amb33 = a;
+      } catch (e) { amb33 = null; return false; }
+      return true;
+    },
+    ambOn() { return !!amb33; },
     liftStart() {
       const c = ac(); if (!c || hum) return;
       try {
@@ -12553,6 +12594,7 @@ if ( uFx > 0.5 ) {
       heave: 0, heaveV: 0, pitch: 0, pitchV: 0, roll: 0, rollV: 0, stopT: 0, laps: 0, lapDone: false, crash: 0, done: false, park: null, walk: null,
       x: 0, z: 0, phi: 0, ended: false, tapHandler: o.onTap || null,
     };
+    drv.van33 = !!(o.job && o.job.van22);
     if (car && mode !== 'walk') {
       setHighlight(curJob, null); hotEl.innerHTML = ''; pinsEl.innerHTML = '';
       car.position.set(0, 0, 0); car.rotation.set(0, 0, 0); W.tilt.add(car);
@@ -12565,6 +12607,11 @@ if ( uFx > 0.5 ) {
     if (mode === 'route') {
       drv.s = 3; drv.d = LANE;
       const q = pathAt(R, drv.s, drv.d, {}); drv.x = q.x; drv.z = q.z; drv.phi = q.phi;
+    } else if (mode === 'park' && o.shop33) {
+      const from = VAN33[o.shop33] ? o.shop33 : 'yard', s = VAN33[from], ids = from === 'yard' ? ['tyres', 'panel', 'factors'] : ['yard'];
+      drv.shop33 = from; drv.x = s.x; drv.z = s.z; drv.phi = s.phi; drv.v = 0;
+      drv.park33 = { spots: ids.map(id => Object.assign({ id }, VAN33[id])), still: 0, err: 99, ang: 0, inside: false, at: null };
+      van33MarksShow(ids);
     } else if (mode === 'park') {
       const bay = o.bay || 0;
       drv.x = 2; drv.z = -10.6; drv.phi = 0; drv.v = 0;
@@ -12577,9 +12624,11 @@ if ( uFx > 0.5 ) {
       me.userData.me = true; W.people.add(me);
       const fromU = o.from === 'unit', fromG = o.from === 'garage';
       drv.walk = { me, keys: {}, pitch: 0, fp: fromG || !!o.fp, x: fromG ? 0 : fromU ? -30.5 : 4.5, z: fromG ? -16.2 : fromU ? -9.5 : -12.5, phi: fromG ? PI / 2 : fromU ? -PI / 2 : 0, v: 0, yaw: fromG ? -PI / 2 : fromU ? PI / 2 + 0.2 : PI - 0.35, tx: null, tz: null, near: null, joy: null, phase: 0 };
+      if (o.at33) { const w = drv.walk; w.x = o.at33.x; w.z = o.at33.z; w.phi = o.at33.phi; w.yaw = o.at33.phi + PI; w.fp = false; }
       if (o.pose) { const w = drv.walk, p = o.pose; w.x = p.x; w.z = p.z; w.yaw = p.yaw; w.pitch = p.pitch || 0; w.fp = true; w.phi = p.yaw + PI; w.phase = (p.bob || 0) / 1.7; w.enterCool = 0.6; if (p.keys) w.keys = p.keys; if (p.ptr && p.ptr.id != null) { Object.assign(DP, p.ptr); w.joy = p.joy || null; } }
     }
     camera.far = 520; camera.updateProjectionMatrix();
+    van33Sync();
     try { setMood(W, S ? S.clock : 600, S ? S.weather : null); } catch (e) { /* the light is a nice-to-have */ }
     M.glass.opacity = 0.94;
     if (W.wash) { const ow = !!(S && S.owned && S.owned.carwash); W.wash.g.visible = ow; W.washSoon.visible = !ow; }
@@ -12594,6 +12643,7 @@ if ( uFx > 0.5 ) {
     if (d.walk && d.walk.me) { W.people.remove(d.walk.me); }
     W.people.children.slice().forEach(p => W.people.remove(p));
     W.bayMark.visible = false; W.bayArrow.visible = false; W.drip.visible = false;
+    van33MarksShow(null); van33Sync();
     W.puffs.forEach(p => { p.life = 0; p.sp.visible = false; });
     if (car && car.parent === W.tilt) {
       W.tilt.remove(car); car.position.set(0, 0, 0); car.rotation.set(0, 0, 0); scene.add(car); bayHide21(false);
@@ -12726,7 +12776,48 @@ if ( uFx > 0.5 ) {
   }
   const sectionAt = (W, s) => { for (const k of ['rough', 'hill', 'fast', 'brake', 'hairpin', 'carpark']) if (inRange(s, W.sec[k][0], W.sec[k][1])) return k; return s < W.sec.town[1] ? 'town' : 'road'; };
   /* free driving on the forecourt and the yard: bump into nothing */
+  /* ======================= build 33: the service van, and the drive across the road to the shops =======================
+     VAN33: where it can stand. It faces the road on the forecourt, and noses in to a bay outside each shop */
+  const VAN33 = { yard: { x: 9.2, z: -4.6, phi: PI / 2 }, tyres: { x: -3.9, z: 10.7, phi: PI / 2 }, panel: { x: 11.6, z: 10.7, phi: PI / 2 }, factors: { x: 27.2, z: 10.7, phi: PI / 2 } };
+  let van33G = null, van33At = 'yard', van33Marks = null;
+  function van33Sync() {
+    const W = dW; if (!W || !W.yardG) return;
+    if (!van33G) {
+      van33G = liteCar({ make: 'bramble', model: 'Bramble Service Van 2.0', style: 'van', paint: '#F2B705', rim: 'steel', rimColor: '#5C6260', reg: 'BU22 VAN' }, { plates: true });
+      van33G.traverse(m => { if (m.isMesh) m.castShadow = true; }); van33G.userData.van33 = true; W.yardG.parent.add(van33G);
+    }
+    const s = VAN33[van33At] || VAN33.yard;
+    van33G.position.set(s.x, 0.02, s.z); van33G.rotation.y = -s.phi; van33G.visible = !(drv && (drv.shop33 || drv.van33));
+  }
+  function van33MarksShow(ids) {
+    const W = dW; if (!W) return;
+    if (!van33Marks) { van33Marks = {}; for (const id of Object.keys(VAN33)) { const m = new T.Mesh(W.bayMark.geometry, W.bayMark.material), a = new T.Mesh(W.bayArrow.geometry, W.bayArrow.material); const s = VAN33[id]; m.position.set(s.x, 0.035, s.z); m.rotation.set(-PI / 2, 0, 0); a.position.set(s.x, 2.6, s.z); a.rotation.x = PI; m.visible = a.visible = false; W.bayMark.parent.add(m); W.bayMark.parent.add(a); van33Marks[id] = [m, a]; } }
+    for (const id of Object.keys(van33Marks)) for (const o of van33Marks[id]) o.visible = !!(ids && ids.includes(id));
+  }
+  /* inside a box round the standing van: you can't walk through it */
+  function van33Box(x, z) {
+    if (!van33G || !van33G.visible) return false;
+    const s = VAN33[van33At] || VAN33.yard, dx = x - s.x, dz = z - s.z, cs = Math.cos(s.phi), sn = Math.sin(s.phi), lx = dx * cs + dz * sn, lz = -dx * sn + dz * cs;
+    return lx > -2.55 && lx < 2.3 && Math.abs(lz) < 1.15;
+  }
+  /* driving the van: the forecourt, the road and the fronts of the shops */
+  function freeBlocked33(x, z, phi) {
+    const cs = Math.cos(phi), sn = Math.sin(phi);
+    for (const k of [-1.55, 0, 1.55]) {
+      const px = x + cs * k, pz = z + sn * k;
+      const fore = px > -11.2 && px < YARD.x1 - 0.9 && pz > YARD.z0 + 0.9 && pz <= -1.0, road = px > -11.2 && px < 33.5 && pz > -1.6 && pz < 13.3;
+      if (!fore && !road) return 'edge';
+      if (px > GAR.x0 - 0.9 && px < GAR.x1 + 0.9 && pz < GAR.z1 + 0.9) return 'wall';
+      for (const g of Object.values(dW.yardCars)) { if (Math.abs(px - g.position.x) < 1.75 && Math.abs(pz - g.position.z) < 2.9) return 'car'; }
+      if (parkedG && parkedG.parent && parkedG.parent !== outside) for (const g of parkedG.children) { if (Math.abs(px - g.position.x - P26.OX) < 1.7 && Math.abs(pz - g.position.z - P26.OZ) < 2.9) return 'car'; }
+      for (const c of SHOP_CARS29) if (Math.abs(px - c[0]) < 1.75 && Math.abs(pz - c[1]) < 2.9) return 'car';
+      for (const bz of [-1.0, 8.2]) if (Math.hypot(px - (CROSS29[0] - 0.5), pz - bz) < 0.7) return 'post';
+      for (const tc of dW.traffic || []) if (tc.g.visible && Math.hypot(px - tc.g.position.x, pz - tc.g.position.z) < 2.3) return 'car';
+    }
+    return null;
+  }
   function freeBlocked(x, z, phi) {
+    if (drv && drv.shop33) return freeBlocked33(x, z, phi);
     const cs = Math.cos(phi), sn = Math.sin(phi);
     for (const k of [-1.55, 0, 1.55]) {
       const px = x + cs * k, pz = z + sn * k;
@@ -12761,6 +12852,13 @@ if ( uFx > 0.5 ) {
       P.inside = P.err < 1.1 && P.ang < 14;
       P.still = Math.abs(d.v) < 0.05 ? P.still + dt : 0;
     }
+    if (d.park33) {
+      const P = d.park33; let b = null;
+      for (const s of P.spots) { const e = Math.hypot(d.x - s.x, d.z - s.z); if (!b || e < b.e) b = { s, e }; }
+      let a = Math.abs((((d.phi - b.s.phi) % (2 * PI)) + 3 * PI) % (2 * PI) - PI); a = Math.min(a, PI - a);
+      P.at = b.s.id; P.err = b.e; P.ang = a * 180 / PI; P.inside = P.err < 1.2 && P.ang < 15;
+      P.still = Math.abs(d.v) < 0.05 ? P.still + dt : 0;
+    }
   }
   /* where you can walk outside: the forecourt and yard, the strip in front of the car wash and the unit, the wash bay,
      and inside the unit through its doors */
@@ -12781,6 +12879,7 @@ if ( uFx > 0.5 ) {
   const WALK_A = [[-12.4, 43.5, -30.5, -1.2], [-47.6, -12.2, -13.95, -4.4], [-20.9, -14.9, -31.7, -13.9], [-47.6, -24.4, -37.6, -14.25]];
   window.__walkOk = (x, z) => walkOk(x, z);
   function walkOk(x, z) {
+    if (van33Box(x, z)) return false;
     if (z > -1.25) return walkShop29(x, z);
     let ok = false;
     for (const a of WALK_A) if (inBox(x, z, a)) { ok = true; break; }
@@ -12829,9 +12928,10 @@ if ( uFx > 0.5 ) {
     /* which car are you next to? */
     let near = null, nearK = null, best = 3.4;
     for (const g of Object.values(dW.yardCars)) { const dd = Math.hypot(g.position.x - w.x, g.position.z - w.z) - 1.4; if (dd < best) { best = dd; near = g.userData.yardNo; nearK = 'y'; } }
+    if (van33G && van33G.visible) { const dd = Math.hypot(van33G.position.x - w.x, van33G.position.z - w.z) - 2.0; if (dd < best) { best = dd; near = 'van'; nearK = 'v'; } }
     if (dW.unitCars) for (const g of Object.values(dW.unitCars)) { if (g.userData.leaveU) continue; const b = g.userData.box, dd = b ? Math.max(b[0] - w.x, w.x - b[1], b[2] - w.z, w.z - b[3], 0) + 0.3 : 9; if (dd < best) { best = dd; near = g.userData.unitNo; nearK = 'u'; } }
     const key = near == null ? null : nearK + near;
-    if (key !== w.nearKey) { w.nearKey = key; w.near = near; d.ev.push({ type: 'near', no: nearK === 'y' ? near : null, uno: nearK === 'u' ? near : null }); }
+    if (key !== w.nearKey) { w.nearKey = key; w.near = near; d.ev.push({ type: 'near', no: nearK === 'y' ? near : null, uno: nearK === 'u' ? near : null, van: nearK === 'v' }); }
   }
   /* other people on the yard: buyers who walk over to a car */
   function peopleStep(dt) {
@@ -12988,6 +13088,11 @@ if ( uFx > 0.5 ) {
   }
   api.driveStart = o => { const d = driveStart(o || {}); if (d) sizeCheck27(true); return d; };
   api.driveEnd = () => driveEnd();
+  api.van33 = at => { van33At = VAN33[at] ? at : 'yard'; van33Sync(); };
+  api.van33Spot = at => Object.assign({}, VAN33[at] || VAN33.yard);
+  api.van33Info = () => (van33G ? { at: van33At, x: +van33G.position.x.toFixed(2), z: +van33G.position.z.toFixed(2), visible: van33G.visible, marks: van33Marks ? Object.keys(van33Marks).filter(k => van33Marks[k][0].visible) : [] } : null);
+  /* for the tests: put the van you're driving in a bay */
+  api.van33Tp = id => { const d = drv, s = VAN33[id]; if (!d || !d.shop33 || !s) return false; d.x = s.x; d.z = s.z; d.phi = s.phi; d.v = 0; return true; };
   api.driving = () => drv;
   api.driveCam = () => { if (!drv || drv.mode === 'walk') return; const order = drv.mode === 'park' ? ['park', 'chase', 'bonnet'] : ['chase', 'far', 'bonnet']; drv.cam = order[(order.indexOf(drv.cam) + 1) % order.length]; drv.camP = null; };
   api.driveYard = list => setYardCars(list);
@@ -13248,6 +13353,7 @@ if ( uFx > 0.5 ) {
     P26.traffic = dt => {
       const W = dW, R = W && W.R; if (!R || !W.traffic) return;
       for (const tc of W.traffic) {
+        if (drv && drv.shop33) { const q2 = pathAt(R, (tc.s - tc.v * dt + R.N) % R.N, -LANE, {}), d0 = Math.hypot(tc.g.position.x - drv.x, tc.g.position.z - drv.z), d1 = Math.hypot(q2.x - drv.x, q2.z - drv.z); if (d0 < 10 && d1 < d0) continue; }
         tc.s = (tc.s - tc.v * dt + R.N) % R.N;
         const tq = pathAt(R, tc.s, -LANE, tc.q || (tc.q = {})); tc.g.position.set(tq.x, tq.y + 0.02, tq.z); tc.g.rotation.y = -(tq.phi + PI); tc.g.visible = !inRange(tc.s, W.sec.carpark[0] - 18, W.sec.carpark[1] + 18);
       }
@@ -15775,6 +15881,14 @@ window.__engCars = () => CARS.map(c => { try { return [c.model, engineSound({ ca
 window.__sfx = () => Sfx;
 window.__eng30 = (P, steps, secs, old) => { window.__eng22 = !!old; let p; try { p = Sfx.render30(P, steps, secs); } finally { window.__eng22 = false; } return p.then(a => { let pk = 0; for (let i = 0; i < a.length; i++) pk = Math.max(pk, Math.abs(a[i])); const q = new Int16Array(a.length), k = pk > 1 ? 1 / pk : 1; for (let i = 0; i < a.length; i++) q[i] = Math.round(a[i] * k * 32767); let s = ''; const u = new Uint8Array(q.buffer); for (let i = 0; i < u.length; i += 8192) s += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return { peak: pk, b64: btoa(s) }; }); };
 window.__advance = m => { if (S && !S.over) advance(m); };
+window.__van33 = (cmd, arg) => {
+  if (cmd === 'walk') { openYard('yard'); return !!YW; }
+  if (cmd === 'card') { vanCard33(); return !!(YW && YW.card === 'van'); }
+  if (cmd === 'go') { vanDrive33(); return !!(YW && YW.shop33); }
+  if (cmd === 'tp') return Car3D.van33Tp(arg);
+  if (cmd === 'give') { yardAct('ygive', document.body); return true; }
+  return { at: vanAt33(), yw: YW ? YW.mode : null, shop33: !!(YW && YW.shop33), from: YW && YW.from, info: Car3D.van33Info ? Car3D.van33Info() : null };
+};
 window.__drv = () => (Car3D.ok && Car3D.driving ? Car3D.driving() : null);
 window.__route = () => (Car3D.ok && Car3D.routeInfo ? Car3D.routeInfo() : null);
 window.__washDbg = (ph, u) => (Car3D.ok && Car3D.washDebug ? Car3D.washDebug(ph, u) : null);
@@ -15782,6 +15896,39 @@ window.__washDbg = (ph, u) => (Car3D.ok && Car3D.washDebug ? Car3D.washDebug(ph,
 /* ---------- the yard: finished project cars wait out here for buyers ---------- */
 const YARD_MAX = 6;
 let YW = null, SALE = null;
+/* build 33: where the service van is parked: 'yard' (its bay on the forecourt), or outside a shop */
+const vanAt33 = () => (S.van33 && S.van33.at) || 'yard';
+function vanCard33() {
+  const el = document.querySelector('#drive .yd-card'); if (!el || !YW || YW.mode !== 'walk') return;
+  const at = vanAt33(), where = at === 'yard' ? 'on the forecourt' : 'outside ' + SHOPS[at].name;
+  el.innerHTML = `<div class="yc-head">${badgeSvg('bramble', 30)}<div><b>Service van</b><span>Bramble Service Van 2.0 · ${esc(where)}</span></div><button class="pc-x" data-dv="ycardx" aria-label="Close">×</button></div>
+    <p class="yc-offer">${at === 'yard' ? 'Drive it across the road and park outside one of the shops.' : 'Drive it back across the road to its bay on the forecourt.'}</p>
+    <div class="yc-acts"><button class="btn primary" data-dv="yvan">${at === 'yard' ? 'Drive to the shops' : 'Drive it back'}</button></div>`;
+  el.hidden = false; YW.card = 'van';
+}
+function vanDrive33() {
+  if (!YW || YW.mode !== 'walk' || BT || RT) return;
+  const van = dispVan(), from = vanAt33();
+  Car3D.driveEnd(); YW = null; driveUi(false);
+  let D = null; try { D = Car3D.driveStart({ mode: 'park', job: van, shop33: from, yard: yardList(), unit: unitList() }); } catch (e) { D = null; }
+  if (!D) { openYard('yard'); return; }
+  D.running = true;
+  YW = { mode: 'park', shop33: true, from, job: van, bay: null, D, say: null, sayT: 0, sayQ: [], bumps: 0, t0: performance.now(), lastCrunch: 0 };
+  driveUi(true); Sfx.setCar(engineSound(van)); Sfx.engStart();
+  driveSay(from === 'yard' ? 'Out onto the road (the traffic will wait), then into one of the yellow bays outside the shops.' : 'Back out (tap D for reverse), over the road and into the yellow bay on the forecourt.', true);
+}
+/* out of the van, beside it, wherever it's parked */
+function vanWalk33(at) {
+  const s = Car3D.van33Spot(at), home = at === 'yard';
+  openYard('yard', null, { x: s.x - 1.7, z: s.z + (home ? -0.6 : 0.4), phi: home ? -Math.PI / 2 : Math.PI / 2 });
+}
+function vanParked33(at) {
+  const Y = YW; if (!Y) return;
+  S.van33 = { at }; S.stats.vanTrips = (S.stats.vanTrips || 0) + (at === 'yard' ? 0 : 1);
+  Car3D.driveEnd(); Sfx.engStop(); YW = null; driveUi(false); Car3D.van33(at); save();
+  toast(at === 'yard' ? 'The van’s back in its bay on the forecourt.' : `Parked outside ${SHOPS[at].name}. ${Y.bumps ? '' : 'Not a scratch.'}`);
+  vanWalk33(at);
+}
 const saleJob = () => (SALE ? SALE.job : cur());
 const yardPrice = j => Math.round(valuation(j).offer / 10) * 10;
 const yardList = skip => (S.yard || []).filter(j => j !== skip).map(j => ({ no: j.no, car: j.car, bay: j.ybay, price: yardPrice(j) }));
@@ -15810,16 +15957,17 @@ function yardAdd(job, bay, score) {
   return job;
 }
 /* walk out to the yard and look round your cars */
-function openYard(from, pose) {
+function openYard(from, pose, at33) {
   if (BT || RT || YW) return;
   if (!canRoad()) { yardSheet(); return; }
-  let D = null; try { D = Car3D.driveStart({ mode: 'walk', yard: yardList(), unit: unitList(), from, pose }); } catch (e) { D = null; }
+  if (Car3D.van33) Car3D.van33(vanAt33());
+  let D = null; try { D = Car3D.driveStart({ mode: 'walk', yard: yardList(), unit: unitList(), from, pose, at33 }); } catch (e) { D = null; }
   if (!D) { if (from === 'unit') unitSheet(); else yardSheet(); return; }
   YW = { mode: 'walk', D, near: null, card: null, say: null, sayT: 0, sayQ: [], from };
   driveUi(true);
   const n = (S.yard || []).length, u = (S.unit || []).length;
   const say26 = !pose || !openYard.said26; openYard.said26 = true;
-  if (say26) driveSay(from === 'unit' ? (u ? `${u} car${u > 1 ? 's' : ''} in the unit. Walk in through the glass door and up to one.` : 'The unit’s empty. Win a car at auction, or wheel a project car over from the workshop.') : n ? `${n} car${n > 1 ? 's' : ''} for sale. Walk up to one, or tap it. The car wash and the unit are next door.` : 'The yard’s empty. Finish a project car and park it out here to sell it. The unit’s next door, past the car wash.', true);
+  if (at33) { /* out of the van: no welcome speech */ } else if (say26) driveSay(from === 'unit' ? (u ? `${u} car${u > 1 ? 's' : ''} in the unit. Walk in through the glass door and up to one.` : 'The unit’s empty. Win a car at auction, or wheel a project car over from the workshop.') : n ? `${n} car${n > 1 ? 's' : ''} for sale. Walk up to one, or tap it. The car wash and the unit are next door.` : 'The yard’s empty. Finish a project car and park it out here to sell it. The unit’s next door, past the car wash.', true);
   if (say26) S.stats.yardVisits = (S.stats.yardVisits || 0) + 1;
 }
 function yardClose() {
@@ -15829,12 +15977,12 @@ function yardClose() {
 /* back to the yard after taking one of its cars out for a spin */
 function yardResume() { setTimeout(() => openYard('yard'), 60); }
 function yardUiHtml() {
-  if (YW.mode === 'park') return `<div class="dv-top"><button class="dv-x" data-dv="ygive" aria-label="Let someone else park it">×</button><div class="dv-title"><b>Park it in bay ${YW.bay + 1}</b><span>${esc(YW.job.car.model)}</span></div><button class="dv-cam" data-dv="cam" aria-label="Change the camera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5h3l1.6-2.5h8.8L18 8.5h3v10H3z"/><circle cx="12" cy="13.3" r="3.6"/></svg></button></div>
+  if (YW.mode === 'park') return `<div class="dv-top"><button class="dv-x" data-dv="ygive" aria-label="${YW.shop33 ? 'Get out and leave the van where it was' : 'Let someone else park it'}">×</button><div class="dv-title"><b>${YW.shop33 ? (YW.from === 'yard' ? 'Drive to the shops' : 'Back to the garage') : `Park it in bay ${YW.bay + 1}`}</b><span>${esc(YW.job.car.model)}</span></div><button class="dv-cam" data-dv="cam" aria-label="Change the camera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5h3l1.6-2.5h8.8L18 8.5h3v10H3z"/><circle cx="12" cy="13.3" r="3.6"/></svg></button></div>
     <div class="dv-say" aria-live="polite" hidden><i class="dv-face">R</i><p></p></div>
     <div class="yd-park" aria-live="polite"><span class="yp-err">Find the yellow bay</span></div>
     <div class="dv-ctrl"><div class="dv-steer"><button class="dv-pad" data-hold="left" aria-label="Steer left">◀</button><button class="dv-pad" data-hold="right" aria-label="Steer right">▶</button></div>
       <div class="dv-pedals"><button class="dv-gearbtn" data-hold="rev" aria-label="Reverse gear" aria-pressed="false">D</button><button class="dv-pedal brake" data-hold="brake" aria-label="Brake">Brake</button><button class="dv-pedal gas" data-hold="gas" aria-label="Accelerate">Gas</button></div></div>
-    <p class="dv-hint">Tap D to switch to reverse. Stop with the car inside the yellow lines.</p>`;
+    <p class="dv-hint">${YW.shop33 ? 'Tap D to switch to reverse. Stop inside any yellow bay. × gets you out and leaves it where it was.' : 'Tap D to switch to reverse. Stop with the car inside the yellow lines.'}</p>`;
   const n = (S.yard || []).length;
   return `<div class="dv-top"><button class="dv-x back" data-dv="yback" aria-label="Back to the workshop">‹ Workshop</button><div class="dv-title"><b>Your yard</b><span>${n ? `${n} car${n > 1 ? 's' : ''} for sale · ${YARD_MAX - n} space${YARD_MAX - n === 1 ? '' : 's'} free` : 'Nothing for sale yet'}</span></div><button class="dv-cam" data-dv="yfp" aria-label="Switch between first and third person"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
     <div class="dv-say" aria-live="polite" hidden><i class="dv-face">R</i><p></p></div>
@@ -15867,6 +16015,8 @@ function yardAct(a, b) {
   const no = Number(b.dataset.no);
   if (a === 'yback') { yardClose(); return; }
   if (a === 'yfp') { const on = Car3D.walkFp(); b.classList.toggle('on', on); toast(on ? 'First person: drag on the right to look round.' : 'Third person.'); return; }
+  if (a === 'yvan') { vanDrive33(); return; }
+  if (a === 'ygive' && YW && YW.shop33) { const f = YW.from; Car3D.driveEnd(); Sfx.engStop(); YW = null; driveUi(false); vanWalk33(f); return; }
   if (a === 'ygive') { const Y = YW; Car3D.driveEnd(); Sfx.engStop(); YW = null; driveUi(false); yardAdd(Y.job, Y.bay, null); toast(`Uncle Ray parks it in bay ${Y.bay + 1} for you.`); return; }
   if (a === 'ycardx') { const el = document.querySelector('#drive .yd-card'); if (el) el.hidden = true; YW.card = null; return; }
   const j = yardJob(no); if (!j) return;
@@ -15897,15 +16047,16 @@ function yardTick(D, dt) {
     if (Sfx.on && !Sfx.engOn) { if (YW && YW.job) Sfx.setCar(engineSound(YW.job)); Sfx.engStart(); }
     Sfx.engSet(D.rpm || 900, D.in.gas, true);
     D.ev.forEach(e => { if (e.type === 'crunch' && performance.now() - Y.lastCrunch > 700) { Y.lastCrunch = performance.now(); Y.bumps++; Sfx.clunk(0); buzz(40); driveSay(e.what === 'car' ? 'Crunch! Mind the other cars!' : e.what === 'wall' ? 'Ouch, that’s the wall!' : 'Careful, that’s the fence.', true); } });
-    const P = D.park, el = document.querySelector('#drive .yp-err');
+    const P = D.park || D.park33, el = document.querySelector('#drive .yp-err');
     if (el && P) el.textContent = P.inside ? (P.still > 0.2 ? 'Hold it there…' : 'In the bay! Stop.') : `${P.err.toFixed(1)} m to go · ${Math.round(P.ang)}° off straight`;
+    if (P && P.inside && P.still > 0.8 && !Y.done && Y.shop33) { Y.done = true; const at = P.at; setTimeout(() => vanParked33(at), 350); }
     if (P && P.inside && P.still > 0.8 && !Y.done) {
       Y.done = true;
       const score = clamp(Math.round(100 - P.err * 30 - P.ang * 1.6 - Y.bumps * 15), 30, 100);
       setTimeout(() => yardParked(score), 350);
     }
   } else {
-    D.ev.forEach(e => { if (e.type === 'shop') { shopSheet(e.id); return; } if (e.type === 'enterGarage') { const p = e.pose; yardClose(); if (p) fpOpen('door', p); else setTimeout(() => fpOpen('door'), 30); return; } if (e.type === 'doorKnock') { driveSay('The roller door’s coming up. Walk in when it’s open.', true); return; } if (e.type === 'near') { if (e.no != null) yardCard(e.no); else if (e.uno != null) unitCard(e.uno); else if (Y.card != null) { const el = document.querySelector('#drive .yd-card'); if (el) el.hidden = true; Y.card = null; } } });
+    D.ev.forEach(e => { if (e.type === 'shop') { shopSheet(e.id); return; } if (e.type === 'enterGarage') { const p = e.pose; yardClose(); if (p) fpOpen('door', p); else setTimeout(() => fpOpen('door'), 30); return; } if (e.type === 'doorKnock') { driveSay('The roller door’s coming up. Walk in when it’s open.', true); return; } if (e.type === 'near') { if (e.van) vanCard33(); else if (e.no != null) yardCard(e.no); else if (e.uno != null) unitCard(e.uno); else if (Y.card != null) { const el = document.querySelector('#drive .yd-card'); if (el) el.hidden = true; Y.card = null; } } });
   }
   if (Y.sayQ && Y.sayQ.length && performance.now() - Y.sayT > 2600) driveSay(Y.sayQ.shift(), true);
   else if (Y.say && performance.now() - Y.sayT > 6000) { const el = document.querySelector('#drive .dv-say'); if (el) el.hidden = true; Y.say = null; }
@@ -18994,7 +19145,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 32</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : 'On') + '</button><span class="build-tag">Build 33</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -19484,7 +19635,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 32;
+const BUILD = 33;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -21793,7 +21944,7 @@ let DSP = null;
 function dispGo(id) {
   const m = (S.disp.list || []).find(x => x.id === id); if (!m || DSP || RT || MG) return;
   if (!canRoad()) { dispFix(m, 0); return; }
-  const van = dispVan();
+  const van = dispVan(); S.van33 = { at: 'yard' };
   DSP = { m, t0: performance.now(), sayT: 0, arrived: false, chipT: 0 };
   if (!startDrive(van, 'fun')) { DSP = null; dispFix(m, 0); return; }
   if (!RT) { DSP = null; return; }
@@ -24301,6 +24452,20 @@ function showWhatsNew32(had31) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 33: the workshop's background noise plays while you're in the workshop and nothing else is going on */
+const ambWant33 = () => !!(S && S.view === 'workshop' && !RT && !YW && !MG && !BT && !document.hidden && !(typeof AUC !== 'undefined' && AUC && AUC.timer));
+setInterval(() => { try { Sfx.amb(ambWant33()); } catch (e) { /* no sound this second */ } }, 1000);
+window.__amb33 = () => ({ want: ambWant33(), on: Sfx.ambOn() });
+/* build 33: what's new */
+function showWhatsNew33(had32) {
+  showModal(`<div><span class="label">Build 33</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Drive the van to the shops.</b> The yellow service van stands on the forecourt. Walk out, go up to it and get in, then cross the road (the traffic waits for you) and park in a yellow bay outside any of the three shops. Get out and walk in. Drive it back to its bay when you’re done.</li>
+      <li><b>A workshop that sounds like one.</b> Quietly, under everything: the compressor kicking in, a rattle gun somewhere, a spanner put down, the hiss of an air line. It follows the sound switch.</li>
+      ${had32 ? '' : '<li><b>25 new models, and three interiors for every one.</b> Every model has a body of its own now, and a cabin of its own in three trims. Tap <b>Inside</b> to look in.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -24308,8 +24473,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen32) { const had31 = !!S.seen31; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; save(); setTimeout(() => showWhatsNew32(had31), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen33) { const had32 = !!S.seen32; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; save(); setTimeout(() => showWhatsNew33(had32), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
