@@ -1726,6 +1726,24 @@ body.lefty34 .dv-ctrl{flex-direction:row-reverse}body.lefty34 .dv-pedals{flex-di
 .b37-cols{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
 .b37-cols section{border-top:1px solid #1C1D1F;padding-top:6px}.b37-cols h4{font:800 11px Barlow,sans-serif;letter-spacing:.12em;text-transform:uppercase;margin:0 0 4px}
 .b37-cols p{margin:0 0 6px;font-size:13.5px;line-height:1.38}.b37-q{font-size:15px!important}.b37-who{font:700 12px Barlow,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:#55595E}
+.b38-n{font-size:20px;font-weight:800}
+.b38-bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.b38-bar i{display:block;height:100%;background:var(--hazard,#F2B705);border-radius:99px}
+.b38-next{margin:0;font-size:13px}
+.b38-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+.b38-c{border:1.5px solid var(--line);border-radius:12px;padding:9px 11px}.b38-c b{display:block;font-size:14px}.b38-c p{margin:4px 0;font-size:13px;line-height:1.35}.b38-c small{color:var(--muted);font-size:11.5px}
+.b38-c.off{border-style:dashed;opacity:.7}.b38-c.off b{color:var(--muted)}
+.h38{display:block}
+.ph36-tabs .seg34-b{flex:1 0 auto;padding:0 10px}
+.ph35{max-height:min(52vh,520px)}
+.cal39{display:grid;gap:8px}
+.cal39-d{border:1.5px solid var(--line);border-radius:12px;padding:8px 11px}.cal39-d.today{border-color:var(--ink)}
+.cal39-d header{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.cal39-d header b{font-size:14px}.cal39-d header small{color:var(--muted);font-size:11.5px}
+.cal39-d ul{margin:5px 0 0;padding-left:18px}.cal39-d li{font-size:13.5px;line-height:1.35}.cal39-d li.late{color:var(--bad,#C8372D);font-weight:700}.cal39-d li.due{font-weight:700}
+.cal39-d p{margin:4px 0 0;font-size:12.5px}
+.ph39-opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.ph39-r{min-height:34px;padding:0 12px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font-weight:700;font-size:12.5px;cursor:pointer}
+.ph39-me{margin:7px 0 0 auto;width:fit-content;max-width:85%;background:var(--ink);color:var(--panel);border-radius:14px 14px 4px 14px;padding:6px 11px;font-size:13.5px}
+.ph39-back{margin:5px 0 0;width:fit-content;max-width:85%;background:var(--line);border-radius:14px 14px 14px 4px;padding:6px 11px;font-size:13.5px}
 </style>
 </head>
 <body>
@@ -2624,7 +2642,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -4115,6 +4133,7 @@ function handBack() {
   goal('jobs'); goal('earn', total);
   if (stars === 5) { goal('five'); S.stats.five = (S.stats.five || 0) + 1; }
   regularRecord(job, stars); reviewRecord(job, stars, { late, budgetN, short }); weekTrack(total, stars);
+  try { book38(job); } catch (e) { /* not recorded */ }
   if (job.regular) S.stats.regulars = (S.stats.regulars || 0) + 1;
   try { if (engineOf(job.car, job).cyl === 12) S.stats.v12 = (S.stats.v12 || 0) + 1; } catch (e) { /* ignore */ }
   if (job.judge && S.story) { if (stars >= 5 && !short) S.story.judge = true; }
@@ -4155,7 +4174,7 @@ function handBack() {
   else if (ups.length) feedback = pick(['It sounds incredible. Worth every penny.', 'Feels like a different car. Brilliant work.', 'That’s exactly what I wanted. I’ll send my mates your way.']);
   else if (found) feedback = 'Thanks for catching the other problem too. I’d never have known.';
   else feedback = pick(['Drives like new. I’ll be telling my mates.', 'Spot on. Cheers.', 'That’s sorted it. You’ve got a customer for life.', 'Brilliant, quieter than the day I bought it.']);
-  try { if (job.customer && !job.staff) text35(job.customer, `Picked up the ${short35(job.car.model)}. ${feedback}`); } catch (e) { /* no text */ }
+  try { if (job.customer && !job.staff) text35(job.customer, `Picked up the ${short35(job.car.model)}. ${feedback}`, stars >= 4 ? 'thanks' : 'moan'); } catch (e) { /* no text */ }
   let unlocks = '';
   if (lvlAfter > lvlBefore) {
     const jobs = COMPLAINTS.filter(c => c.lvl > lvlBefore && c.lvl <= lvlAfter).map(c => c.title.toLowerCase());
@@ -16570,6 +16589,7 @@ function regularRecord(job, stars) {
   let r = list.find(x => x.reg === job.car.reg);
   if (!r) { r = { name: job.customer, reg: job.car.reg, car: Object.assign({}, job.car), visits: 0, snap: {} }; list.unshift(r); }
   r.visits++; r.day = S.day; r.car = Object.assign({}, job.car, { dirt: 0, keyed: null, graffiti: null }); Object.assign(r.snap, snap);
+  r.hist = [{ d: S.day, t: job.title, f: (job.faulty || []).concat(job.bonus || []).filter(id => job.parts[id] && job.parts[id].isNew && CAT[id]).map(id => CAT[id].name).slice(0, 4) }].concat(r.hist || []).slice(0, 5);
   S.regulars = list.slice(0, 14);
 }
 function regularPick(job) {
@@ -19096,6 +19116,7 @@ function ticketHtml(job) {
       ${trimName32(job.car) ? `<div class="wide"><dt>Inside</dt><dd>${esc(trimName32(job.car))}</dd></div>` : ''}
       <div class="wide"><dt>Engine</dt><dd>${esc(engineLine21(job.car, job))}</dd></div>
       ${job.regular ? `<div class="wide"><dt>Regular customer</dt><dd>Visit ${job.regular} · regulars tip up to 30% more</dd></div>` : ''}
+      ${job.regular ? hist38Html(job) : ''}
       <div><dt>Odometer</dt><dd>${job.car.miles.toLocaleString('en-GB')} mi</dd></div>
       ${job.tune ? `<div class="wide"><dt>Dyno target</dt><dd>${job.tune.target} bhp${job.tune.done ? ` · made ${job.tune.final} bhp` : ` · standard ${job.car.bhp} bhp`}</dd></div>` : ''}
       ${(() => { const pl = perfLine(job); return `<div class="wide"><dt>Performance</dt><dd>${esc(pl.text)}<small class="t-small">${esc(pl.sub)}</small></dd></div>`; })()}
@@ -19339,7 +19360,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 37</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 39</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -19829,7 +19850,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 37;
+const BUILD = 39;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -20566,7 +20587,7 @@ document.addEventListener('click', e => {
 });
 const SUBS = {
   jobs: [['customers', 'Customers'], ['callouts', 'Call-outs'], ['auctions', 'Auctions'], ['fixoff', 'Fix-Off'], ['yard', 'Yard & unit']],
-  collection: [['showroom', 'Showroom'], ['parts', 'Items'], ['tools', 'Toolbox'], ['feed', 'Bonnetgram']],
+  collection: [['showroom', 'Showroom'], ['parts', 'Items'], ['tools', 'Toolbox'], ['faults', 'Fault book'], ['feed', 'Bonnetgram']],
   garage: [['overview', 'Overview'], ['upgrades', 'Upgrades'], ['staff', 'Staff'], ['business', 'Business'], ['awards', 'Awards'], ['settings', 'Settings']],
 };
 function subOf(page) { const v = S.sub && S.sub[page]; return SUBS[page].some(x => x[0] === v) && areaOpen(v) ? v : SUBS[page][0][0]; }
@@ -20661,6 +20682,7 @@ function renderCollection22() {
   h += `<div data-sub="parts">${partsHtml22()}</div>`;
   h += `<div data-sub="sets">${setsHtml23()}</div>`;
   h += `<div data-sub="tools">${toolboxHtml22()}</div>`;
+  h += `<div data-sub="faults">${book38Html()}</div>`;
   h += `<div data-sub="feed">${feedHtml22()}</div>`;
   h += `<p class="build">Bonnet Up · build ${BUILD}</p>`;
   $('#view-collection').innerHTML = h;
@@ -24730,9 +24752,9 @@ function note35(msg) {
   const P = ph35(), m = String(msg).slice(0, 300); if (P.list.length && P.list[0].k === 'n' && P.list[0].m === m) return;
   P.list.unshift({ k: 'n', m, d: S.day, c: S.clock }); ph35Trim(P);
 }
-function text35(from, msg) {
+function text35(from, msg, y) {
   if (!S || !from || !msg) return;
-  const P = ph35(); P.list.unshift({ k: 't', f: String(from).slice(0, 60), m: String(msg).slice(0, 400), d: S.day, c: S.clock }); P.un = Math.min(99, (P.un || 0) + 1); ph35Trim(P);
+  const P = ph35(); P.seq = (P.seq || 0) + 1; P.list.unshift({ k: 't', f: String(from).slice(0, 60), m: String(msg).slice(0, 400), d: S.day, c: S.clock, id: P.seq, y: y || '' }); P.un = Math.min(99, (P.un || 0) + 1); ph35Trim(P);
   phBadge35(); try { Sfx.pop(); } catch (e) { /* no sound */ } buzz(30);
 }
 function phBadge35() {
@@ -24744,16 +24766,17 @@ function phBadge35() {
 const when35 = x => (x.d === S.day ? 'Today' : x.d === S.day - 1 ? 'Yesterday' : `Day ${x.d}`) + ' · ' + hhmm(Math.min(x.c || 0, 24 * 60 - 1));
 function phone35Html() {
   const P = ph35(), un = P.un || 0, texts = P.list.filter(x => x.k === 't'), notes = P.list.filter(x => x.k !== 't').slice(0, 20);
-  const tab = UI.ph36 === 'map' ? 'map' : UI.ph36 === 'paper' && S.paper37 ? 'paper' : 'msgs';
+  const tab = UI.ph36 === 'map' ? 'map' : UI.ph36 === 'cal' ? 'cal' : UI.ph36 === 'paper' && S.paper37 ? 'paper' : 'msgs';
   if (tab === 'paper') S.paper37.read = true;
-  const tabs = `<div class="seg34 ph36-tabs" role="group" aria-label="Phone"><button class="seg34-b" data-b="ph36tab" data-v="msgs" aria-pressed="${tab === 'msgs'}">Messages${un ? ` (${un})` : ''}</button><button class="seg34-b" data-b="ph36tab" data-v="map" aria-pressed="${tab === 'map'}">Town map</button>${S.paper37 ? `<button class="seg34-b" data-b="ph36tab" data-v="paper" aria-pressed="${tab === 'paper'}">Paper${S.paper37.read ? '' : ' •'}</button>` : ''}</div>`;
+  const tabs = `<div class="seg34 ph36-tabs" role="group" aria-label="Phone"><button class="seg34-b" data-b="ph36tab" data-v="msgs" aria-pressed="${tab === 'msgs'}">Messages${un ? ` (${un})` : ''}</button><button class="seg34-b" data-b="ph36tab" data-v="map" aria-pressed="${tab === 'map'}">Town map</button><button class="seg34-b" data-b="ph36tab" data-v="cal" aria-pressed="${tab === 'cal'}">Calendar</button>${S.paper37 ? `<button class="seg34-b" data-b="ph36tab" data-v="paper" aria-pressed="${tab === 'paper'}">Paper${S.paper37.read ? '' : ' •'}</button>` : ''}</div>`;
   if (tab === 'paper') { S.paper37.read = true; return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}<div class="ph35">${paper37Html()}</div><button class="btn primary wide" data-a="close-modal">Done</button>`; }
+  if (tab === 'cal') return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}<div class="ph35">${cal39Html()}</div><button class="btn primary wide" data-a="close-modal">Done</button>`;
   if (tab === 'map') return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}<p class="ph36-wx">${wxLine36()}</p><div class="ph35 map36-wrap">${map36Html()}</div><button class="btn primary wide" data-a="close-modal">Done</button>`;
   return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}
     <p class="ph36-wx">${wxLine36()}</p>
     <div class="ph35">
       <span class="label">Texts</span>
-      ${texts.length ? texts.map((x, i) => `<div class="ph35-msg${i < un ? ' new' : ''}"><b>${esc(x.f)}</b><p>${esc(x.m)}</p><small>${when35(x)}</small></div>`).join('') : '<p class="muted ph35-none">No texts yet. Customers text you here about their cars.</p>'}
+      ${texts.length ? texts.map((x, i) => `<div class="ph35-msg${i < un ? ' new' : ''}"><b>${esc(x.f)}</b><p>${esc(x.m)}</p><small>${when35(x)}</small>${reply39Html(x)}</div>`).join('') : '<p class="muted ph35-none">No texts yet. Customers text you here about their cars.</p>'}
       <span class="label">What happened</span>
       ${notes.length ? notes.map(x => `<div class="ph35-note"><small>${when35(x)}</small>${esc(x.m)}</div>`).join('') : '<p class="muted ph35-none">Nothing yet.</p>'}
     </div>
@@ -24765,8 +24788,8 @@ function morning35() {
   (S.bays || []).forEach(j => {
     if (!j || j.project || j.van22 || j.staff || !j.customer || j.due == null || !j.car) return;
     const m = short35(j.car.model);
-    if (j.due === S.day) text35(j.customer, pick([`Morning! Is my ${m} still on for today?`, `Hi, just checking the ${m} will be ready today. I need it back tonight.`, `Morning. Any news on the ${m}? You said today.`]));
-    else if (j.due < S.day) { const n = S.day - j.due; text35(j.customer, n === 1 ? `My ${m} was due back yesterday. When can I have it?` : `It’s been ${n} days late now. Where’s my ${m}?`); }
+    if (j.due === S.day) text35(j.customer, pick([`Morning! Is my ${m} still on for today?`, `Hi, just checking the ${m} will be ready today. I need it back tonight.`, `Morning. Any news on the ${m}? You said today.`]), 'due');
+    else if (j.due < S.day) { const n = S.day - j.due; text35(j.customer, n === 1 ? `My ${m} was due back yesterday. When can I have it?` : `It’s been ${n} days late now. Where’s my ${m}?`, 'late'); }
   });
 }
 const short35 = m => String(m || 'car').split(' ').slice(1).join(' ') || String(m || 'car');
@@ -24834,7 +24857,7 @@ act22('map36shops', () => {
   if (canRoad() && !RT && !YW && !MG && !BT) { S.view = 'workshop'; render(); try { vanWalk33(vanAt33()); return; } catch (e) { /* fall through */ } }
   S.view = 'garage'; render(); toTop(); toast('Tools, tyre kit and paint come from the shops over the road.');
 });
-act22('ph36tab', b => { UI.ph36 = b.dataset.v === 'map' ? 'map' : b.dataset.v === 'paper' ? 'paper' : 'msgs'; const sh = $('#sheet'); if (sh) { sh.innerHTML = phone35Html(); const t = sh.querySelector('[data-b="ph36tab"][aria-pressed="true"]'); if (t) t.focus(); } });
+act22('ph36tab', b => { UI.ph36 = b.dataset.v === 'map' ? 'map' : b.dataset.v === 'cal' ? 'cal' : b.dataset.v === 'paper' ? 'paper' : 'msgs'; const sh = $('#sheet'); if (sh) { sh.innerHTML = phone35Html(); const t = sh.querySelector('[data-b="ph36tab"][aria-pressed="true"]'); if (t) t.focus(); } });
 /* build 36: tomorrow's weather is decided a day ahead, so the phone can tell you */
 const wx36 = () => (S.wx36 === 'rain' || S.wx36 === 'dry' ? S.wx36 : (S.wx36 = chance(0.2) ? 'rain' : 'dry'));
 const wxLine36 = () => wx36() === 'rain' ? 'Rain tomorrow: wet roads, and the cars come in dirtier.' : 'Dry tomorrow.';
@@ -24898,6 +24921,101 @@ function showWhatsNew37(had36) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 38: the fault book. S.fb38 = { kind: { n: times fixed, d: first day } } */
+const BOOK38 = (() => { const out = []; const seen = {}; Object.keys(CAT).forEach(id => { const k = CAT[id].kind; if (seen[k] || !HINT[k]) return; seen[k] = 1; out.push({ k, id, name: CAT[id].name, corner: CAT[id].corner, zone: CAT[id].zone }); }); return out; })();
+function book38(job) {
+  if (!job || !job.parts || job.staff) return;
+  const B = (S.fb38 = S.fb38 || {}), before = Object.keys(B).length;
+  const ids = (job.faulty || []).concat(job.bonus || []).filter(id => job.parts[id] && job.parts[id].isNew && CAT[id] && HINT[CAT[id].kind]);
+  ids.forEach(id => { const k = CAT[id].kind; const e = B[k] || (B[k] = { n: 0, d: S.day }); e.n++; });
+  const after = Object.keys(B).length;
+  if (after > before) {
+    const fresh = after - before;
+    for (let m = Math.floor(before / 10) + 1; m * 10 <= after; m++) goldAdd(5, `${m * 10} faults in your fault book`);
+    try { note35(`Fault book: ${fresh} new fault${fresh > 1 ? 's' : ''} added. ${after} of ${BOOK38.length} found.`); } catch (e) { /* no note */ }
+  }
+}
+function book38Html() {
+  const B = S.fb38 || {}, got = BOOK38.filter(x => B[x.k]).length, next = Math.min(BOOK38.length, (Math.floor(got / 10) + 1) * 10);
+  const where = z => (z === 'engine' ? 'Under the bonnet' : CORNERS[z] ? 'At one of the wheels' : 'Underneath');
+  const order = BOOK38.slice().sort((a, b) => (B[b.k] ? 1 : 0) - (B[a.k] ? 1 : 0));
+  return `<section class="card22 book38"><div class="c22-h"><div><span class="label">Every fault you’ve fixed</span><h3>Fault book</h3></div><b class="b38-n">${got} / ${BOOK38.length}</b></div>
+    <div class="b38-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${BOOK38.length}" aria-valuenow="${got}"><i style="width:${(got / BOOK38.length * 100).toFixed(1)}%"></i></div>
+    <p class="muted b38-next">${got >= BOOK38.length ? 'You’ve found every fault there is. Proper mechanic.' : `Find ${next - got} more for 5 Gold Bolts.`}</p>
+    <div class="b38-grid">${order.map(x => { const e = B[x.k]; let say = ''; try { say = HINT[x.k](x.corner); } catch (er) { say = ''; }
+      return e ? `<div class="b38-c"><b>${esc(x.name)}</b><p>“${esc(say)}”</p><small>Fixed ${e.n} time${e.n > 1 ? 's' : ''} · first on day ${e.d}</small></div>`
+        : `<div class="b38-c off"><b>Not found yet</b><p>${where(x.zone)}</p></div>`; }).join('')}</div></section>`;
+}
+/* build 38: a regular's service history, on the ticket */
+function hist38Html(job) {
+  if (!job || !job.car) return '';
+  const r = (S.regulars || []).find(x => x.reg === job.car.reg); if (!r || !(r.hist || []).length) return '';
+  return `<div class="wide"><dt>Service history</dt><dd>${r.hist.slice(0, 3).map(h => `<span class="h38">Day ${h.d}: ${esc(h.t)}${h.f && h.f.length ? ` · ${esc(h.f.join(', '))}` : ''}</span>`).join('')}</dd></div>`;
+}
+window.__book38 = () => ({ fb: S.fb38 || {}, kinds: BOOK38.length, gold: S.gold || 0, regs: (S.regulars || []).map(r => ({ reg: r.reg, hist: r.hist || [] })) });
+/* build 38: what's new */
+function showWhatsNew38(had37) {
+  showModal(`<div><span class="label">Build 38</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>The fault book.</b> Collection, Fault book: every kind of fault you’ve found and fixed, how it showed itself, and how many you’ve done. Every ten new ones earns 5 Gold Bolts.</li>
+      <li><b>Service history.</b> When a regular brings their car back, the job card shows what you did to it last time.</li>
+      ${had37 ? '' : '<li><b>Cars drive in, and the local paper.</b> Take a job and the car comes in through the door. The Brickfield Bugle comes out every week, on your phone.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
+/* build 39: the calendar (the phone's Calendar tab) */
+function cal39Days() {
+  const days = [];
+  for (let i = 0; i < 7; i++) days.push({ d: S.day + i, i, e: [] });
+  const add = (d, t, cls) => { const x = days.find(y => y.d === d); if (x) x.e.push({ t, cls: cls || '' }); };
+  (S.bays || []).forEach((j, b) => {
+    if (!j || j.project || j.van22 || j.due == null || !j.car) return;
+    const who = j.customer ? `${j.customer}’s ${short35(j.car.model)}` : `The ${short35(j.car.model)}`;
+    if (j.due < S.day) { const n = S.day - j.due; add(S.day, `${who} is ${n} day${n > 1 ? 's' : ''} late (bay ${b + 1})`, 'late'); }
+    else add(j.due, `${who} is due back (bay ${b + 1})`, j.due === S.day ? 'due' : '');
+  });
+  (S.staff || []).forEach(st => { if (st.away > 0) add(S.day + st.away, `${st.name.split(' ')[0]} is back at work${st.course ? ', better for the course' : ''}`); });
+  if (S.wk && S.wk.start != null) add(S.wk.start + 7, 'The Brickfield Bugle comes out');
+  if (S.contract) { const fl = fleetById(S.contract.id); add(S.day + S.contract.left, `${fl ? fl.name : 'The fleet'} contract ends: bonus paid`); }
+  if (S.loan && S.loan.daily > 0) add(S.day + Math.ceil(S.loan.owed / S.loan.daily), 'Your loan’s paid off');
+  return days;
+}
+function cal39Html() {
+  return `<div class="cal39">${cal39Days().map(x => `<section class="cal39-d${x.i === 0 ? ' today' : ''}"><header><b>${x.i === 0 ? 'Today' : x.i === 1 ? 'Tomorrow' : weekdayOf(x.d)}</b><small>${x.i < 2 ? weekdayOf(x.d) + ' · ' : ''}day ${x.d}${x.i === 1 ? ` · ${wx36() === 'rain' ? 'rain forecast' : 'dry'}` : ''}</small></header>
+    ${x.e.length ? `<ul>${x.e.map(e => `<li class="${e.cls}">${esc(e.t)}</li>`).join('')}</ul>` : '<p class="muted">Nothing booked.</p>'}</section>`).join('')}</div>`;
+}
+window.__cal39 = cmd => { if (cmd === 'open') { UI.ph36 = 'cal'; phone35(); return true; } return cal39Days(); };
+/* build 39: quick replies. [what you say, what they say back, reputation] */
+const REPLY39 = {
+  due: [['It’ll be ready today.', 'Brilliant, thanks.', 0.01], ['Running a bit behind, sorry.', 'OK. Keep me posted.', 0.01]],
+  late: [['Sorry, nearly there.', 'Please hurry, I need it.', 0.02], ['First thing tomorrow, promise.', 'I’ll hold you to that.', 0.02]],
+  thanks: [['Thanks! See you next time.', 'Will do!', 0], ['Glad it’s sorted.', 'Cheers again.', 0]],
+  moan: [['Sorry. Bring it back and I’ll look again.', 'OK. Thanks for being honest.', 0.01], ['It was right when it left.', 'Not from where I’m sitting.', 0]],
+};
+function reply39Html(x) {
+  if (x.r) return `<div class="ph39-me">${esc(x.r)}</div>${x.back ? `<div class="ph39-back">${esc(x.back)}</div>` : ''}`;
+  const o = REPLY39[x.y]; if (!o || S.day - (x.d || 0) > 2) return '';
+  return `<div class="ph39-opts">${o.map((r, i) => `<button class="ph39-r" data-b="ph39reply" data-i="${x.id}" data-o="${i}">${esc(r[0])}</button>`).join('')}</div>`;
+}
+act22('ph39reply', b => {
+  const P = ph35(), x = P.list.find(t => t.k === 't' && String(t.id) === b.dataset.i), o = x && REPLY39[x.y] && REPLY39[x.y][+b.dataset.o];
+  if (!x || !o || x.r) return;
+  x.r = o[0]; x.back = o[1]; if (o[2]) S.rep = clamp(S.rep + o[2], 0, 5);
+  save(); try { Sfx.pop(); } catch (e) { /* no sound */ }
+  const sh = $('#sheet'); if (sh) { const top = (sh.querySelector('.ph35') || {}).scrollTop || 0; sh.innerHTML = phone35Html(); const l = sh.querySelector('.ph35'); if (l) l.scrollTop = top; }
+  renderHud();
+});
+window.__reply39 = (id, o) => { const b = document.querySelector(`[data-b="ph39reply"][data-i="${id}"][data-o="${o}"]`); if (b) b.click(); return !!b; };
+/* build 39: what's new */
+function showWhatsNew39(had38) {
+  showModal(`<div><span class="label">Build 39</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>A calendar.</b> On your phone: the next seven days, with the cars due back (and any that are late), staff back at work, the paper, a fleet contract ending, your last loan payment, and tomorrow’s weather.</li>
+      <li><b>Reply to texts.</b> Customers’ texts have quick replies, and they answer back. A polite word to someone waiting on their car does your reputation a little good.</li>
+      ${had38 ? '' : '<li><b>The fault book and service history.</b> Collection, Fault book: every fault you’ve fixed. Regulars’ job cards show what you did last time.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -24905,8 +25023,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen37) { const had36 = !!S.seen36; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; save(); setTimeout(() => showWhatsNew37(had36), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen39) { const had38 = !!S.seen38; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; save(); setTimeout(() => showWhatsNew39(had38), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
