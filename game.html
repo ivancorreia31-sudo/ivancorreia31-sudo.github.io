@@ -1744,6 +1744,32 @@ body.lefty34 .dv-ctrl{flex-direction:row-reverse}body.lefty34 .dv-pedals{flex-di
 .ph39-r{min-height:34px;padding:0 12px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font-weight:700;font-size:12.5px;cursor:pointer}
 .ph39-me{margin:7px 0 0 auto;width:fit-content;max-width:85%;background:var(--ink);color:var(--panel);border-radius:14px 14px 4px 14px;padding:6px 11px;font-size:13.5px}
 .ph39-back{margin:5px 0 0;width:fit-content;max-width:85%;background:var(--line);border-radius:14px 14px 14px 4px;padding:6px 11px;font-size:13.5px}
+@media (max-width:480px){.dv-dash{gap:6px;padding:6px 9px;max-width:calc(100vw - 10px)}.dv-speed{min-width:44px}.dv-speed b{font-size:26px}.dv-rev{width:34px}.dv-lamps{gap:2px}.dv-lamps i{padding:2px 3px;font-size:8.5px}.dv-notes{padding:5px 9px;font-size:11px}}
+@media (max-width:420px){.dv-notes .w40{display:none}.dv-notes::before{content:'';display:inline-block;width:11px;height:11px;margin-right:4px;vertical-align:-1px;border:2px solid currentColor;border-radius:50%;box-sizing:border-box}}
+@media (max-width:370px){.dv-wheel{display:none}.dv-dash{gap:5px}}
+@media (orientation: landscape) and (max-height: 560px){.stat .k .wkd{display:none}.stats{gap:10px!important}}
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 800px){.hud .brand{display:none}}
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 700px){.stat:not(:first-child) .k{display:none}#h-lvl::before{content:'Lv ';font-size:.72em;opacity:.75}}
+#toast-prev{position:fixed;left:50%;transform:translate(-50%,-100%);z-index:44;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;width:max-content;max-width:calc(100% - 40px)}
+.tp40{background:var(--hud-bg);color:var(--hud-fg);opacity:.82;border-radius:10px;padding:7px 13px;font-weight:600;font-size:12.5px;line-height:1.3;text-align:center;transition:opacity .3s}
+.tp40.out{opacity:0}
+.ov40 .ov40-lead{margin:2px 0 8px;font-size:15px;line-height:1.4}
+.ov40-pts{margin:0 0 12px;padding-left:18px;display:grid;gap:6px}.ov40-pts li{font-size:14px;line-height:1.38}
+.linkish{border:0;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer}
+.pins40 .mk:not(.door) .mk-label{display:none!important}
+.lv41s{cursor:pointer;border-radius:8px}.lv41s:focus-visible{outline:2px solid var(--hazard);outline-offset:3px}
+.lv41-bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden;width:100%}.lv41-bar i{display:block;height:100%;background:var(--hazard,#F2B705);border-radius:99px}
+.lv41-p{margin:6px 0 4px;font-size:13.5px}
+.lv41{list-style:none;margin:4px 0 8px;padding:0;display:grid;gap:8px;width:100%;text-align:left}
+.lv41 li{border:1.5px solid var(--line);border-radius:12px;padding:9px 12px}.lv41 li b{display:block;font-size:14px}.lv41-a{display:block;font-size:13.5px;margin-top:2px}.lv41 li small{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.35}
+.pin-n{position:absolute;inset:0;display:grid;place-items:center;font:900 11px/1 Barlow,sans-serif;color:var(--hazard-ink);font-style:normal}
+.pin.num42 .pin-dot{left:-12px;top:-12px;width:24px;height:24px}
+.pin.num42 .pin-n{font-size:12.5px}
+.pin.num42 .pin-label{display:none}
+.pin.num42:hover .pin-label,.pin.num42:focus-visible .pin-label{display:grid;z-index:2}
+.chips .ans .n42{align-self:center;flex:0 0 auto;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--hazard);color:var(--hazard-ink);font:900 11.5px/1 Barlow,sans-serif;font-style:normal}
+.chips .ans.wrong .n42,.chips .ans.ruled .n42{background:var(--line);color:var(--muted)}
+.tip42{margin:0 0 10px;padding:9px 12px;border-radius:10px;background:var(--line);font-size:13px;line-height:1.4;text-align:left}
 </style>
 </head>
 <body>
@@ -1756,7 +1782,7 @@ body.lefty34 .dv-ctrl{flex-direction:row-reverse}body.lefty34 .dv-pedals{flex-di
       <div class="stat"><span class="k" id="h-day">Day 1</span><span class="clk23"><span class="v" id="h-clock">08:00</span><button class="h-skip" id="h-skip" data-b="skip" aria-label="Skip time" title="Skip time"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5v13l8.2-6.5zM12 5.5v13l8.2-6.5z"/><rect x="20.4" y="5.5" width="1.9" height="13" rx=".6"/></svg></button></span></div>
       <div class="stat"><span class="k">Cash</span><span class="v" id="h-cash">£400</span></div>
       <div class="stat"><span class="k"><span class="k-long">Reputation</span><span class="k-short">Rep</span></span><span class="v" id="h-rep">★ 3.0</span></div>
-      <div class="stat"><span class="k">Level</span><span class="v" id="h-lvl">1</span><span class="xp"><i id="h-xp"></i></span></div>
+      <div class="stat lv41s" data-b="lvl41" role="button" tabindex="0" aria-label="Your garage level: see what opens next"><span class="k">Level</span><span class="v" id="h-lvl">1</span><span class="xp"><i id="h-xp"></i></span></div>
     </div>
     <div class="hud-tools">
       <span class="streak" id="h-streak" hidden></span>
@@ -2642,7 +2668,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -3785,7 +3811,12 @@ function endDay() {
   try { morning35(); } catch (e) { /* no texts today */ }
   achCheck();
   if (storyOn() && S.story.ch === 5 && !S.story.judge) storyJudgeJob();
-  if (S.money < BANKRUPT) S.over = true;
+  /* build 41: not straight out of business */
+  if (S.money < BANKRUPT) {
+    if (!S.ray41) { const gift = Math.round((-100 - S.money) / 10) * 10; S.ray41 = S.day; S.money += gift; sum.ray41 = gift; S.warn41 = 0; }
+    else if (!S.warn41) { S.warn41 = S.day; sum.warn41 = true; }
+    else S.over = true;
+  } else if (S.warn41) { S.warn41 = 0; sum.clear41 = true; }
   render();
   showDaySummary(sum);
 }
@@ -4202,6 +4233,8 @@ function abandon() {
 const Sfx = (() => {
   let ctx = null, out = null, on = true, nb = null, hum = null, loop = null, eng = null, crank = null, held = false, pmute = false;
   const voices = {};
+  /* build 41: the player's volume settings: s for everything, r for the radio on top */
+  const VOL41 = { s: 1, r: 1, node: null };
   let amb33 = null;
   function compressor33(sec) {
     const c = ac(); if (!c) return;
@@ -4228,7 +4261,7 @@ const Sfx = (() => {
     try {
       if (!ctx) {
         const C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
-        ctx = new C(); out = ctx.createGain(); out.gain.value = 0.55; out.connect(ctx.destination);
+        ctx = new C(); out = ctx.createGain(); out.gain.value = 0.55 * VOL41.s; out.connect(ctx.destination);
       }
       if (ctx.state === 'suspended') ctx.resume();
     } catch (e) { return null; }
@@ -4630,7 +4663,8 @@ const Sfx = (() => {
       const bus = c.createGain(), hp = c.createBiquadFilter(), lp = c.createBiquadFilter(), comp = c.createDynamicsCompressor(), vol = c.createGain();
       hp.type = 'highpass'; hp.frequency.value = 110; lp.type = 'lowpass'; lp.frequency.value = 7200;
       comp.threshold.value = -20; comp.ratio.value = 3; comp.attack.value = 0.01; comp.release.value = 0.2;
-      vol.gain.value = 0.0001; bus.connect(hp); hp.connect(lp); lp.connect(comp); comp.connect(vol); vol.connect(out);
+      vol.gain.value = 0.0001; bus.connect(hp); hp.connect(lp); lp.connect(comp); comp.connect(vol);
+      { const lv = c.createGain(); lv.gain.value = VOL41.r; VOL41.node = lv; vol.connect(lv); lv.connect(out); }
       /* a little room: a filtered echo */
       const dl = c.createDelay(1), fb = c.createGain(), dlf = c.createBiquadFilter(), send = c.createGain();
       dl.delayTime.value = 0.21; fb.gain.value = 0.28; dlf.type = 'lowpass'; dlf.frequency.value = 2400; send.gain.value = 0.5;
@@ -4815,6 +4849,7 @@ const Sfx = (() => {
       return true;
     },
     ambOn() { return !!amb33; },
+    vol41(s, r) { VOL41.s = s; VOL41.r = r; try { if (out) out.gain.value = 0.55 * s; if (VOL41.node) VOL41.node.gain.value = r; } catch (e) { /* no audio */ } return { s, r, out: out ? +out.gain.value.toFixed(3) : null, radio: VOL41.node ? +VOL41.node.gain.value.toFixed(3) : null }; },
     liftStart() {
       const c = ac(); if (!c || hum) return;
       try {
@@ -4970,8 +5005,21 @@ function rollCash(to) {
 let toastTimer = 0;
 function toast(msg) {
   try { note35(msg); } catch (e) { /* not kept */ }
-  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  const t = $('#toast');
+  try { if (t.classList.contains('show') && t.textContent && t.textContent !== msg && Date.now() - (toast.at40 || 0) < 2600) prevToast40(t, t.textContent); } catch (e) { /* just replace it */ }
+  toast.at40 = Date.now();
+  t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+/* build 40: the one before stays a moment longer, just above the new one */
+function prevToast40(t, m) {
+  let box = document.getElementById('toast-prev');
+  if (!box) { box = document.createElement('div'); box.id = 'toast-prev'; box.setAttribute('aria-hidden', 'true'); document.body.appendChild(box); }
+  const d = document.createElement('div'); d.className = 'tp40'; d.textContent = m; box.appendChild(d);
+  while (box.children.length > 2) box.firstChild.remove();
+  const place = () => { const r = t.getBoundingClientRect(); box.style.top = Math.max(4, r.top - 6) + 'px'; };
+  place(); requestAnimationFrame(place);
+  setTimeout(() => { d.classList.add('out'); setTimeout(() => d.remove(), 320); }, 2600);
 }
 let modalClosable = true;
 function showModal(html, closable = true) {
@@ -10449,7 +10497,12 @@ if ( uFx > 0.5 ) {
     const W = canvas.clientWidth, H = canvas.clientHeight, padX = Math.min(84, (W - insetR) / 4);
     const pinXY = (x, y) => [clampN(x, padX, W - insetR - padX), clampN(y, 110, H - inset - (landscape ? 72 : 30))];
     const pts = els.map(el => { const c = partCenterLocal(el.dataset.id); return c ? pinXY(...screenOf(c)) : pinXY((W - insetR) / 2, (H - inset) / 2); });
+    /* build 40: labels kept left of the buttons down the side */
+    let railL = W - insetR;
+    try { const nv = layer.querySelector('.nav'), cr = canvas.getBoundingClientRect(); if (nv && nv.offsetWidth) { const r = nv.getBoundingClientRect(); if (r.top < cr.top + H * 0.75) railL = Math.min(railL, r.left - cr.left - 6); } } catch (e) { /* no rail */ }
+    els.forEach((el, i) => { const l = el.querySelector('.pin-label'), hw = (l && l.offsetWidth ? l.offsetWidth : 150) / 2; pts[i][0] = clampN(pts[i][0], 8 + hw, Math.max(8 + hw, railL - hw)); });
     for (let i = 1; i < pts.length; i++) for (let j = 0; j < i; j++) if (Math.abs(pts[i][0] - pts[j][0]) < 120 && Math.abs(pts[i][1] - pts[j][1]) < 46) pts[i][1] = pts[j][1] + 48;
+
     els.forEach((el, i) => { el.style.transform = `translate(${pts[i][0].toFixed(1)}px,${pts[i][1].toFixed(1)}px)`; });
   }
   const fitDist = r => r / Math.sin(fovMin() / 2);
@@ -11004,6 +11057,7 @@ if ( uFx > 0.5 ) {
     tgt.carX = 0;
     if (fresh && !booth) {
       Object.assign(st, tgt);
+      if (car) { car.position.set(st.carX, st.lift, 0); car.updateMatrixWorld(true); }
       cam.animate(overviewView()); cam.snap();
       if (arriving && !reduced) st.carX = 6.5;
       if (arriving && !reduced && WANT37 != null && WANT37 === job.no && !window.__noDriveIn37) {
@@ -11033,6 +11087,8 @@ if ( uFx > 0.5 ) {
   api.redrawText = () => { for (const d of TEXDRAW) { const g = d.c.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, d.c.width, d.c.height); g.save(); try { d.draw(fitText(g), d.c.width, d.c.height); } catch (e) { /* skip */ } g.restore(); d.t.needsUpdate = true; } kick(); };
   api.snapshot = () => { if (drv || fp) return null; try { renderer.shadowMap.needsUpdate = true; renderer.render(scene, camera); return canvas.toDataURL('image/jpeg', 0.92); } catch (e) { return null; } };
   api.radioLit = on => { if (RADIO_LCD) { RADIO_LCD.color.copy(col(on ? '#7CF0C8' : '#20302A')); kick(); } };
+  /* for the tests: where the camera's looking, and how high a part is now */
+  api.look40 = id => { const c = id && partCenterLocal(id); let y = null; if (c && car) { const v = c.clone(); car.updateMatrixWorld(true); car.localToWorld(v); y = +v.y.toFixed(3); } return { py: +cam.T.py.toFixed(3), lift: +st.lift.toFixed(3), carY: car ? +car.position.y.toFixed(3) : null, partY: y }; };
   api.camTo = (o, raw) => { if (raw) { Object.assign(cam.R, o); Object.assign(cam.T, o); } else { cam.animate(o); cam.snap(); } kick(); };
   api.envState = () => ({ in: !!ENVS.in, out: !!ENVS.out });
   api.renderInfo = () => { const i = renderer.info; return { calls: i.render.calls, tris: i.render.triangles, geos: i.memory.geometries, tex: i.memory.textures }; };
@@ -11067,7 +11123,7 @@ if ( uFx > 0.5 ) {
     if (car && curJob) Object.keys(CAPS).forEach(k => applyCap(k, curJob));
     kick();
   };
-  api.setPins = html => { pinsEl.innerHTML = html || ''; if (car) placePins(); };
+  api.setPins = html => { pinsEl.innerHTML = html || ''; layer.classList.toggle('pins40', !!pinsEl.children.length); if (car) placePins(); };
   api.boothHost = () => stage;
   api.boothStart = base => {
     booth = { base, side: null, wait: null, last: null, sig: null };
@@ -15113,16 +15169,16 @@ function quizHtml(job) {
   return `<div class="st-row"><div class="st-text"><h3>What’s broken?</h3>${clue}</div></div>
     ${q.help ? `<p class="toolhint">${esc(q.help.tool)}: <b>${esc(q.help.text)}</b></p>` : ''}
     <p class="st-sub">Tap the broken part on the car${job.faulty.length > 1 ? ` · fault ${job.found.length + 1} of ${job.faulty.length}` : ''}${LISTENABLE.has(CAT[q.id].kind) && !q.listened ? ' · or <button class="linkbtn" data-a="listen">listen with the stethoscope</button>' : ''}</p>
-    <div class="chips">${q.opts.map(x => {
+    <div class="chips">${q.opts.map((x, i) => {
       const wrong = q.wrong.includes(x), ruled = q.ruled.includes(x);
-      return `<button class="ans${wrong ? ' wrong' : ''}${ruled ? ' ruled' : ''}" data-a="g-ans" data-id="${x}"${wrong || ruled ? ' disabled' : ''}>${esc(CAT[x].name)}<small>${esc(CAT[x].corner ? CORNERS[CAT[x].corner].phrase : ZONE_BY[CAT[x].zone].label.toLowerCase())}</small></button>`;
+      return `<button class="ans${wrong ? ' wrong' : ''}${ruled ? ' ruled' : ''}" data-a="g-ans" data-id="${x}"${wrong || ruled ? ' disabled' : ''}><i class="n42" aria-hidden="true">${i + 1}</i>${esc(CAT[x].name)}<small>${esc(CAT[x].corner ? CORNERS[CAT[x].corner].phrase : ZONE_BY[CAT[x].zone].label.toLowerCase())}</small></button>`;
     }).join('')}</div>`;
 }
 function pinsHtml(job) {
-  const q = job.quiz;
-  return q.opts.map(x => {
+  const q = job.quiz, many = q.opts.length > 3;
+  return q.opts.map((x, i) => {
     const wrong = q.wrong.includes(x), ruled = q.ruled.includes(x);
-    return `<button class="pin${wrong ? ' wrong' : ''}${ruled ? ' ruled' : ''}" data-a="g-ans" data-id="${x}"${wrong || ruled ? ' disabled tabindex="-1"' : ''} aria-label="${esc(partLabel(x))}"><span class="pin-label">${esc(CAT[x].name)}<small>${esc(CAT[x].corner ? CORNERS[CAT[x].corner].phrase : ZONE_BY[CAT[x].zone].label.toLowerCase())}${wrong ? ' · not this' : ruled ? ' · ruled out' : ''}</small></span><span class="pin-dot"></span></button>`;
+    return `<button class="pin${many ? ' num42' : ''}${wrong ? ' wrong' : ''}${ruled ? ' ruled' : ''}" data-a="g-ans" data-id="${x}"${wrong || ruled ? ' disabled tabindex="-1"' : ''} aria-label="${i + 1}: ${esc(partLabel(x))}"><span class="pin-label">${esc(CAT[x].name)}<small>${esc(CAT[x].corner ? CORNERS[CAT[x].corner].phrase : ZONE_BY[CAT[x].zone].label.toLowerCase())}${wrong ? ' · not this' : ruled ? ' · ruled out' : ''}</small></span><span class="pin-dot"><b class="pin-n">${i + 1}</b></span></button>`;
   }).join('');
 }
 function stepCardHtml(job) {
@@ -15427,6 +15483,17 @@ function cardHtml(job, id) {
   return h + `<div class="pc-acts">${acts}</div>${note ? `<p class="pc-note">${esc(note)}</p>` : ''}</div>`;
 }
 function welcomeOverlay() {
+  if (!UI.howto40) return `<div class="ov-card ov40" role="dialog" aria-label="Welcome">
+    <span class="label">Unit 4, Brickfield Trading Estate</span>
+    <h2>Your first customer is here</h2>
+    <p class="ov40-lead">Uncle Ray’s handed you the keys to his old garage, and a car with a problem is already on the ramp: find what’s wrong, fix it, and hand it back.</p>
+    <ul class="ov40-pts">
+      <li><b>Follow the card at the bottom.</b> It always tells you what to do next.</li>
+      <li><b>Drag to look round,</b> pinch to zoom, and tap things on the car to work on them.</li>
+    </ul>
+    <div class="row"><button class="btn primary" data-a="dismiss-intro">Let’s go</button><button class="btn" data-a="story-start">Play the story</button></div>
+    <p class="muted">Everything else is explained when you reach it. The full rules are under <button class="linkish" data-a="intro">How to play</button>.</p>
+  </div>`;
   return `<div class="ov-card" role="dialog" aria-label="How to play">
     <span class="label">Unit 4, Brickfield Trading Estate</span>
     <h2>Your first customer is here</h2>
@@ -15750,7 +15817,7 @@ function driveUi(on) {
       ${AUCRUN && !AUCRUN.arrived ? '<div class="dv-lapchip dv-togo" aria-label="Distance to the auction"><span>To go</span><b class="dv-togo-m">…</b><small>Car auction</small></div>' : DSP && !DSP.arrived ? `<div class="dv-lapchip dv-togo" aria-label="Distance to the breakdown"><span>To go</span><b class="dv-togo-m">…</b><small>${esc(DISP_TYPES[DSP.m.type].name)}</small></div>` : RT.purpose === 'fun' ? `<div class="dv-lapchip" aria-label="Lap time"><span>Lap</span><b class="dv-lapt">0:00.0</b><small>${S.rec && S.rec.lap ? 'Record ' + lapText(S.rec.lap.v) : 'No record yet'}</small></div>` : `<ol class="dv-tests" aria-label="Tests on the route">${DTESTS.map(([k, n]) => `<li data-t="${k}">${esc(n)}</li>`).join('')}</ol>`}
       <div class="dv-say" aria-live="polite" hidden><i class="dv-face">${esc(RT.cust[0])}</i><p></p></div>
       <div class="dv-dash" aria-hidden="true"><span class="dv-speed"><b>0</b><small>mph</small></span><span class="dv-gear">N</span><span class="dv-wheel"><svg viewBox="-12 -12 24 24"><circle r="9.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M-9 0h18M0 0v9" stroke="currentColor" stroke-width="2.6"/></svg></span><div class="dv-rev"><i></i></div><span class="dv-temp"><i></i></span>
-        <span class="dv-lamps"><i class="lp-abs">ABS</i><i class="lp-eng">ENG</i><i class="lp-bat">BAT</i><i class="lp-oil">OIL</i></span>${RT.purpose === 'fun' ? '' : '<button class="dv-notes" data-dv="notes" aria-label="What you’ve noticed so far">Noticed <b>0</b></button>'}</div>
+        <span class="dv-lamps"><i class="lp-abs">ABS</i><i class="lp-eng">ENG</i><i class="lp-bat">BAT</i><i class="lp-oil">OIL</i></span>${RT.purpose === 'fun' ? '' : '<button class="dv-notes" data-dv="notes" aria-label="What you’ve noticed so far"><span class="w40">Noticed </span><b>0</b></button>'}</div>
       <div class="dv-pre"><span class="label">Before you set off</span><div class="dv-pre-b"><button class="btn primary dv-key" data-hold="key">Hold the key</button><button class="btn" data-dv="lights">Lights</button><button class="btn" data-dv="washers">Washers</button></div><button class="btn primary wide dv-go" data-dv="go" disabled>Drive off</button></div>
       <div class="dv-ctrl"><div class="dv-steer dv-swpad" data-steer aria-label="Steering: drag left or right"><span class="dv-swtrack"></span><span class="dv-sw"><svg viewBox="-20 -20 40 40" aria-hidden="true"><circle r="16" fill="none" stroke="currentColor" stroke-width="4.2"/><circle r="4.4" fill="currentColor"/><path d="M-15.5 -1.5 L-4.4 -1 M15.5 -1.5 L4.4 -1 M0 4.4 L0 15.5" stroke="currentColor" stroke-width="4.2" stroke-linecap="round"/></svg></span><small>drag to steer</small></div>
         <div class="dv-pedals"><button class="dv-pedal brake" data-hold="brake" aria-label="Brake">Brake</button><button class="dv-pedal gas" data-hold="gas" aria-label="Accelerate">Gas</button></div></div>
@@ -19302,7 +19369,7 @@ function renderJobs() {
 /* ---------- UI: garage ---------- */
 function renderGarage() {
   const L = levelOf(S.xp), [a, b] = levelSpan(L);
-  let h = `<header class="ph"><span class="label">Unit 4, Brickfield Trading Estate</span><h1>Garage</h1><p>Open 08:00 to ${closeText()}. Rent is taken every night when you close up; go more than ${money(-BANKRUPT)} overdrawn and the bank shuts you down.</p></header>`;
+  let h = `<header class="ph"><span class="label">Unit 4, Brickfield Trading Estate</span><h1>Garage</h1><p>Open 08:00 to ${closeText()}. Rent is taken every night when you close up. If you close up more than ${money(-BANKRUPT)} overdrawn, you get one day to get back inside the limit before the bank shuts you down.</p></header>`;
   h += subTabsHtml('garage') + '<div data-sub="overview">' + garageTop22();
   h += `<details class="morestats"><summary>All the numbers</summary><div class="ledger">
     <div><span class="label">Days trading</span><b>${S.day}</b></div>
@@ -19360,7 +19427,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 39</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 42</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -19399,7 +19466,7 @@ function showInvoice(r) {
     ${r.levelUp ? `<div class="levelup"><b>Level ${r.levelUp}</b>${esc(r.unlocks)}</div>` : ''}
     ${baBtn22(r.no)}
     <button class="btn primary wide" data-a="close-modal">Back to the workshop</button>`);
-  Sfx.cash(); popFrom('#h-cash', '+' + money(r.total));
+  if (r.total > 0) { Sfx.cash(); popFrom(document.querySelector('#sheet tr.tot td.n') || '#h-cash', '+' + money(r.total)); }
   if (r.levelUp) setTimeout(() => Sfx.level(), 350); else if (r.stars === 5) setTimeout(() => Sfx.perfect(), 350); else if (r.stars <= 2) setTimeout(() => Sfx.bad(), 350);
   if (r.levelUp || r.stars === 5) confetti();
 }
@@ -19422,6 +19489,9 @@ function showDaySummary(sum) {
   if (sum.cmp && sum.cmp.ignored) h += `<p class="badline">${sum.cmp.ignored} complaint${sum.cmp.ignored > 1 ? 's' : ''} you didn’t deal with turned into bad reviews. Reputation −${sum.cmp.lost.toFixed(2)}.</p>`;
   if (sum.cmp && sum.cmp.arrived) h += `<p class="warnline">${sum.cmp.arrived} customer${sum.cmp.arrived > 1 ? 's have' : ' has'} come back with a complaint. ${sum.cmp.arrived > 1 ? 'They’re' : 'It’s'} on the job board: deal with ${sum.cmp.arrived > 1 ? 'them' : 'it'} today.</p>`;
   if (overdue.length) h += `<p class="warnline">${overdue.map(b => `${esc(b.customer)}’s ${esc(b.car.model)} is now overdue.`).join(' ')} Late cars pay 25% less labour.</p>`;
+  if (sum.ray41) h += `<p class="warnline">You closed up past the bank’s ${money(-BANKRUPT)} limit. Uncle Ray’s put ${money(sum.ray41)} in to keep the doors open, just this once. Next time the bank gives you one day’s warning, then shuts you down.</p>`;
+  if (sum.warn41) h += `<p class="badline">Final warning from the bank: you’re ${money(-S.money)} overdrawn. Be back above −${money(-BANKRUPT)} when you close tonight or they’ll shut you down. Hand cars back, sell a car or a part, or put a job’s parts on the cheaper boxes.</p>`;
+  if (sum.clear41) h += `<p class="warnline">You’re back inside the bank’s limit. The final warning’s lifted.</p>`;
   if (S.over) {
     h += `<p class="badline">You’re ${money(-S.money)} overdrawn. The bank has called in the overdraft and the landlord has changed the locks.</p><p>You traded for ${sum.day} days and handed back ${S.stats.jobs} cars.</p><button class="btn primary wide" data-a="restart">Start a new garage</button>`;
   } else {
@@ -19757,8 +19827,8 @@ document.addEventListener('click', e => {
     case 'closeday': askCloseDay(); break;
     case 'confirm-closeday': closeModal(); endDay(); break;
     case 'close-modal': closeModal(); break;
-    case 'dismiss-intro': S.seenIntro = true; render(); break;
-    case 'intro': S.seenIntro = false; S.view = 'workshop'; render(); toTop(); break;
+    case 'dismiss-intro': S.seenIntro = true; UI.howto40 = false; render(); break;
+    case 'intro': S.seenIntro = false; UI.howto40 = true; S.view = 'workshop'; render(); toTop(); break;
     case 'reset': askReset(); break;
     case 'rename': askRename(); break;
     case 'rename-yes': renameYes(); break;
@@ -19850,7 +19920,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 39;
+const BUILD = 42;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -23703,6 +23773,7 @@ window.__triProbe = () => (Car3D.ok && Car3D.triProbe ? Car3D.triProbe() : null)
 window.__triTop = (k, n) => (Car3D.ok && Car3D.triTop ? Car3D.triTop(k, n) : null);
 window.__bayTest = h => { if (Car3D.ok && Car3D.bayTest) Car3D.bayTest(h); };
 window.__camTo = (o, raw) => { if (Car3D.ok) Car3D.camTo(o, raw); };
+window.__look40 = id => (Car3D.ok && Car3D.look40 ? Car3D.look40(id) : null);
 window.__renderInfo = () => (Car3D.ok ? Car3D.renderInfo() : null);
 window.__triDrive = () => (Car3D.ok && Car3D.triDrive ? Car3D.triDrive() : null);
 
@@ -24674,6 +24745,7 @@ function showWhatsNew32(had31) {
 const ambWant33 = () => !!(S && S.view === 'workshop' && !RT && !YW && !MG && !BT && !document.hidden && !(typeof AUC !== 'undefined' && AUC && AUC.timer));
 setInterval(() => { try { Sfx.amb(ambWant33()); } catch (e) { /* no sound this second */ } }, 1000);
 window.__amb33 = () => ({ want: ambWant33(), on: Sfx.ambOn() });
+window.__vol41 = () => { const o = set34(); return Object.assign({ vol: o.vol, rvol: o.rvol }, Sfx.vol41({ quiet: 0.5, normal: 1, loud: 1.35 }[o.vol] || 1, { quiet: 0.45, normal: 1, loud: 1.5 }[o.rvol] || 1)); };
 /* build 33: what's new */
 function showWhatsNew33(had32) {
   showModal(`<div><span class="label">Build 33</span><h2 class="sheet-title">What’s new</h2></div>
@@ -24690,11 +24762,14 @@ const SET34 = [
   ['steer', 'Steering', [['gentle', 'Gentle'], ['normal', 'Normal'], ['quick', 'Quick']], 'How fast the wheel turns, and how far you drag for full lock.'],
   ['cam', 'Camera drag', [['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast']], 'How far the view turns when you drag round the car.'],
   ['gfx', 'Graphics', [['save', 'Battery saver'], ['auto', 'Auto'], ['sharp', 'Sharp']], 'Battery saver: lower resolution, no lighting effects, 30 frames a second on the road. Sharp: full resolution.'],
+  ['vol', 'Sound volume', [['quiet', 'Quiet'], ['normal', 'Normal'], ['loud', 'Loud']], 'Everything you hear: tools, engines, the workshop and the radio.'],
+  ['rvol', 'Radio volume', [['quiet', 'Quiet'], ['normal', 'Normal'], ['loud', 'Loud']], 'The radio, against everything else.'],
 ];
-const set34 = () => Object.assign({ hand: 'right', steer: 'normal', cam: 'normal', gfx: 'auto' }, S.set34 || {});
+const set34 = () => Object.assign({ hand: 'right', steer: 'normal', cam: 'normal', gfx: 'auto', vol: 'normal', rvol: 'normal' }, S.set34 || {});
 function apply34() {
   const o = set34();
   document.body.classList.toggle('lefty34', o.hand === 'left');
+  try { Sfx.vol41({ quiet: 0.5, normal: 1, loud: 1.35 }[o.vol] || 1, { quiet: 0.45, normal: 1, loud: 1.5 }[o.rvol] || 1); } catch (e) { /* no sound */ }
   try { if (Car3D.ok && Car3D.prefs34) Car3D.prefs34(Object.assign({ fx: S.fx24 !== false }, o)); } catch (e) { /* no 3D */ }
 }
 const steerK34 = () => ({ gentle: 0.7, normal: 1, quick: 1.35 })[set34().steer] || 1;
@@ -24708,6 +24783,7 @@ function showTitle34() {
   const m = document.getElementById('modal'); if (m && !m.hidden) return;
   showModal(`<div class="title34"><span class="label">Welcome back</span><h2 class="title34-h">Bonnet Up</h2>${S.gname ? `<p class="title34-g">${esc(S.gname)}</p>` : ""}
     <p class="title34-s">Day ${S.day} · ${money(S.money)} · garage level ${levelOf(S.xp)}</p></div>
+    ${saveTip42() ? '<p class="tip42">Safari can clear a website’s saved data if you don’t visit for a week. To keep your garage, add Bonnet Up to your Home Screen (Share, then Add to Home Screen), or back it up under Garage, Settings, Move your save.</p>' : ''}
     <button class="btn primary wide" data-a="close-modal">Carry on</button>
     <div class="title34-row"><button class="btn" data-a="intro">How to play</button><button class="btn" data-b="title34set">Settings</button></div>`);
 }
@@ -24976,6 +25052,7 @@ function cal39Days() {
   });
   (S.staff || []).forEach(st => { if (st.away > 0) add(S.day + st.away, `${st.name.split(' ')[0]} is back at work${st.course ? ', better for the course' : ''}`); });
   if (S.wk && S.wk.start != null) add(S.wk.start + 7, 'The Brickfield Bugle comes out');
+  if (S.warn41) add(S.day, `The bank’s deadline: be back above −${money(-BANKRUPT)} by closing`, 'late');
   if (S.contract) { const fl = fleetById(S.contract.id); add(S.day + S.contract.left, `${fl ? fl.name : 'The fleet'} contract ends: bonus paid`); }
   if (S.loan && S.loan.daily > 0) add(S.day + Math.ceil(S.loan.owed / S.loan.daily), 'Your loan’s paid off');
   return days;
@@ -25016,6 +25093,74 @@ function showWhatsNew39(had38) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 40: what's new */
+function showWhatsNew40(had39) {
+  showModal(`<div><span class="label">Build 40</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Fixes from a fresh play-through.</b> Coming back to a car up on the lift now points the camera at the wheel, not the floor. The test-drive dashboard fits on a phone, and the level shows in the top bar with the phone sideways.</li>
+      <li><b>Nothing missed.</b> When two messages pop up together, the first one stays on screen just above the second.</li>
+      <li><b>A shorter welcome</b> for new players. The full rules are still under How to play.</li>
+      ${had39 ? '' : '<li><b>The fault book, service history, a calendar and text replies.</b> Collection, Fault book; regulars’ job cards; and on your phone, Calendar and quick replies to customers.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
+window.__bust41 = cmd => { if (cmd && cmd.money != null) { S.money = cmd.money; save(); render(); } if (cmd === 'end') { endDay(); } return { money: S.money, ray: S.ray41 || 0, warn: S.warn41 || 0, over: !!S.over, day: S.day }; };
+/* build 41: the level sheet: progress to the next level and what opens at the next few */
+function level41Html() {
+  const L = levelOf(S.xp), [a, b] = levelSpan(L), pct = Math.round(Math.min(1, (S.xp - a) / (b - a)) * 100);
+  const rows = [];
+  for (let k = L + 1; k <= L + 8 && rows.length < 3; k++) {
+    const areas = Object.values(AREAS).filter(v => v[0] === k).map(v => v[1]);
+    const kit = UPGRADES.filter(u => u.lvl === k).map(u => u.name);
+    if (!areas.length && !kit.length) continue;
+    const kitTxt = kit.length > 4 ? kit.slice(0, 4).join(', ') + ` and ${kit.length - 4} more` : kit.join(', ');
+    rows.push(`<li><b>Level ${k}</b>${areas.length ? `<span class="lv41-a">${esc(areas.join(' · '))}</span>` : ''}${kit.length ? `<small>To buy: ${esc(kitTxt)}</small>` : ''}</li>`);
+  }
+  return `<div><span class="label">Garage level</span><h2 class="sheet-title">Level ${L}</h2></div>
+    <div class="lv41-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${pct}%"></i></div>
+    <p class="muted lv41-p">${(S.xp - a).toLocaleString()} of ${(b - a).toLocaleString()} XP to level ${L + 1}. Every car you hand back and every test drive earns XP.</p>
+    ${rows.length ? `<span class="label">Coming up</span><ul class="lv41">${rows.join('')}</ul>` : '<p>Everything’s open. Keep climbing for the bigger jobs.</p>'}
+    <button class="btn primary wide" data-a="close-modal">Back to work</button>`;
+}
+act22('lvl41', () => showModal(level41Html()));
+document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.dataset && e.target.dataset.b === 'lvl41') { e.preventDefault(); e.target.click(); } });
+window.__lvl41 = () => { showModal(level41Html()); return { lvl: levelOf(S.xp), rows: document.querySelectorAll('#sheet .lv41 li').length }; };
+/* build 41: what's new */
+function showWhatsNew41(had40) {
+  showModal(`<div><span class="label">Build 41</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>A safety net.</b> Going past the bank’s limit no longer ends your garage at once. The first time, Uncle Ray helps out. After that the bank gives you a final warning and a day to put it right.</li>
+      <li><b>What’s next.</b> Tap your level in the top bar to see how far it is to the next one, and what opens at the next few levels.</li>
+      <li><b>Volume.</b> Garage, Settings: sound volume and radio volume.</li>
+      ${had40 ? '' : '<li><b>Fixes from a fresh play-through.</b> The camera on a raised car, the test-drive dashboard on phones, and messages that no longer knock each other off the screen.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
+/* build 42: keep the save */
+const ios42 = () => /iPad|iPhone|iPod/.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+const installed42 = () => { try { return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } };
+const topLevel42 = () => { try { return window.top === window; } catch (e) { return false; } };
+function persist42() {
+  if (!S || !S.stats || (S.stats.jobs || 0) < 1 || S.persist42) return;
+  if (/Firefox\//.test(navigator.userAgent || '')) return;
+  try {
+    if (!navigator.storage || !navigator.storage.persist) return;
+    navigator.storage.persisted().then(p => p ? true : navigator.storage.persist()).then(ok => { S.persist42 = ok ? 1 : 0; if (ok) save(); }, () => { /* not allowed here */ });
+  } catch (e) { /* not supported */ }
+}
+setTimeout(() => { try { persist42(); } catch (e) { /* later */ } }, 5000);
+hookOn('money', () => { try { persist42(); } catch (e) { /* later */ } });
+const saveTip42 = () => ios42() && !installed42() && topLevel42() && S && S.day >= 2;
+/* build 42: what's new */
+function showWhatsNew42(had41) {
+  showModal(`<div><span class="label">Build 42</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Numbered choices.</b> When you choose what’s broken, each part has the same number on the car and on the card. With more than three, the car just shows the numbers, so the names don’t pile up.</li>
+      <li><b>Your save, kept safe.</b> The game asks your browser to keep its storage. On an iPhone, the welcome-back screen explains how to stop Safari clearing it.</li>
+      ${had41 ? '' : '<li><b>A safety net, what’s next and volume.</b> Going bust no longer ends your garage at once, tap your level to see what opens next, and set the volume in Settings.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25023,8 +25168,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen39) { const had38 = !!S.seen38; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; save(); setTimeout(() => showWhatsNew39(had38), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen42) { const had41 = !!S.seen41; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; save(); setTimeout(() => showWhatsNew42(had41), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
