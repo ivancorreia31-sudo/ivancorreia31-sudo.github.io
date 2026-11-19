@@ -2668,7 +2668,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -10469,7 +10469,35 @@ if ( uFx > 0.5 ) {
   }
   const pv = new T.Vector3();
   function screenOf(local) { pv.copy(local); car.localToWorld(pv); pv.project(camera); return [(pv.x * 0.5 + 0.5) * canvas.clientWidth, (-pv.y * 0.5 + 0.5) * canvas.clientHeight]; }
-  const clampXY = (x, y) => [clampN(x, 30, canvas.clientWidth - insetR - (landscape ? 24 : 70)), clampN(y, 74, canvas.clientHeight - inset - (landscape ? 72 : 30))];
+  /* build 43: where the button rail and the camera / See-through / Inside row are, relative to the view */
+  let rail43T = -1e9, rail43V = null;
+  function rails43() {
+    const now = performance.now(); if (now - rail43T < 300) return rail43V; rail43T = now;
+    try {
+      const c = canvas.getBoundingClientRect(), box = el => { if (!el || !el.offsetWidth || el.closest('[hidden]')) return null; const r = el.getBoundingClientRect(); return { l: r.left - c.left, r: r.right - c.left, t: r.top - c.top, b: r.bottom - c.top }; };
+      let nav = null; layer.querySelectorAll('.nav > .nav-btn, .nav > .lift').forEach(el => { const q = box(el); if (!q) return; nav = nav ? { l: Math.min(nav.l, q.l), r: Math.max(nav.r, q.r), t: Math.min(nav.t, q.t), b: Math.max(nav.b, q.b) } : q; });
+      return (rail43V = { nav, row: box(layer.querySelector('.nav-row')) });
+    } catch (e) { return (rail43V = null); }
+  }
+  const clampXY = (x, y) => {
+    const W = canvas.clientWidth; let mx = W - insetR - (landscape ? 24 : 70), my = canvas.clientHeight - inset - (landscape ? 72 : 30);
+    const rs = rails43();
+    if (rs && rs.nav) { if (rs.nav.l > W / 2) mx = Math.min(mx, rs.nav.l - 28); else if (x < rs.nav.r + 28) my = Math.min(my, rs.nav.t - 28); }
+    if (rs && rs.row && x > rs.row.l - 28) my = Math.min(my, rs.row.t - 28);
+    return [clampN(x, 30, Math.max(30, mx)), clampN(y, 74, Math.max(74, my))];
+  };
+  /* build 43: the whole ring of nuts kept clear of the cards at the top, the buttons and the edges; if there isn't room
+     for it, it gets smaller rather than the nuts piling up on each other */
+  const fit43 = (cx, cy, R, lim) => {
+    for (let k = 0; k < 2; k++) {
+      const [mx] = clampXY(1e5, cy), my = Math.min(clampXY(cx - R, 1e5)[1], clampXY(cx + R, 1e5)[1]);
+      let top = 74; if (lim && cx + R + 26 > lim.l && cx - R - 26 < lim.r) top = Math.max(top, lim.b + 30);
+      if (my - top < 2 * R) R = Math.max(34, (my - top) / 2);
+      cx = clampN(cx, 30 + R, Math.max(30 + R, mx - R));
+      cy = clampN(cy, top + R, Math.max(top + R, my - R));
+    }
+    return [cx, cy, R];
+  };
   let ovLimT = -1e9, ovLimV = null;
   function ovTopLimit() {
     const now = performance.now(); if (now - ovLimT < 300) return ovLimV; ovLimT = now;
@@ -10483,9 +10511,10 @@ if ( uFx > 0.5 ) {
     let c = partCenterLocal(boltPart);
     const subObj = boltSub && CAPS[boltPart] && CAPS[boltPart][boltSub];
     if (subObj) { car.updateMatrixWorld(true); c = car.worldToLocal(subObj.getWorldPosition(new T.Vector3())); }
-    let [cx, cy] = c ? screenOf(c) : [canvas.clientWidth / 2, (canvas.clientHeight - inset) / 2]; const n = els.length, R = n > 1 ? 64 : 0;
+    let [cx, cy] = c ? screenOf(c) : [canvas.clientWidth / 2, (canvas.clientHeight - inset) / 2]; const n = els.length; let R = n > 1 ? 64 : 0;
     const lim = ovTopLimit();
-    if (lim && cx + R + 26 > lim.l && cx - R - 26 < lim.r) cy = Math.max(cy, Math.min(lim.b + R + 30, canvas.clientHeight - inset - R - (landscape ? 72 : 30)));
+    if (R) [cx, cy, R] = fit43(cx, cy, R, lim);
+    else if (lim && cx + R + 26 > lim.l && cx - R - 26 < lim.r) cy = Math.max(cy, Math.min(lim.b + R + 30, canvas.clientHeight - inset - R - (landscape ? 72 : 30)));
     for (let i = 0; i < n; i++) {
       const a = -PI / 2 + i * 2 * PI / n, [x, y] = clampXY(cx + R * Math.cos(a), cy + R * Math.sin(a));
       els[i].style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
@@ -19427,7 +19456,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 42</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 43</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -19920,7 +19949,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 42;
+const BUILD = 43;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -25161,6 +25190,15 @@ function showWhatsNew42(had41) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 43: what's new */
+function showWhatsNew43(had42) {
+  showModal(`<div><span class="label">Build 43</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Nuts you can always tap.</b> When the part you’re working on is near the edge of the screen, its nuts no longer pile up under the buttons down the side. The ring stays clear of the buttons and gets smaller if it has to.</li>
+      ${had42 ? '' : '<li><b>Fixes, a safety net and numbered choices.</b> A fresh play-through fixed the camera on a raised car and the phone layouts. Going bust no longer ends your garage at once. When you choose what’s broken, the parts are numbered.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25168,8 +25206,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen42) { const had41 = !!S.seen41; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; save(); setTimeout(() => showWhatsNew42(had41), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen43) { const had42 = !!S.seen42; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; save(); setTimeout(() => showWhatsNew43(had42), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
