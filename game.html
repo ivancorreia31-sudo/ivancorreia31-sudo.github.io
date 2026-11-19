@@ -6,9 +6,7 @@
 <meta name="theme-color" content="#1D2521">
 <style>:root{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Bonnet Up</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>@font-face{font-family:'Barlow';src:url('fonts/Barlow-Regular.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}@font-face{font-family:'Barlow';src:url('fonts/Barlow-Medium.woff') format('woff');font-weight:500;font-style:normal;font-display:swap}@font-face{font-family:'Barlow';src:url('fonts/Barlow-SemiBold.woff') format('woff');font-weight:600;font-style:normal;font-display:swap}@font-face{font-family:'Barlow';src:url('fonts/Barlow-Bold.woff') format('woff');font-weight:700;font-style:normal;font-display:swap}@font-face{font-family:'Barlow';src:url('fonts/Barlow-MediumItalic.woff') format('woff');font-weight:500;font-style:italic;font-display:swap}@font-face{font-family:'Big Shoulders Display';src:url('fonts/BigShouldersDisplay-VF.woff') format('woff');font-weight:700 900;font-style:normal;font-display:swap}@font-face{font-family:'IBM Plex Mono';src:url('fonts/IBMPlexMono-Medium.woff') format('woff');font-weight:500;font-style:normal;font-display:swap}@font-face{font-family:'IBM Plex Mono';src:url('fonts/IBMPlexMono-SemiBold.woff') format('woff');font-weight:600;font-style:normal;font-display:swap}</style>
 <style>
 /* Layout: sticky garage HUD with a hazard-tape edge over one working column; from 900px the job splits into ticket + diagnosis | car on the ramp + parts. Fixed tab bar at the foot. */
 :root{
@@ -1770,6 +1768,43 @@ body.lefty34 .dv-ctrl{flex-direction:row-reverse}body.lefty34 .dv-pedals{flex-di
 .chips .ans .n42{align-self:center;flex:0 0 auto;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--hazard);color:var(--hazard-ink);font:900 11.5px/1 Barlow,sans-serif;font-style:normal}
 .chips .ans.wrong .n42,.chips .ans.ruled .n42{background:var(--line);color:var(--muted)}
 .tip42{margin:0 0 10px;padding:9px 12px;border-radius:10px;background:var(--line);font-size:13px;line-height:1.4;text-align:left}
+.gw44 .gw44-g{height:10px;margin:8px 0 6px}
+.gw44.hit{border-color:var(--good)}
+.gw44.hit h3{color:var(--good)}
+#sheet .gw44{margin-top:14px}
+.gw44-r{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--line)}
+.gw44-r.won{background:rgba(63,163,96,.18)}
+.lnk44{display:inline;padding:0;border:0;background:none;color:inherit;font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.upg44{margin:4px 0 2px}
+.nw44{white-space:nowrap}
+#h-radio{display:none!important}
+h2.sh{margin-bottom:0}
+.sh-sub{margin:6px 0 12px}
+.nav [data-a="nav-compass"]{display:none}
+@media (pointer:coarse){.nav .zoombtn{display:none}}
+.rad44-now{margin:2px 0 10px}
+.rad44-off{margin:0 0 10px;padding:8px 10px;border-radius:10px;background:var(--line)}
+.rad44-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px}
+.rad44-st{display:grid;gap:2px;text-align:left;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;cursor:pointer;min-height:56px}
+.rad44-st small{color:var(--muted);font-size:12.5px;line-height:1.3}
+.rad44-st[aria-pressed="true"]{border-color:var(--hazard);box-shadow:inset 0 0 0 1px var(--hazard)}
+.gloss44{margin:4px 0 14px}
+.gloss44 summary{cursor:pointer;font-weight:700;padding:6px 0}
+.gloss44 dl{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 14px;margin:6px 0 0}
+.gloss44 dl>div{display:flex;gap:6px;align-items:baseline;font-size:14px;line-height:1.35}
+.gloss44 dl>div.w{grid-column:1/-1}
+.gloss44 dt{font-weight:700;flex:0 0 auto}
+.gloss44 dt::after{content:":"}
+.gloss44 dd{margin:0;color:var(--muted)}
+.al44-top{display:flex;align-items:center;gap:12px;margin:4px 0 6px}
+.al44-top>div{display:grid;gap:2px;flex:1}
+.al44-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.al44-ph{display:grid;gap:3px;padding:0 0 8px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);font:inherit;text-align:left;overflow:hidden;cursor:pointer}
+.al44-ph b,.al44-ph small{padding:0 10px}
+.al44-ph small{color:var(--muted);font-size:12.5px}
+.al44-img{display:block;aspect-ratio:3/2;background:var(--line)}
+.al44-img img{display:block;width:100%;height:100%;object-fit:cover}
+.ba-fans{margin:6px 0 0}
 </style>
 </head>
 <body>
@@ -1823,7 +1858,7 @@ body.lefty34 .dv-ctrl{flex-direction:row-reverse}body.lefty34 .dv-pedals{flex-di
 <div id="toast" role="status" aria-live="polite"></div>
 <div class="modal" id="modal" hidden><div class="sheet" role="dialog" aria-modal="true" id="sheet"></div></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="three.min.js"></script>
 <script>
 (() => {
 'use strict';
@@ -2668,7 +2703,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -2744,7 +2779,7 @@ const partsMult = () => (S.owned.trade ? 0.85 : 1) * ((evNow() || {}).parts || 1
 const stockMult = () => (own('stock') >= 2 ? 0.95 : 1);
 const costMult = id => partsMult() * stockMult() * (own('stock') && CONSUMABLE.includes(CAT[id].kind) ? 0.8 : 1) * (S.owned.tyremc && CAT[id].kind === 'wheel' ? 0.8 : 1);
 const buyPrice = (job, id) => Math.round(listPrice(job, id) * costMult(id));
-const labourMult = () => repMult() * (1 + [0, 0, 0.05, 0.12][Math.min(3, own('ads'))]) * (own('racing') >= 3 ? 1.05 : 1) * legacyMult();
+const labourMult = () => repMult() * (1 + [0, 0, 0.05, 0.12][Math.min(3, own('ads'))]) * (own('racing') >= 3 ? 1.05 : 1) * legacyMult() * (1 + trust44(levelOf(S.xp)));
 const labourFor = job => Math.round(job.labour * labourMult());
 /* ---------- labour: customers pay book time ---------- */
 const LABOUR_RATE = 48;
@@ -2990,7 +3025,7 @@ function gainXP(n, quiet) {
   const before = levelOf(S.xp); S.xp += n;
   const up = levelOf(S.xp) > before;
   if (up) { try { goldAdd(10 + 2 * levelOf(S.xp), null, true); } catch (e) { /* early in the game */ } }
-  if (up && !quiet) { Sfx.level(); confetti(); toast(`Level ${levelOf(S.xp)}! New jobs, cars and kit are unlocked. ${opened28(before, levelOf(S.xp))} +${10 + 2 * levelOf(S.xp)} Gold Bolts.`); }
+  if (up && !quiet) { Sfx.level(); confetti(); toast(`Level ${levelOf(S.xp)}! ${lvlNews44(before, levelOf(S.xp))} +${10 + 2 * levelOf(S.xp)} Gold Bolts.`); }
   return up;
 }
 function goal(type, n = 1) {
@@ -3798,7 +3833,7 @@ function endDay() {
     const cars = S.weather === 'rain' ? ri(2, 6) : ri(10, 20), take = cars * 8;
     S.money += take; S.stats.washTake = (S.stats.washTake || 0) + take; sum.wash = { cars, take, rain: S.weather === 'rain' };
   }
-  sideNight(sum); if (S.wk) S.wk.side = (S.wk.side || 0) + (sum.side || []).reduce((n, r) => n + r.amt, 0);
+  sideNight(sum); if (!S.wk) S.wk = { start: S.day, earned: 0, jobs: 0, five: 0 }; S.wk.side = (S.wk.side || 0) + (sum.side || []).reduce((n, r) => n + r.amt, 0); S.wk.staff = (S.wk.staff || 0) + (sum.staffTaken || 0); S.wk.staffJobs = (S.wk.staffJobs || 0) + (sum.staffJobs || 0);
   sum.rentParts = rentParts();
   S.money -= rent; loanNight(); S.day++; S.clock = DAY_START; S.today = { jobs: 0, earned: 0 };
   const L = levelOf(S.xp);
@@ -3920,7 +3955,7 @@ const deskHue = name => { let h = 0; for (const ch of String(name)) h = (h * 31 
 function deskCard28(j) {
   return `<article class="ticket desk28"><div class="t-top"><span>At reception</span><span>Waiting to be seen</span></div>
       <div class="d28-row"><span class="d28-face" style="--h:${deskHue(j.customer)}">${esc(j.customer.split(' ').map(w => w[0]).join('').slice(0, 2))}</span><div><h2 class="t-title">${esc(j.customer)}</h2><p class="muted">${esc(carLine(j.car))}</p></div></div>
-      <button class="btn primary wide" data-a="desk-go" data-id="${j.no}">${Car3D.ok && Car3D.fpStart ? 'Go to reception' : 'See them'}</button>
+      <button class="btn primary wide" data-a="desk-go" data-id="${j.no}">See them</button>
     </article>`;
 }
 function deskServe(no) {
@@ -3936,7 +3971,7 @@ function deskServe(no) {
       <div><dt>Book time</dt><dd>${bookText(bookOf(j))}</dd></div>
       <div><dt>Difficulty</dt><dd>${diffHtml(j.diff)}</dd></div>
     </dl>
-    <div class="row"><button class="btn primary" data-a="desk-book" data-id="${j.no}">Book it in</button><button class="btn" data-a="desk-no" data-id="${j.no}">Not today</button></div>`);
+    <div class="row">${S.bays.some(b => b === null) ? `<button class="btn primary" data-b="desk-start44" data-id="${j.no}">Start on it now</button><button class="btn" data-a="desk-book" data-id="${j.no}">Book it in for later</button>` : `<button class="btn primary" data-a="desk-book" data-id="${j.no}">Book it in</button>`}<button class="btn" data-a="desk-no" data-id="${j.no}">Not today</button></div>`);
 }
 function deskAfter() {
   save(); try { if (Car3D.ok && Car3D.queueSync) Car3D.queueSync(); } catch (e) { /* no 3D */ }
@@ -3958,7 +3993,7 @@ function deskNo(no) {
 /* to the desk: on foot in the 3D workshop, or straight to the customer where there is no 3D */
 function deskGo(no) {
   if (!deskList().length) { deskServe(); return; }
-  if (Car3D.ok && Car3D.fpStart && !BT && !RT && !YW && !MG && !busy) {
+  if (window.__walkDesk44 && Car3D.ok && Car3D.fpStart && !BT && !RT && !YW && !MG && !busy) {
     if (S.view !== 'workshop') { S.view = 'workshop'; render(); }
     if (!FPW) fpOpen('recep');
     if (FPW) { deskHud(); return; }
@@ -4045,7 +4080,6 @@ function aucArrive() {
 }
 function buy(id) {
   const u = UPGRADES.find(x => x.id === id); if (!u) return;
-  { const sk = shopOf(id); if (sk && !TEST28() && SHOP_AT !== sk) { toast(`${u.name}: sold at ${SHOPS[sk].name}, across the road.`); return; } }
   const nx = nextUpg(u); if (!nx) return;
   if (u.needs && !own(u.needs)) return;
   if (levelOf(S.xp) < nx.lvl || S.money < nx.price) return;
@@ -4216,6 +4250,7 @@ function handBack() {
     if (jobs.length) bits.push(`${jobs.length} new jobs, including ${shuffle(jobs).slice(0, 3).join(', ')}.`);
     if (cars.length) bits.push('New cars: ' + cars.join(', ') + '.');
     if (kit.length) bits.push('In the Garage: ' + kit.join(', ') + '.');
+    if (trust44(lvlAfter) > trust44(lvlBefore)) bits.push(`Customers trust you more: labour pays ${Math.round(trust44(lvlAfter) * 100)}% more than it did at level 6.`);
     unlocks = bits.join(' ');
   }
   render();
@@ -15537,13 +15572,21 @@ function welcomeOverlay() {
       <li><b>Grow the business</b> in the garage: an MOT bay, a recovery truck, fleet contracts, bank loans, your labour rate and late opening.</li>
       <li><b>Pick your parts.</b> Budget, value, genuine and premium boxes look different under the bonnet, with the maker’s name on them. Customers notice.</li>
       <li><b>Build an empire.</b> Side businesses pay every night, then more garages, your own race team, the freehold. Or sell up and start again with a legacy bonus.</li>
-      <li><b>Put the radio on</b> with the radio button at the top: three stations. It fades out while you’re on the road.</li>
-      <li><b>Check Daily</b> for your login reward, the lucky wheel, three challenges, the week’s event, crates, the free Garage Pass and the weekly league.</li>
+      <li><b>Put the radio on</b> from your phone (the phone button at the top), or tap the radio in the workshop: three stations.</li>
+      <li><b>Garage of the Week.</b> Each week has a takings target, under Goals. Hit it for Gold Bolts.</li>
+      <li><b>Check Daily</b> for your login reward, the lucky wheel, three challenges, the week’s event and crates.</li>
       <li><b>Skip time</b> with the ⏩ button by the clock: to the next customer, until a mechanic’s done, an hour or two, or closing time.</li>
       <li><b>Combos.</b> Score 90% or more on hands-on jobs one after another for bonus cash, Gold Bolts and crates.</li>
       <li><b>Collect.</b> Crates and shipping containers hold tools, paints, wraps, rims, tyres, spoilers, turbos and rare engines, from Common to Mythic. Fit them from the Customise sheet.</li>
       <li><b>Call-outs and Fix-Offs</b> are under Jobs: drive the van out to stranded drivers, or race a rival mechanic for their car.</li>
     </ol>
+    <details class="gloss44"><summary>British car words in the game</summary><dl>
+      <div><dt>Bonnet</dt><dd>hood</dd></div><div><dt>Boot</dt><dd>trunk</dd></div><div><dt>Tyre</dt><dd>tire</dd></div><div><dt>Windscreen</dt><dd>windshield</dd></div>
+      <div><dt>Silencer</dt><dd>muffler</dd></div><div><dt>Sump</dt><dd>oil pan</dd></div><div><dt>Gearbox</dt><dd>transmission</dd></div><div><dt>Petrol</dt><dd>gasoline</dd></div>
+      <div><dt>Saloon</dt><dd>sedan</dd></div><div><dt>Estate</dt><dd>station wagon</dd></div><div><dt>Track rod</dt><dd>tie rod</dd></div><div><dt>Tracking</dt><dd>wheel alignment</dd></div>
+      <div><dt>Kerb</dt><dd>curb</dd></div><div><dt>Motor factors</dt><dd>car parts shop</dd></div>
+      <div class="w"><dt>MOT</dt><dd>the yearly safety test a car needs to stay on the road</dd></div><div class="w"><dt>£, mph</dt><dd>pounds (the game’s money) and miles per hour</dd></div>
+    </dl></details>
     <div class="row"><button class="btn primary" data-a="story-start">Play the story</button><button class="btn" data-a="dismiss-intro">Let’s go</button></div>
     <p class="muted">The story has six chapters with Uncle Ray, or just get stuck in.</p>
   </div>`;
@@ -16489,8 +16532,8 @@ function achCheck() {
   else if (got.length) { achBusy = true; setTimeout(() => { achBusy = false; got.forEach(([n, r], i) => setTimeout(() => { toast(`Achievement: ${n}! +${money(r)}`); Sfx.perfect(); }, i * 1800)); }, 300); }
 }
 function achHtml() {
-  const A = S.ach || {}, n = ACH.filter(a => A[a[0]]).length;
-  return `<h2 class="sh">Achievements</h2><p class="sh-sub">${n} of ${ACH.length} done. Each one pays a reward.</p><ul class="ach">${ACH.map(([id, name, desc, , reward]) => `<li class="${A[id] ? 'done' : ''}"><b>${esc(name)}</b><span>${esc(desc)}</span><small>${A[id] ? `Done on day ${A[id]}` : `+${money(reward)}`}</small></li>`).join('')}</ul>`;
+  const A = S.ach || {}, ACHV = ACH.filter(a => !achOff44(a[0]) || A[a[0]]), n = ACHV.filter(a => A[a[0]]).length;
+  return `<h2 class="sh">Achievements</h2><p class="sh-sub">${n} of ${ACHV.length} done. Each one pays a reward.</p><ul class="ach">${ACHV.map(([id, name, desc, , reward]) => `<li class="${A[id] ? 'done' : ''}"><b>${esc(name)}</b><span>${esc(desc)}</span><small>${A[id] ? `Done on day ${A[id]}` : `+${money(reward)}`}</small></li>`).join('')}</ul>`;
 }
 
 /* ---------- fleet contracts: a firm sends you its cars every day for a week, for a bit more labour, on time or else ---------- */
@@ -16724,7 +16767,8 @@ function weekTrack(total, stars) { const w = (S.wk = S.wk || { start: S.day, ear
 function weekNight(sum) {
   const w = S.wk; if (!w || S.day - w.start < 7) return;
   const prev = S.wkPrev || null;
-  sum.week = { n: Math.max(1, Math.ceil(w.start / 7)), earned: w.earned, jobs: w.jobs, five: w.five, side: w.side || 0, prev: prev ? prev.earned : null };
+  sum.week = { n: Math.max(1, Math.ceil(w.start / 7)), earned: w.earned + (w.staff || 0), jobs: w.jobs + (w.staffJobs || 0), five: w.five, side: w.side || 0, prev: prev ? prev.earned + (prev.staff || 0) : null };
+  try { gwNight44(sum.week); } catch (e) { /* no target this week */ }
   try { paper37(sum.week); } catch (e) { /* no paper this week */ }
   S.wkPrev = w; S.wk = { start: S.day, earned: 0, jobs: 0, five: 0 };
 }
@@ -19188,9 +19232,16 @@ function welcomeHtml() {
       <li><span><b>Hire mechanics and grow.</b>From level 2 you can take on staff to work the other ramps. In the garage: an MOT bay, a recovery truck, fleet contracts, loans, your labour rate and opening hours.</span></li>
       <li><span><b>Choose your parts carefully.</b>Every quality and every maker looks different under the bonnet. Premium parts earn a bonus; cheap ones save money but customers notice.</span></li>
       <li><span><b>Spend it.</b>Specialist kit, side businesses, promotions, more garages and a race team. When you’re rich enough you can sell up and start again with a legacy bonus.</span></li>
-      <li><span><b>Come back every day.</b>Daily rewards, challenges and events, the showroom’s takings and your Bonnetgram fans keep going while you’re away.</span></li>
-      <li><span><b>Climb.</b>Thirty Garage Pass tiers a season, a weekly league from Bronze to Champion, and collection sets with bonuses that last for good.</span></li>
+      <li><span><b>Come back every day.</b>Daily rewards, challenges and events, and the showroom’s takings keep going while you’re away.</span></li>
+      <li><span><b>Climb.</b>Garage of the Week: a takings target every week that grows with you. Collection sets have bonuses that last for good.</span></li>
     </ol>
+    <details class="gloss44"><summary>British car words in the game</summary><dl>
+      <div><dt>Bonnet</dt><dd>hood</dd></div><div><dt>Boot</dt><dd>trunk</dd></div><div><dt>Tyre</dt><dd>tire</dd></div><div><dt>Windscreen</dt><dd>windshield</dd></div>
+      <div><dt>Silencer</dt><dd>muffler</dd></div><div><dt>Sump</dt><dd>oil pan</dd></div><div><dt>Gearbox</dt><dd>transmission</dd></div><div><dt>Petrol</dt><dd>gasoline</dd></div>
+      <div><dt>Saloon</dt><dd>sedan</dd></div><div><dt>Estate</dt><dd>station wagon</dd></div><div><dt>Track rod</dt><dd>tie rod</dd></div><div><dt>Tracking</dt><dd>wheel alignment</dd></div>
+      <div><dt>Kerb</dt><dd>curb</dd></div><div><dt>Motor factors</dt><dd>car parts shop</dd></div>
+      <div class="w"><dt>MOT</dt><dd>the yearly safety test a car needs to stay on the road</dd></div><div class="w"><dt>£, mph</dt><dd>pounds (the game’s money) and miles per hour</dd></div>
+    </dl></details>
     <div class="row"><button class="btn primary" data-a="story-start">Play the story</button><button class="btn" data-a="dismiss-intro">Got it</button></div>
   </section>`;
 }
@@ -19398,7 +19449,7 @@ function renderJobs() {
 /* ---------- UI: garage ---------- */
 function renderGarage() {
   const L = levelOf(S.xp), [a, b] = levelSpan(L);
-  let h = `<header class="ph"><span class="label">Unit 4, Brickfield Trading Estate</span><h1>Garage</h1><p>Open 08:00 to ${closeText()}. Rent is taken every night when you close up. If you close up more than ${money(-BANKRUPT)} overdrawn, you get one day to get back inside the limit before the bank shuts you down.</p></header>`;
+  let h = `<header class="ph"><span class="label">Unit 4, Brickfield Trading Estate</span><h1>Garage</h1><p>Open 08:00 to ${closeText()}. Rent is taken every night. Close up more than ${money(-BANKRUPT)} overdrawn and the bank gives you one day to put it right.</p></header>`;
   h += subTabsHtml('garage') + '<div data-sub="overview">' + garageTop22();
   h += `<details class="morestats"><summary>All the numbers</summary><div class="ledger">
     <div><span class="label">Days trading</span><b>${S.day}</b></div>
@@ -19438,6 +19489,8 @@ function renderGarage() {
   h += `<div class="story-card"><div><span class="label">Story mode</span><b>${!S.story ? 'Ray’s garage' : S.story.done ? 'Garage of the Year' : `Chapter ${S.story.ch + 1}: ${esc(STORY[S.story.ch].title)}`}</b><p class="muted">${!S.story ? 'Six chapters, from Uncle Ray’s keys to Garage of the Year.' : S.story.done ? 'You beat Slade Speedfit. The trophy’s yours.' : S.story.on ? 'Tap to see this chapter’s goals.' : 'Paused.'}</p></div><button class="btn${S.story && S.story.on ? '' : ' primary'}" data-a="${!S.story ? 'story' : S.story.on || S.story.done ? 'story' : 'story-resume'}">${!S.story ? 'Start the story' : S.story.done ? 'See it' : S.story.on ? 'Chapter goals' : 'Carry on'}</button></div>`;
   h += '</div><div data-sub="staff">' + SUBG.staff + '</div><div data-sub="business">' + SUBG.business + '</div><div data-sub="awards">' + SUBG.awards + '</div><div data-sub="upgrades">' + upgCatChips22();
   const st = styleOf();
+  { const ks = Object.keys(SHOPS), lk = (k, end) => `<span class="nw44"><button class="lnk44" data-a="shop-go" data-id="${k}">${esc(SHOPS[k].name)}</button>${end}</span>`;
+    h += `<p class="muted sm upg44">Rather walk? The same kit is sold over the road at ${ks.map((k, i) => lk(k, i === ks.length - 1 ? '.' : i === ks.length - 2 ? '' : ',')).map((x, i) => (i === ks.length - 1 && i ? 'and ' : '') + x).join(' ')}</p>`; }
   for (const [cat, title, blurb] of UPG_CATS) {
     h += `<div class="upcat" data-cat="${cat}"><h2 class="sh">${title}</h2><p class="sh-sub">${blurb}${cat === 'looks' ? ` Style now: <b>${st}</b> · tips +${Math.round(st * 4)}%` : ''}</p><ul class="upg">`;
     UPGRADES.filter(u => (u.cat || 'tools') === cat).forEach(u => {
@@ -19448,7 +19501,6 @@ function renderGarage() {
       if (!nx) act = `<span class="ownedtag">${u.levels ? 'Maxed' : 'Owned'}</span>`;
       else if (u.needs && !own(u.needs)) act = `<button class="btn" disabled>Needs the ${esc(lc(UPGRADES.find(x => x.id === u.needs).name))}</button>`;
       else if (L < nx.lvl) act = `<button class="btn" disabled>Unlocks at level ${nx.lvl}</button>`;
-      else if (shopOf(u.id) && !TEST28()) act = `<button class="btn" data-a="shop-go" data-id="${shopOf(u.id)}">${money(nx.price)} · at ${esc(SHOPS[shopOf(u.id)].name)}</button>`;
       else act = `<button class="btn primary" data-a="buy" data-id="${u.id}"${S.money >= nx.price ? '' : ' disabled'}>${n ? 'Upgrade' : 'Buy'} · ${money(nx.price)}</button>`;
       const title2 = u.levels ? `${esc(u.name)} ${pips}` : esc(u.name);
       const body = u.levels ? `${have ? `<p class="have">Now: <b>${esc(have.name)}</b>. ${esc(have.desc)}</p>` : ''}${nx ? `<p>${n ? 'Next' : 'Level 1'}: <b>${esc(nx.name)}</b>. ${esc(nx.desc)}</p>` : ''}` : `<p>${esc(u.desc)}</p>`;
@@ -19456,7 +19508,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 43</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 44</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -19512,7 +19564,7 @@ function showDaySummary(sum) {
       <tr class="tot"><td>Cash in the bank</td><td class="n${S.money < 0 ? ' neg' : ''}">${money(S.money)}</td></tr>
     </table>`;
   if (sum.week) { const w = sum.week, up = w.prev != null ? w.earned - w.prev : null;
-    h += `<div class="weekrep"><span class="label">Week ${w.n} report</span><p><b>${money(w.earned + w.side)}</b> this week: ${w.jobs} car${w.jobs === 1 ? '' : 's'} handed back${w.five ? `, ${w.five} five-star` : ''}${w.side ? `, ${money(w.side)} from the side businesses` : ''}.${up != null ? ` That’s <b class="${up >= 0 ? 'pos' : 'neg'}">${up >= 0 ? '+' : '−'}${money(Math.abs(up))}</b> on the week before.` : ''} Business value: <b>${money(netWorth21())}</b>.</p></div>`; }
+    h += `<div class="weekrep"><span class="label">Week ${w.n} report</span><p><b>${money(w.earned + w.side)}</b> this week: ${w.jobs} car${w.jobs === 1 ? '' : 's'} handed back${w.five ? `, ${w.five} five-star` : ''}${w.side ? `, ${money(w.side)} from the side businesses` : ''}.${up != null ? ` That’s <b class="${up >= 0 ? 'pos' : 'neg'}">${up >= 0 ? '+' : '−'}${money(Math.abs(up))}</b> on the week before.` : ''} Business value: <b>${money(netWorth21())}</b>.</p>${gwSumHtml44(w)}</div>`; }
   if (sum.staff && (sum.staff.jobs || (S.staff || []).length)) h += `<p class="stf-sumline">Your staff handed back <b>${sum.staff.jobs}</b> car${sum.staff.jobs === 1 ? '' : 's'} today and took <b>${money(sum.staff.taken)}</b>.</p>`;
   if (sum.news && sum.news.length) h += `<ul class="news">${sum.news.map(n => `<li>${esc(n)}</li>`).join('')}</ul>`;
   if (sum.cmp && sum.cmp.ignored) h += `<p class="badline">${sum.cmp.ignored} complaint${sum.cmp.ignored > 1 ? 's' : ''} you didn’t deal with turned into bad reviews. Reputation −${sum.cmp.lost.toFixed(2)}.</p>`;
@@ -19542,7 +19594,7 @@ function goalsListHtml() {
 function showGoals() {
   ensureState();
   showModal(`<div><span class="label">Day ${S.day}</span><h2 class="sheet-title">Today’s goals</h2></div>${eventHtml()}${goalsListHtml()}
-    <p class="muted">${S.goals.sweep ? 'Clean sweep done. New goals tomorrow morning.' : `Finish all three for a clean-sweep bonus of ${money(sweepBonus())}. New goals every morning.`}${S.streak > 1 ? ` You’re on a streak of ${S.streak} perfect jobs.` : ''}</p>
+    <p class="muted">${S.goals.sweep ? 'Clean sweep done. New goals tomorrow morning.' : `Finish all three for a clean-sweep bonus of ${money(sweepBonus())}. New goals every morning.`}${S.streak > 1 ? ` You’re on a streak of ${S.streak} perfect jobs.` : ''}</p>${gwHtml44()}
     <button class="btn primary wide" data-a="close-modal">Back to work</button>`);
 }
 function askAbandon() {
@@ -19949,7 +20001,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 43;
+const BUILD = 44;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -20321,7 +20373,7 @@ const CHAL = {
   people: { say: () => 'Finish a job for one of the regular characters', need: [1, 1], hook: 'charjob', gold: 15, cash: 300, lvl: 2 },
 };
 function dailyMake() {
-  const L = levelOf(S.xp), pool = Object.keys(CHAL).filter(k => (CHAL[k].lvl || 1) <= L && (!CHAL[k].req || CHAL[k].req()));
+  const L = levelOf(S.xp), pool = Object.keys(CHAL).filter(k => !CHAL[k].off && (CHAL[k].lvl || 1) <= L && (!CHAL[k].req || CHAL[k].req()));
   const pickN = shuffle(pool).slice(0, 3);
   S.daily = { key: dayKey(), rerolls: 0, bonus: false, list: pickN.map(k => chalMake(k, L)) };
 }
@@ -20353,7 +20405,7 @@ function chalClaim(i) {
 function chalReroll(i) {
   const c = S.daily && S.daily.list[i]; if (!c || c.done) return;
   const cost = 5 + 5 * S.daily.rerolls; if (!goldSpend(cost, 'reroll')) return;
-  const L = levelOf(S.xp), used = S.daily.list.map(x => x.k), pool = Object.keys(CHAL).filter(k => !used.includes(k) && (CHAL[k].lvl || 1) <= L && (!CHAL[k].req || CHAL[k].req()));
+  const L = levelOf(S.xp), used = S.daily.list.map(x => x.k), pool = Object.keys(CHAL).filter(k => !CHAL[k].off && !used.includes(k) && (CHAL[k].lvl || 1) <= L && (!CHAL[k].req || CHAL[k].req()));
   if (!pool.length) return; S.daily.list[i] = chalMake(pick(pool), L); S.daily.rerolls++; render();
 }
 function chalHtml() {
@@ -20686,7 +20738,7 @@ document.addEventListener('click', e => {
 });
 const SUBS = {
   jobs: [['customers', 'Customers'], ['callouts', 'Call-outs'], ['auctions', 'Auctions'], ['fixoff', 'Fix-Off'], ['yard', 'Yard & unit']],
-  collection: [['showroom', 'Showroom'], ['parts', 'Items'], ['tools', 'Toolbox'], ['faults', 'Fault book'], ['feed', 'Bonnetgram']],
+  collection: [['showroom', 'Showroom'], ['parts', 'Items'], ['tools', 'Toolbox'], ['faults', 'Fault book'], ['feed', 'Photos']],
   garage: [['overview', 'Overview'], ['upgrades', 'Upgrades'], ['staff', 'Staff'], ['business', 'Business'], ['awards', 'Awards'], ['settings', 'Settings']],
 };
 function subOf(page) { const v = S.sub && S.sub[page]; return SUBS[page].some(x => x[0] === v) && areaOpen(v) ? v : SUBS[page][0][0]; }
@@ -20775,7 +20827,7 @@ act22('tskip-ad', b => timerSkip(b.dataset.id, 'ad'));
 /* the Collection page */
 function renderCollection22() {
   S.inv.looked = S.inv.looked || {};
-  let h = `<header class="ph"><span class="label">Everything you’ve found</span><h1>Collection</h1><p>Your prestige showroom, every part and paint you’ve collected, your toolbox, and Bonnetgram.</p></header>`;
+  let h = `<header class="ph"><span class="label">Everything you’ve found</span><h1>Collection</h1><p>Your showroom, everything you’ve collected, your toolbox, the fault book and your photos.</p></header>`;
   h += subTabsHtml('collection', { showroom: showBank22() >= 50 ? '£' : 0, parts: Object.keys(S.inv.items).filter(id => !S.inv.looked[id]).length, sets: setsReady23() });
   h += `<div data-sub="showroom">${showroomHtml22()}</div>`;
   h += `<div data-sub="parts">${partsHtml22()}</div>`;
@@ -20830,7 +20882,7 @@ function toolboxHtml22() {
 /* the top of the Garage page: the numbers that matter, and where things are */
 function garageTop22() {
   const L = levelOf(S.xp), F = fameTier22();
-  return `<div class="gtop"><div><span class="label">Business value</span><b>${money(netWorth21())}</b></div><div><span class="label">Gold Bolts</span><b>${goldTxt(S.gold || 0)}</b></div><div><span class="label">Level</span><b>${L}</b></div><div><span class="label">Fame</span><b>${esc(F.name)}</b><small class="muted">${(S.fame.followers || 0).toLocaleString('en-GB')} followers</small></div></div>
+  return `<div class="gtop"><div><span class="label">Business value</span><b>${money(netWorth21())}</b></div><div><span class="label">Gold Bolts</span><b>${goldTxt(S.gold || 0)}</b></div><div><span class="label">Level</span><b>${L}</b></div><div><span class="label">Fans</span><b>${esc(F.name)}</b><small class="muted">${(S.fame.followers || 0).toLocaleString('en-GB')} fans</small></div></div>
     <div class="gquick"><button class="btn sm" data-b="sub" data-p="garage" data-v="upgrades">Buy upgrades</button><button class="btn sm" data-b="sub" data-p="garage" data-v="staff">Staff</button><button class="btn sm" data-b="goto" data-v="collection" data-s="showroom">Showroom</button><button class="btn sm" data-b="goto" data-v="daily">Daily rewards</button></div>`;
 }
 
@@ -21193,7 +21245,7 @@ hookOn('job', d => {
   const newMods = (v.unlock || []).filter(m => !S.chars.unlocked[m]);
   newMods.forEach(m => { S.chars.unlocked[m] = true; });
   if (v.item) invAdd(v.item);
-  if (v.post && typeof fameAdd22 === 'function') fameAdd22(v.post, `${C.name} tagged you`);
+  if (v.post && typeof fameAdd22 === 'function') fameAdd22(v.post, `${C.name} told everyone about you`);
   hookFire('charjob', { ch: v.ch, visit: v.id, stars: d.stars });
   setTimeout(() => {
     if (v.item) showItemGot(v.item, `A thank-you from ${C.name}`);
@@ -21636,7 +21688,7 @@ function showroomHtml22() {
   for (let k = (R.cars || []).length; k < showSlots(); k++) h += `<li class="empty"><div class="sh-pic"><span>Empty plinth</span></div><div class="sh-txt"><b>Space for a car</b><small>A finished project car, parts above 72%</small></div><div class="sh-li-acts"><button class="btn sm primary" data-b="sh-pick">Add a car</button></div></li>`;
   h += '</ul>';
   if (nx) h += `<div class="c22-acts"><button class="btn" data-b="sh-build"${L < nx[2] ? ' disabled' : ''}>${L < nx[2] ? `More plinths at level ${nx[2]}` : `Extend to ${nx[0]} cars · ${money(nx[1])}`}</button></div>`;
-  h += `<p class="muted sm">Prestige comes from power, class, condition and the collector parts on each car: a mythic part counts 32 times a common one. Your Bonnetgram fame adds ${Math.round(8 * fameTier22().idx)}%.</p></section>`;
+  h += `<p class="muted sm">Prestige comes from power, class, condition and the collector parts on each car: a mythic part counts 32 times a common one. Your fans add ${Math.round(8 * fameTier22().idx)}%.</p></section>`;
   return h;
 }
 function showPick22() {
@@ -21795,7 +21847,7 @@ function showScene(L) {
    When it's finished it takes another from the same angle. The before & after card puts them side by side with a bar
    you drag across, you can save it, and you can post it to Bonnetgram, the in-game social app, where virtual fans
    like it, follow you and push you up the fame tiers (which make your showroom pay more). */
-const FAME = [[0, 'Unknown'], [100, 'Local hero'], [500, 'Petrolhead'], [2000, 'Car influencer'], [8000, 'Celebrity mechanic'], [30000, 'Living legend']];
+const FAME = [[0, 'Unknown'], [100, 'Local hero'], [500, 'Petrolhead favourite'], [2000, 'Talk of the town'], [8000, 'Famous mechanic'], [30000, 'Living legend']];
 function fameTier22() {
   const f = (S && S.fame && S.fame.followers) || 0;
   let i = 0; while (i < FAME.length - 1 && f >= FAME[i + 1][0]) i++;
@@ -21811,9 +21863,9 @@ function fameAdd22(n, why) {
     S.fame.tier = after.idx;
     const g = [0, 10, 20, 30, 50, 80][after.idx] || 0;
     if (g) goldAdd(g, null, true);
-    setTimeout(() => { toast(`Fame tier up: you’re a ${after.name}! ${g ? `+${g} Gold Bolts, and ` : ''}your showroom pays ${Math.round(after.idx * 8)}% more.`); confetti(); Sfx.level(); }, 400);
+    setTimeout(() => { toast(`More fans: you’re now “${after.name}”! ${g ? `+${g} Gold Bolts, and ` : ''}your showroom pays ${Math.round(after.idx * 8)}% more.`); confetti(); Sfx.level(); }, 400);
   }
-  if (why) toast(`+${Math.round(n).toLocaleString('en-GB')} followers: ${why}`);
+  if (why) toast(`+${Math.round(n).toLocaleString('en-GB')} fans: ${why}`);
 }
 /* which jobs get photographed: project cars, the regulars' cars, and anything getting a new look */
 const baWorthy = j => !!(j && (j.project || j.char22 || j.respray || (j.mods && j.mods.length)));
@@ -21841,8 +21893,11 @@ function baAfter22(j) {
   if (cur() !== j) return !!R.a;
   const url = Car3D.heroShot(720, 480); if (!url) return !!R.a;
   let worth = 0; try { worth = j.project ? valuation(j).offer : labourFor(j); } catch (e) { /* fine */ }
+  const first44 = !R.a;
   Object.assign(R, { a: true, model: j.car.model, paint: j.car.paintName || '', worth, items: carItemsOf(j.car), char: j.char22 || null, project: !!j.project, at: nowMs() });
-  photoPut('ba-' + j.no + '-a', url); save();
+  photoPut('ba-' + j.no + '-a', url);
+  if (first44) { try { fans44(R); } catch (e) { /* fine */ } S.stats.posts = (S.stats.posts || 0) + 1; hookFire('post', { no: j.no }); }
+  save();
   return true;
 }
 const baBtn22 = no => { const R = S.fame && S.fame.ba && S.fame.ba[no]; return R && R.b && R.a ? `<button class="btn wide ba-btn" data-b="ba-open" data-no="${no}">${'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14"/><path d="m8 10-2 2 2 2M16 10l2 2-2 2"/></svg>'}See the before & after</button>` : ''; };
@@ -21853,11 +21908,11 @@ function baShow22(jOrNo, why) {
   Promise.all([photoGet('ba-' + no + '-b'), photoGet('ba-' + no + '-a')]).then(([b, a]) => {
     if (!b || !a) { toast('The photos for that one have gone.'); return; }
     BAV = { no, b, a };
-    const posted = (S.fame.posts || []).some(p => p.no === no);
     showModal(`<div><span class="label">${why === 'showroom' ? 'On a plinth' : 'Finished'}</span><h2 class="sheet-title">${esc(R.model)}</h2><p class="muted">Drag the bar to compare.</p></div>
       <div class="ba22" style="--x:100%"><img class="ba-a" src="${a}" alt="After"><div class="ba-b"><img src="${b}" alt="Before"></div><div class="ba-bar"><i></i></div><span class="ba-tag l">Before</span><span class="ba-tag r">After</span></div>
       <p class="ba-cap">${R.paid ? `Bought for ${money(R.paid)}` : 'Came in like this'}${R.worth ? ` · ${R.project ? 'worth' : 'paid'} ${money(R.worth)} now` : ''}${R.items && R.items.length ? ` · ${R.items.length} collector part${R.items.length > 1 ? 's' : ''}` : ''}</p>
-      <div class="row ba-acts">${posted ? '<span class="ownedtag">Posted</span>' : `<button class="btn primary" data-b="ba-post" data-no="${no}">Post to Bonnetgram</button>`}<button class="btn" data-b="ba-save" data-no="${no}">Save the picture</button><button class="btn ghost" data-a="close-modal">Close</button></div>`);
+      ${R.fans ? `<p class="muted sm ba-fans">This one won you ${R.fans.toLocaleString('en-GB')} fans.</p>` : ''}
+      <div class="row ba-acts"><button class="btn primary" data-b="ba-save" data-no="${no}">Save the picture</button><button class="btn" data-a="close-modal">Close</button></div>`);
     const fr = document.querySelector('#sheet .ba22'); if (!fr) return;
     const set = x => { const r = fr.getBoundingClientRect(); fr.style.setProperty('--x', Math.max(0, Math.min(100, (x - r.left) / r.width * 100)) + '%'); };
     let down = false;
@@ -21947,7 +22002,8 @@ const NPC_POSTS = [
   { ch: 'arabella', t: 'Polo was simply divine. Everyone asked about the gold. Daddy’s still livid.', lvl: 4 },
   { ch: 'giles', t: 'Mabel and Dolly send their regards. Back in the field where they belong.', lvl: 2 },
 ];
-function feedHtml22() {
+function feedHtml22() { return album44Html(); }
+function feedHtmlOld22() {
   bgTick22();
   const F = S.fame, T = fameTier22(), posts = F.posts || [];
   const done = (S.chars && S.chars.done) || {};
@@ -24254,7 +24310,7 @@ function passRollover23(s) {
   S.pass = { season: s, xp: 0, claimed: [], bonus: 0, last: P ? { season: P.season, tier: passTier(P) } : null };
 }
 function passXP23(n, why) {
-  if (!S || !n) return;
+  if (!S || !n || S.pass44) return;
   const P = pass23(), before = passTier(P), bb = passBonusReady(P);
   P.xp += Math.round(n * (perk23('pass') ? 1.15 : 1));
   const after = passTier(P);
@@ -24274,7 +24330,7 @@ hookOn('container', () => passXP23(PASS_XP.container));
 hookOn('post', () => passXP23(PASS_XP.post));
 hookOn('showcollect', () => passXP23(PASS_XP.show));
 hookOn('craft', () => passXP23(PASS_XP.craft));
-hookOn('ensure', () => { try { pass23(); } catch (e) { /* items not ready */ } });
+hookOn('ensure', () => { try { passRetire44(); } catch (e) { /* items not ready */ } });
 function passHtml23() {
   const P = pass23(), s = P.season, th = passTheme(s), tier = passTier(P), ex = passExOf(s);
   const into = tier >= PASS_TIERS ? (P.xp - PASS_TIERS * PASS_STEP) % PASS_BONUS : P.xp - tier * PASS_STEP, need = tier >= PASS_TIERS ? PASS_BONUS : PASS_STEP;
@@ -24368,7 +24424,7 @@ function lgClaim23() {
   render();
 }
 function lgAdd23(n) {
-  if (!S || !n) return;
+  if (!S || !n || S.league44) return;
   const L = league23(), before = lgTable(L).findIndex(x => x.me);
   L.pts += Math.round(n * (perk23('league') ? 1.15 : 1));
   const after = lgTable(L).findIndex(x => x.me);
@@ -24380,7 +24436,7 @@ hookOn('mini', d => { if (d.score >= 90) lgAdd23(LG_PTS.mini90); });
 hookOn('dispatch', d => { if (d.ok) lgAdd23(LG_PTS.dispatch); });
 hookOn('fixoff', d => { if (d.win) lgAdd23(LG_PTS.fixoff); });
 hookOn('chal', () => lgAdd23(LG_PTS.chal));
-hookOn('ensure', () => { try { league23(); } catch (e) { /* early */ } });
+hookOn('ensure', () => { try { lgRetire44(); } catch (e) { /* early */ } });
 function leagueHtml23() {
   const L = league23(), D = LEAGUES[L.div], tab = lgTable(L), me = tab.findIndex(x => x.me) + 1, r = L.result;
   const zone = i => (i < 3 && L.div < LEAGUES.length - 1 ? 'up' : i >= 7 && L.div > 0 ? 'down' : '');
@@ -24409,7 +24465,7 @@ const WHEEL = [
   { k: 'token', t: 'style', w: 12, col: '#2F7BD8', label: 'Style crate' },
   { k: 'cash', m: 3, w: 10, col: '#2C7A4B', label: 'Big cash' },
   { k: 'gold', n: 25, w: 10, col: '#F2A900', label: '25 Gold' },
-  { k: 'pass', n: 150, w: 10, col: '#9B4FD6', label: 'Pass XP' },
+  { k: 'pass', n: 150, w: 10, col: '#9B4FD6', label: '150 XP' },
   { k: 'jackpot', w: 2, col: '#E5386D', label: 'JACKPOT' },
 ];
 const wheelCash = m => Math.round((150 + 30 * levelOf(S.xp)) * m / 50) * 50;
@@ -24421,7 +24477,7 @@ function wheel23() {
 const wheelFree = () => (perk23('spin2') ? 2 : 1);
 const wheelLeft = () => Math.max(0, wheelFree() - wheel23().used);
 function wheelPrizeText(p) {
-  return p.k === 'cash' ? money(wheelCash(p.m)) : p.k === 'gold' ? `${p.n} Gold Bolts` : p.k === 'shards' ? `${p.n} shards` : p.k === 'token' ? `a ${CRATES[p.t].name}` : p.k === 'pass' ? `${p.n} Garage Pass XP` : `a Legend crate and 50 Gold Bolts`;
+  return p.k === 'cash' ? money(wheelCash(p.m)) : p.k === 'gold' ? `${p.n} Gold Bolts` : p.k === 'shards' ? `${p.n} shards` : p.k === 'token' ? `a ${CRATES[p.t].name}` : p.k === 'pass' ? `${p.n} XP` : `a Legend crate and 50 Gold Bolts`;
 }
 function wheelPay(i) {
   const p = WHEEL[i];
@@ -24429,7 +24485,7 @@ function wheelPay(i) {
   else if (p.k === 'gold') goldAdd(p.n, null, true);
   else if (p.k === 'shards') crates23().shards += p.n;
   else if (p.k === 'token') { S.crates.tokens = S.crates.tokens || {}; S.crates.tokens[p.t] = (S.crates.tokens[p.t] || 0) + 1; }
-  else if (p.k === 'pass') passXP23(p.n);
+  else if (p.k === 'pass') gainXP(p.n, true);
   else { S.crates.tokens = S.crates.tokens || {}; S.crates.tokens.legend = (S.crates.tokens.legend || 0) + 1; goldAdd(50, null, true); S.stats.jackpots = (S.stats.jackpots || 0) + 1; }
 }
 function wheelRoll() { const tot = WHEEL.reduce((s, p) => s + p.w, 0); let x = Math.random() * tot; for (let i = 0; i < WHEEL.length; i++) { x -= WHEEL[i].w; if (x <= 0) return i; } return 0; }
@@ -24480,7 +24536,7 @@ function wheelSpin23(how) {
 }
 function wheelHtml23() {
   const W = wheel23(), left = wheelLeft(), ad = !W.ad && adsOk();
-  return `<section class="card22 whc23${left ? ' on' : ''}"><div class="whc23-art" aria-hidden="true">${wheelSvg()}</div><div><span class="label">Lucky wheel</span><b>${left ? `${left} free spin${left > 1 ? 's' : ''} waiting` : 'Spun today'}</b><p class="muted sm">${left ? 'Cash, Gold Bolts, crates, shards, Pass XP, or the jackpot.' : W.last != null ? `You won ${esc(wheelPrizeText(WHEEL[W.last]))}. ` : ''}${left ? '' : `Next free spin in <span data-until="${nowMs() + msLeftToday()}">${durText(msLeftToday())}</span>.`}</p></div><button class="btn${left ? ' primary' : ''}" data-b="wh-open">${left ? 'Spin' : ad ? 'Ad spin' : 'Look'}</button></section>`;
+  return `<section class="card22 whc23${left ? ' on' : ''}"><div class="whc23-art" aria-hidden="true">${wheelSvg()}</div><div><span class="label">Lucky wheel</span><b>${left ? `${left} free spin${left > 1 ? 's' : ''} waiting` : 'Spun today'}</b><p class="muted sm">${left ? 'Cash, Gold Bolts, crates, shards, XP, or the jackpot.' : W.last != null ? `You won ${esc(wheelPrizeText(WHEEL[W.last]))}. ` : ''}${left ? '' : `Next free spin in <span data-until="${nowMs() + msLeftToday()}">${durText(msLeftToday())}</span>.`}</p></div><button class="btn${left ? ' primary' : ''}" data-b="wh-open">${left ? 'Spin' : ad ? 'Ad spin' : 'Look'}</button></section>`;
 }
 act22('wh-open', () => wheelOpen23());
 act22('wh-spin', () => wheelSpin23('free'));
@@ -24495,10 +24551,10 @@ window.__wheelSpin = i => { const W = wheel23(); W.used = Math.max(0, W.used - 1
 const SETS = [
   { id: 'cham', name: 'Colour Shifters', items: ['p_cham_violet', 'p_cham_copper', 'p_cham_mid', 'p_pearl'], gold: 40, perk: 'shards', perkText: '15% more shards from every crate' },
   { id: 'wraps', name: 'Wrapped Up', items: ['w_carbon', 'w_camo', 'w_tiger'], gold: 30, perk: 'gold5', perkText: '+1 Gold Bolt for every five-star job' },
-  { id: 'elem', name: 'The Elements', items: ['w_neon', 'w_lava', 'w_lightning', 'w_galaxy'], gold: 120, perk: 'pass', perkText: '15% more Garage Pass XP' },
+  { id: 'elem', name: 'The Elements', items: ['w_neon', 'w_lava', 'w_lightning', 'w_galaxy'], gold: 120, perk: 'gw2', perkText: 'Garage of the Week pays 50% more Gold Bolts' },
   { id: 'chrome', name: 'Mirror Finish', items: ['p_chrome', 'p_goldchrome', 'r_spinner'], gold: 150, perk: 'crate5', perkText: '5% off every crate' },
   { id: 'rims', name: 'Wheel Deal', items: ['r_dish', 'r_aero', 'r_wire', 'r_forged', 'r_neon', 'r_carbon'], gold: 60, perk: 'jobcash', perkText: '+£40 on every car you hand back' },
-  { id: 'tyres', name: 'Sidewall Stories', items: ['tz_letters', 'tz_gold', 'tz_neon', 'tz_flame', 'tz_rainbow'], gold: 120, perk: 'league', perkText: '15% more league points' },
+  { id: 'tyres', name: 'Sidewall Stories', items: ['tz_letters', 'tz_gold', 'tz_neon', 'tz_flame', 'tz_rainbow'], gold: 120, perk: 'gwlow', perkText: 'Garage of the Week targets are 10% lower' },
   { id: 'boost', name: 'Full Boost', items: ['tb_t25', 'tb_35', 'tb_hurricane', 'tb_typhoon', 'tb_billet'], gold: 80, perk: 'chal2', perkText: '+3 Gold Bolts for every daily challenge' },
   { id: 'wings', name: 'Downforce', items: ['sp_lip', 'sp_duck', 'sp_gt', 'sp_swan', 'sp_dragon'], gold: 80, perk: 'combo2', perkText: 'Double cash from hands-on combos' },
   { id: 'engines', name: 'The Engine Room', items: ['e_flat6', 'e_v6tt', 'e_rotary', 'e_v8tt', 'e_v10', 'e_v12', 'e_ev'], gold: 200, perk: 'free3', perkText: 'A free crate every three hours instead of four' },
@@ -24585,36 +24641,33 @@ window.__combo = () => combo23();
 /* ======================= build 23: the Daily page, in sections =======================
    Today (login, the lucky wheel, the combo, deliveries, challenges, the weekly event), Crates, the Garage Pass and the
    weekly league, each with its own count on the chip. */
-SUBS.daily = [['today', 'Today'], ['crates', 'Crates'], ['pass', 'Pass'], ['league', 'League']];
+SUBS.daily = [['today', 'Today'], ['crates', 'Crates']];
 function dailyCounts23() {
   const today = (loginReady() ? 1 : 0) + (S.daily && S.daily.key === dayKey() ? S.daily.list.filter(c => c.done && !c.claimed).length : 0)
     + (S.ev && S.ev.week === weekKey() ? EV_MILES.filter(([need], i) => S.ev.pts >= need && !S.ev.claimed.includes(i)).length : 0)
     + (S.timers || []).filter(t => t.ready).length + wheelLeft();
   crateFreeTick();
   const crates = (S.crates.free || 0) + Object.values(S.crates.tokens || {}).reduce((a, b) => a + b, 0) + (dealToday23().used ? 0 : 0);
-  const L = league23();
-  return { today, crates, pass: passClaimable(pass23()), league: L.result && !L.result.claimed ? 1 : 0 };
+  return { today, crates };
 }
 function renderDaily22() {
   let h = `<header class="ph ph23"><span class="label">Come back every day</span><h1>Daily</h1></header>`;
   h += `<div class="goldbar gb23"><span class="gb-big">${goldTxt(S.gold || 0)}<small>Gold Bolts</small></span><span class="gb-sh">${shardTxt(crates23().shards)}<small>shards</small></span><button class="btn sm ghost" data-b="goldhow" aria-label="How to earn Gold Bolts">How to earn</button></div>`;
   h += subTabsHtml('daily', dailyCounts23());
-  h += `<div data-sub="today">${loginHtml()}${wheelHtml23()}${comboHtml23()}${timersHtml22()}${chalHtml()}${evHtml()}</div>`;
+  h += `<div data-sub="today">${loginHtml()}${wheelHtml23()}${gwHtml44()}${chalHtml()}${evHtml()}${comboHtml23()}${timersHtml22()}</div>`;
   h += `<div data-sub="crates">${cratesHtml()}</div>`;
-  h += `<div data-sub="pass">${passHtml23()}</div>`;
-  h += `<div data-sub="league">${leagueHtml23()}</div>`;
   h += `<p class="build">Bonnet Up · build ${BUILD}</p>`;
   $('#view-daily').innerHTML = h;
   applySubs('daily');
 }
 function dailyCount22() {
-  const c = dailyCounts23(); return c.today + c.crates + c.pass + c.league;
+  const c = dailyCounts23(); return c.today + c.crates;
 }
 /* the old "How to earn" list, with the new ways in it */
 act22('goldhow', () => showModal(`<div><span class="label">Gold Bolts</span><h2 class="sheet-title">How to earn them</h2></div><ul class="news">
   <li><b>Log in every day.</b> 5 to 30 a day, more the longer your streak.</li><li><b>Daily challenges.</b> 10 to 15 each, and 20 more for doing all three.</li>
-  <li><b>The lucky wheel.</b> A free spin every day.</li><li><b>The Garage Pass.</b> Tiers pay Gold Bolts, crates and shards; it’s free.</li>
-  <li><b>The weekly league.</b> Finish in the top three for a prize.</li><li><b>The weekly event.</b> Milestones pay Gold Bolts, crates and an exclusive prize.</li>
+  <li><b>The lucky wheel.</b> A free spin every day.</li><li><b>Garage of the Week.</b> Hit the week’s takings target. Every third win brings a paint or wheels you can’t get anywhere else.</li>
+  <li><b>The weekly event.</b> Milestones pay Gold Bolts, crates and an exclusive prize.</li>
   <li><b>Levelling up</b> pays Gold Bolts, and so do achievements, collection sets and hands-on combos.</li>
   <li><b>Fix-Offs, call-outs and the showroom</b> sometimes pay in Gold Bolts.</li>${adsOk() ? '<li><b>Watch a short ad</b> to skip a timer, double your login reward or spin the wheel again.</li>' : ''}</ul>
   <p class="muted sm">Spend them on crates, or to skip a timer. You can’t buy them with real money.</p><button class="btn primary wide" data-a="close-modal">Got it</button>`));
@@ -24871,9 +24924,10 @@ function phBadge35() {
 const when35 = x => (x.d === S.day ? 'Today' : x.d === S.day - 1 ? 'Yesterday' : `Day ${x.d}`) + ' · ' + hhmm(Math.min(x.c || 0, 24 * 60 - 1));
 function phone35Html() {
   const P = ph35(), un = P.un || 0, texts = P.list.filter(x => x.k === 't'), notes = P.list.filter(x => x.k !== 't').slice(0, 20);
-  const tab = UI.ph36 === 'map' ? 'map' : UI.ph36 === 'cal' ? 'cal' : UI.ph36 === 'paper' && S.paper37 ? 'paper' : 'msgs';
+  const tab = UI.ph36 === 'map' ? 'map' : UI.ph36 === 'cal' ? 'cal' : UI.ph36 === 'radio' ? 'radio' : UI.ph36 === 'paper' && S.paper37 ? 'paper' : 'msgs';
   if (tab === 'paper') S.paper37.read = true;
-  const tabs = `<div class="seg34 ph36-tabs" role="group" aria-label="Phone"><button class="seg34-b" data-b="ph36tab" data-v="msgs" aria-pressed="${tab === 'msgs'}">Messages${un ? ` (${un})` : ''}</button><button class="seg34-b" data-b="ph36tab" data-v="map" aria-pressed="${tab === 'map'}">Town map</button><button class="seg34-b" data-b="ph36tab" data-v="cal" aria-pressed="${tab === 'cal'}">Calendar</button>${S.paper37 ? `<button class="seg34-b" data-b="ph36tab" data-v="paper" aria-pressed="${tab === 'paper'}">Paper${S.paper37.read ? '' : ' •'}</button>` : ''}</div>`;
+  const tabs = `<div class="seg34 ph36-tabs" role="group" aria-label="Phone"><button class="seg34-b" data-b="ph36tab" data-v="msgs" aria-pressed="${tab === 'msgs'}">Messages${un ? ` (${un})` : ''}</button><button class="seg34-b" data-b="ph36tab" data-v="map" aria-pressed="${tab === 'map'}">Town map</button><button class="seg34-b" data-b="ph36tab" data-v="cal" aria-pressed="${tab === 'cal'}">Calendar</button>${S.paper37 ? `<button class="seg34-b" data-b="ph36tab" data-v="paper" aria-pressed="${tab === 'paper'}">Paper${S.paper37.read ? '' : ' •'}</button>` : ''}<button class="seg34-b" data-b="ph36tab" data-v="radio" aria-pressed="${tab === 'radio'}">Radio${Sfx.on && Sfx.radio.on ? ' ♪' : ''}</button></div>`;
+  if (tab === 'radio') return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}<div class="ph35">${radio44Html()}</div><button class="btn primary wide" data-a="close-modal">Done</button>`;
   if (tab === 'paper') { S.paper37.read = true; return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}<div class="ph35">${paper37Html()}</div><button class="btn primary wide" data-a="close-modal">Done</button>`; }
   if (tab === 'cal') return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}<div class="ph35">${cal39Html()}</div><button class="btn primary wide" data-a="close-modal">Done</button>`;
   if (tab === 'map') return `<div><span class="label">Day ${S.day} · ${hhmm(Math.min(S.clock, 24 * 60 - 1))}</span><h2 class="sheet-title">Phone</h2></div>${tabs}<p class="ph36-wx">${wxLine36()}</p><div class="ph35 map36-wrap">${map36Html()}</div><button class="btn primary wide" data-a="close-modal">Done</button>`;
@@ -24962,7 +25016,7 @@ act22('map36shops', () => {
   if (canRoad() && !RT && !YW && !MG && !BT) { S.view = 'workshop'; render(); try { vanWalk33(vanAt33()); return; } catch (e) { /* fall through */ } }
   S.view = 'garage'; render(); toTop(); toast('Tools, tyre kit and paint come from the shops over the road.');
 });
-act22('ph36tab', b => { UI.ph36 = b.dataset.v === 'map' ? 'map' : b.dataset.v === 'cal' ? 'cal' : b.dataset.v === 'paper' ? 'paper' : 'msgs'; const sh = $('#sheet'); if (sh) { sh.innerHTML = phone35Html(); const t = sh.querySelector('[data-b="ph36tab"][aria-pressed="true"]'); if (t) t.focus(); } });
+act22('ph36tab', b => { UI.ph36 = b.dataset.v === 'map' ? 'map' : b.dataset.v === 'cal' ? 'cal' : b.dataset.v === 'paper' ? 'paper' : b.dataset.v === 'radio' ? 'radio' : 'msgs'; const sh = $('#sheet'); if (sh) { sh.innerHTML = phone35Html(); const t = sh.querySelector('[data-b="ph36tab"][aria-pressed="true"]'); if (t) t.focus(); } });
 /* build 36: tomorrow's weather is decided a day ahead, so the phone can tell you */
 const wx36 = () => (S.wx36 === 'rain' || S.wx36 === 'dry' ? S.wx36 : (S.wx36 = chance(0.2) ? 'rain' : 'dry'));
 const wxLine36 = () => wx36() === 'rain' ? 'Rain tomorrow: wet roads, and the cars come in dirtier.' : 'Dry tomorrow.';
@@ -24998,6 +25052,7 @@ function paper37(w) {
   else if (w.jobs <= 2) { head = `QUIET WEEK AT ${GU}`; stand = `Just ${w.jobs} car${pl(w.jobs)} through the doors at ${G} this week${w.earned > 0 ? `, and ${money(w.earned)} taken` : ''}.`; }
   else if (w.prev != null && w.earned < w.prev * 0.8) { head = `QUIETER WEEK AT ${GU}`; stand = `${w.jobs} car${pl(w.jobs)} fixed and ${money(w.earned)} taken, down on last week’s ${money(w.prev)}.`; }
   else { head = `BUSY WEEK AT ${GU}`; stand = `${w.jobs} car${pl(w.jobs)} fixed and ${money(w.earned)} taken.`; }
+  if (w.gw && w.gw.won) { head = S.gname ? `${GU} IS GARAGE OF THE WEEK` : 'GARAGE OF THE WEEK'; stand = `${S.gname || 'The garage'} took ${money(w.gw.take)} this week, beating the ${money(w.gw.target)} target${w.gw.streak > 1 ? ` for the ${ordinal(w.gw.streak)} week running` : ''}.`; }
   const said = ((S.ph35 && S.ph35.list) || []).find(x => x.k === 't' && /^Picked up the /.test(x.m));
   const lot = areaOpen('auctions') && (S.lots || [])[0];
   const town = shuffle(TOWN37.slice()).slice(0, 2);
@@ -25141,14 +25196,16 @@ function level41Html() {
   for (let k = L + 1; k <= L + 8 && rows.length < 3; k++) {
     const areas = Object.values(AREAS).filter(v => v[0] === k).map(v => v[1]);
     const kit = UPGRADES.filter(u => u.lvl === k).map(u => u.name);
-    if (!areas.length && !kit.length) continue;
+    if (!areas.length && !kit.length && !(trust44(k) > trust44(k - 1))) continue;
     const kitTxt = kit.length > 4 ? kit.slice(0, 4).join(', ') + ` and ${kit.length - 4} more` : kit.join(', ');
-    rows.push(`<li><b>Level ${k}</b>${areas.length ? `<span class="lv41-a">${esc(areas.join(' · '))}</span>` : ''}${kit.length ? `<small>To buy: ${esc(kitTxt)}</small>` : ''}</li>`);
+    const tr = trust44(k) > trust44(k - 1) ? `<small>Labour pays 3% more (${Math.round(trust44(k) * 100)}% in all)</small>` : '';
+    rows.push(`<li><b>Level ${k}</b>${areas.length ? `<span class="lv41-a">${esc(areas.join(' · '))}</span>` : ''}${kit.length ? `<small>To buy: ${esc(kitTxt)}</small>` : ''}${tr}</li>`);
   }
   return `<div><span class="label">Garage level</span><h2 class="sheet-title">Level ${L}</h2></div>
     <div class="lv41-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${pct}%"></i></div>
-    <p class="muted lv41-p">${(S.xp - a).toLocaleString()} of ${(b - a).toLocaleString()} XP to level ${L + 1}. Every car you hand back and every test drive earns XP.</p>
-    ${rows.length ? `<span class="label">Coming up</span><ul class="lv41">${rows.join('')}</ul>` : '<p>Everything’s open. Keep climbing for the bigger jobs.</p>'}
+    <p class="muted lv41-p">${(S.xp - a).toLocaleString('en-GB')} of ${(b - a).toLocaleString('en-GB')} XP to level ${L + 1}. Every car you hand back and every test drive earns XP.</p>
+    ${trust44(L) ? `<p class="lv41-p">Your level adds <b>${Math.round(trust44(L) * 100)}%</b> to what customers pay for labour.</p>` : ''}
+    ${rows.length ? `<span class="label">Coming up</span><ul class="lv41">${rows.join('')}</ul>` : '<p>Everything’s open, and customers pay the most they will for your labour.</p>'}
     <button class="btn primary wide" data-a="close-modal">Back to work</button>`;
 }
 act22('lvl41', () => showModal(level41Html()));
@@ -25199,6 +25256,180 @@ function showWhatsNew43(had42) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* ======================= build 44: Garage of the Week =======================
+   One target for each week of game days: everything the garage takes (cars handed back, the staff's cars, the side
+   businesses). It's set 5% above your last three weeks, never below a floor for your level, so it grows as you do.
+   Hitting it pays Gold Bolts (more for weeks in a row); every third win also brings one of the paints or wheels that
+   used to be Garage Pass prizes, or a Performance crate once you have them all. */
+const GW44_EX = ['p_px_neonflip', 'r_px_lime', 'p_px_coral', 'p_px_ice', 'p_px_racegreen', 'p_px_titanium', 'p_px_patina', 'r_px_copper', 'p_px_sunset', 'p_px_rose', 'p_px_ink', 'r_px_blackgold'];
+GW44_EX.forEach(id => { const it = ITEMS[id]; if (it && it.blurb) it.blurb = it.blurb.replace(/\s*[A-Z][A-Za-z ]+ season only\.$/, ' A Garage of the Week prize.'); });
+['jobs', 'five', 'earn', 'post'].forEach(k => { if (CHAL[k]) CHAL[k].off = true; });
+const achOff44 = id => ['pass15', 'pass30', 'promoted', 'champion'].includes(id);
+const gwBase44 = () => Math.round((GW44_K.a + GW44_K.b * levelOf(S.xp)) / 50) * 50;
+const GW44_K = { a: 600, b: 500 };
+function gwTarget44() {
+  const G = S.gw44, h = (G.hist || []).slice(-3);
+  const form = h.length ? h.reduce((x, y) => x + y, 0) / h.length : 0;
+  let t = Math.max(gwBase44(), form * 1.05);
+  if (perk23('gwlow')) t *= 0.9;
+  return Math.max(50, Math.round(t / 50) * 50);
+}
+function gw44() {
+  if (!S.wk) S.wk = { start: S.day, earned: 0, jobs: 0, five: 0 };
+  if (!S.gw44) S.gw44 = { wins: 0, streak: 0, target: 0, start: null, hist: [] };
+  const G = S.gw44;
+  if (!G.target || G.start !== S.wk.start) { G.start = S.wk.start; G.target = gwTarget44(); }
+  return G;
+}
+const gwTake44 = () => (S.wk ? (S.wk.earned || 0) + (S.wk.side || 0) + (S.wk.staff || 0) : 0);
+const gwLeft44 = () => (S.wk ? Math.max(1, 7 - (S.day - S.wk.start)) : 7);
+const gwGold44 = streak => Math.round((30 + 10 * Math.min(6, streak)) * (perk23('gw2') ? 1.5 : 1));
+const gwExLeft44 = () => GW44_EX.filter(id => ITEMS[id] && !(S.inv && S.inv.seen && S.inv.seen[id]));
+/* the night the week ends (called from weekNight, before the paper is written) */
+function gwNight44(w) {
+  const G = gw44(), take = (w.earned || 0) + (w.side || 0), target = G.target, won = take >= target;
+  G.hist = (G.hist || []).concat([take]).slice(-4);
+  let gold = 0, item = null, tok = null;
+  if (won) {
+    G.wins = (G.wins || 0) + 1; gold = gwGold44(G.streak || 0); G.streak = (G.streak || 0) + 1;
+    goldAdd(gold, null, true);
+    if (G.wins % 3 === 0) { item = gwExLeft44()[0] || null; if (item) invAdd(item); else { tok = 'power'; S.crates.tokens = S.crates.tokens || {}; S.crates.tokens.power = (S.crates.tokens.power || 0) + 1; } }
+    S.stats.gw44 = G.wins;
+    try { text35('Brickfield Bugle', `You’re Garage of the Week! ${money(take)} taken, against a target of ${money(target)}. Read all about it under Paper.`); } catch (e) { /* no phone */ }
+  } else G.streak = 0;
+  w.gw = { target, take, won, gold, item, tok, streak: G.streak };
+  G.last = w.gw; G.target = 0;
+}
+function gwSumHtml44(w) {
+  const g = w && w.gw; if (!g) return '';
+  return g.won
+    ? `<p class="gw44-r won"><b>Garage of the Week!</b> ${money(g.take)} taken against a target of ${money(g.target)}: <b>+${g.gold} Gold Bolts</b>${g.item ? ` and <b>${esc(ITEMS[g.item].name)}</b>, a prize you can’t get anywhere else (it’s in Collection, Items)` : g.tok ? ' and a free Performance crate' : ''}.${g.streak > 1 ? ` That’s ${g.streak} weeks running.` : ''}</p>`
+    : `<p class="gw44-r">Garage of the Week: ${money(g.take)} taken, ${money(g.target - g.take)} short of the ${money(g.target)} target. A new week starts tomorrow.</p>`;
+}
+function gwHtml44() {
+  const G = gw44(), take = gwTake44(), hit = take >= G.target, left = gwLeft44(), k = Math.min(1, take / Math.max(1, G.target));
+  const third = (G.wins + 1) % 3 === 0, ex = gwExLeft44().length;
+  const prize = `${gwGold44(G.streak || 0)} Gold Bolts${third ? (ex ? ' and a paint or set of wheels you can’t get anywhere else' : ' and a Performance crate') : ''}`;
+  return `<section class="card22 gw44${hit ? ' hit' : ''}"><div class="c22-h"><div><span class="label">Garage of the Week</span><h3>${hit ? 'Target hit!' : `Take ${money(G.target)} this week`}</h3></div><span class="muted sm">${left === 1 ? 'Last day' : `${left} days left`}</span></div>
+    <div class="gauge gw44-g" role="img" aria-label="${money(take)} of ${money(G.target)}"><i class="good" style="width:${Math.round(k * 100)}%"></i></div>
+    <p class="sm"><b>${money(take)}</b> of ${money(G.target)}${hit ? '. The prize is paid when you close up on the last day.' : ''}</p>
+    <p class="muted sm">Prize: ${prize}. Every car you or your staff hand back counts, and so do the side businesses.${G.wins ? ` Won ${G.wins} time${G.wins > 1 ? 's' : ''}${G.streak > 1 ? `, ${G.streak} in a row` : ''}.` : ''}</p></section>`;
+}
+/* the Garage Pass and the weekly league are over: hand over anything reached but not claimed, once */
+function passRetire44() {
+  if (!S || S.pass44) return;
+  S.pass44 = 1;
+  const P = S.pass; if (!P || P.season == null || !Array.isArray(P.claimed)) return;
+  let n = 0;
+  for (let t = 1; t <= passTier(P); t++) if (!P.claimed.includes(t)) { P.claimed.push(t); passGive23(t, P.season, true); n++; }
+  const b = Math.max(0, passBonusReady(P)); for (let i = 0; i < b; i++) { P.bonus = (P.bonus || 0) + 1; goldAdd(10, null, true); crates23().shards += 25; }
+  if (n + b) setTimeout(() => toast(`The Garage Pass has finished. Your ${n + b} unclaimed reward${n + b > 1 ? 's were' : ' was'} added for you.`), 1800);
+}
+function lgRetire44() {
+  if (!S || S.league44) return;
+  S.league44 = 1;
+  const L = S.league; if (!L) return;
+  try { const ws = lgWeekStart(); if (L.week != null && L.week < ws) lgRollover23(ws); } catch (e) { /* fine */ }
+  const r = S.league && S.league.result;
+  if (r && !r.claimed) {
+    r.claimed = true;
+    if (r.gold) goldAdd(r.gold, null, true);
+    if (r.tok) { S.crates.tokens = S.crates.tokens || {}; S.crates.tokens[r.tok] = (S.crates.tokens[r.tok] || 0) + 1; }
+    if (r.gold || r.tok) setTimeout(() => toast(`The weekly league has finished. Your last prize was added: ${r.gold} Gold Bolts${r.tok ? ` and a ${CRATES[r.tok].name}` : ''}.`), 2600);
+  }
+}
+window.__gw44 = cmd => {
+  if (cmd === 'take') { const G = gw44(); S.wk.earned = (S.wk.earned || 0) + G.target; save(); render(); return gwTake44(); }
+  if (cmd === 'end') { gw44(); S.wk.start = S.day - 6; S.gw44.start = S.wk.start; save(); return true; }
+  return Object.assign({ take: gwTake44(), left: gwLeft44() }, gw44());
+};
+/* build 44: from the reception card, book a customer in and bring their car straight onto a free ramp */
+function deskStart44(no) {
+  const j = S.board.find(x => x.no === no); closeModal(); if (!j || !j.desk) return;
+  delete j.desk; S.stats.desk = (S.stats.desk || 0) + 1; Sfx.good();
+  try { if (FPW) fpClose(); } catch (e) { /* not walking */ }
+  acceptJob(no);
+}
+act22('desk-start44', b => deskStart44(Number(b.dataset.id)));
+/* build 44: the radio, on the phone */
+function radio44Html() {
+  const R = Sfx.radio, on = Sfx.on && R.on, np = R.nowPlaying();
+  return `<div class="rad44">
+    ${Sfx.on ? '' : '<p class="rad44-off">The game’s sound is off. <button class="btn sm" data-b="radio44" data-v="snd">Turn the sound on</button></p>'}
+    <p class="rad44-now" aria-live="polite">${on ? `On air: <b>${esc(np.station)}</b>${np.title ? `, “${esc(np.title)}” by ${esc(np.artist)}` : ''}` : 'The radio is off.'}</p>
+    <div class="rad44-list">${R.stations.map((st, i) => `<button class="rad44-st" data-b="radio44" data-v="${i}" aria-pressed="${on && R.station === st}"><b>${esc(st.name)}</b><small>${esc(st.tag)}</small></button>`).join('')}<button class="rad44-st" data-b="radio44" data-v="off" aria-pressed="${!on}"><b>Off</b><small>Just the workshop</small></button></div>
+    <p class="muted sm">The radio fades out while you’re on the road.</p></div>`;
+}
+act22('radio44', b => {
+  const v = b.dataset.v, R = Sfx.radio;
+  const keep = (o, i) => { try { localStorage.setItem('bonnet-up.radio', o ? 'on' : 'off'); if (i != null) localStorage.setItem('bonnet-up.station', String(i)); } catch (e) { /* storage unavailable */ } };
+  if (v === 'snd') { if (!Sfx.on) Sfx.toggle(); Sfx.unlock(); }
+  else if (v === 'off') { R.set(false); keep(false); }
+  else {
+    const i = Math.max(0, Math.min(R.stations.length - 1, +v || 0));
+    if (!Sfx.on) Sfx.toggle();
+    Sfx.unlock(); R.set(true, i); keep(true, i);
+    S.stats.stations = [...new Set([...(S.stats.stations || []), R.station.id])]; achCheck(); save();
+  }
+  renderHud();
+  const sh = $('#sheet'); if (sh && UI.ph36 === 'radio') { sh.innerHTML = phone35Html(); const t = sh.querySelector(`[data-b="radio44"][data-v="${v}"]`); if (t) t.focus(); }
+});
+/* build 44: Photos, and fans from the work */
+{ const E = EVENTS22.find(e => e.id === 'classic'); if (E) E.tasks.forEach(t => { if (t[0] === 'post') t[1] = 'Finish a before & after'; }); }
+function fans44(R) {
+  const pts = (R.items || []).reduce((n, id) => n + [6, 10, 18, 32, 60, 120][rarIdx(ITEMS[id] ? ITEMS[id].rarity : 'common')], 0);
+  const base = 40 + Math.min(400, (R.worth || 0) / 60) + pts * 4 + (R.char ? 80 : 0) + (R.project ? 30 : 0);
+  const reach = Math.sqrt(1 + ((S.fame && S.fame.followers) || 0) / 150);
+  const n = Math.max(5, Math.round(base * reach * (0.8 + Math.random() * 0.5) * 0.18));
+  R.fans = n; fameAdd22(n);
+  return n;
+}
+/* old saves: posts still collecting likes are finished, once */
+function fansSettle44() {
+  if (!S || !S.fame || S.fame.settled44) return;
+  S.fame.settled44 = 1;
+  let gain = 0;
+  for (const p of S.fame.posts || []) { if (p.likes < p.target) { p.likes = p.target; const f = Math.round(p.target * 0.18) - (p.gave || 0); if (f > 0) { gain += f; p.gave = (p.gave || 0) + f; } } }
+  if (gain) fameAdd22(gain);
+}
+hookOn('ensure', () => { try { fansSettle44(); } catch (e) { /* fine */ } });
+function album44Html() {
+  const F = S.fame || {}, T = fameTier22(), ba = F.ba || {};
+  const list = Object.keys(ba).map(Number).filter(no => ba[no] && ba[no].a).sort((x, y) => (ba[y].at || ba[y].t || 0) - (ba[x].at || ba[x].t || 0));
+  let h = `<section class="al44"><div class="al44-top"><div><span class="label">Fans</span><b>${esc(T.name)}</b><small class="muted">${(F.followers || 0).toLocaleString('en-GB')} fans${T.next ? ` · ${Math.max(0, T.need - (F.followers || 0)).toLocaleString('en-GB')} more to “${esc(T.next)}”` : ''}</small><span class="bar22 wide"><i style="width:${Math.round(T.k * 100)}%"></i></span></div></div>
+    <p class="muted sm">The game photographs project cars, the regulars’ cars and anything getting a new look, before and after. Every finished one wins fans, and more fans make your showroom pay more.</p>`;
+  if (!list.length) h += '<div class="quiet">No photos yet. Finish a project car, a respray or one of the regulars’ jobs.</div>';
+  else h += `<div class="al44-grid">${list.slice(0, 60).map(no => { const R = ba[no]; return `<button class="al44-ph" data-b="ba-open" data-no="${no}" aria-label="Before and after: ${esc(R.model || 'car')}"><span class="al44-img" data-al44="${no}"></span><b>${esc(R.model || '')}</b><small>${R.project ? 'Project car' : R.char ? 'A regular’s car' : 'Customer car'}${R.fans ? ` · ${R.fans} fans` : ''}</small></button>`; }).join('')}</div>${list.length > 60 ? `<p class="muted sm">The newest 60 of your ${list.length} before & afters.</p>` : ''}`;
+  h += '</section>';
+  setTimeout(() => document.querySelectorAll('[data-al44]').forEach(el => { const no = +el.dataset.al44; photoGet('ba-' + no + '-a').then(u => { if (u && el.isConnected) el.innerHTML = `<img src="${u}" alt="" loading="lazy">`; }); }), 0);
+  return h;
+}
+/* build 44: from level 7, labour pays 3% more a level, up to 24% */
+function trust44(L) { return Math.min(0.24, 0.03 * Math.max(0, (L || 1) - 6)); }
+function lvlNews44(a, b) {
+  const jobs = COMPLAINTS.filter(c => c.lvl > a && c.lvl <= b).length, cars = CARS.filter(c => c.lvl > a && c.lvl <= b).length;
+  const kit = UPGRADES.filter(u => (u.lvl > a && u.lvl <= b) || (u.levels || []).some(l => l.lvl > a && l.lvl <= b)).length;
+  const bits = [];
+  const what = [jobs ? 'jobs' : '', cars ? 'cars' : '', kit ? 'kit' : ''].filter(Boolean);
+  if (what.length) bits.push(`New ${what.length > 1 ? what.slice(0, -1).join(', ') + ' and ' + what[what.length - 1] : what[0]} to find.`);
+  const ar = opened28(a, b); if (ar) bits.push(ar);
+  if (trust44(b) > trust44(a)) bits.push(`Labour pays ${Math.round(trust44(b) * 100)}% more now.`);
+  return bits.join(' ');
+}
+/* build 44: what's new */
+function showWhatsNew44(had43) {
+  showModal(`<div><span class="label">Build 44</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Garage of the Week.</b> Each week has a takings target, under Goals. Your staff and side businesses count too. Hit it for Gold Bolts, more for weeks in a row. Every third win brings a paint or set of wheels you can’t get anywhere else.</li>
+      <li><b>Quicker customers.</b> Tap someone waiting at reception and their card opens straight away. With a ramp free, “Start on it now” brings the car straight in.</li>
+      <li><b>Buy kit in one tap</b> on the Garage page. The shops over the road still sell it if you’d rather walk.</li>
+      <li><b>Tidier.</b> The radio is on your phone now. There are fewer buttons beside the car, and Bonnetgram is now a Photos album. Your before & afters win fans by themselves.</li>
+      <li><b>The Garage Pass and the weekly league have finished.</b> Anything you’d reached but not claimed has been added for you.</li>
+      <li><b>Later levels count.</b> From level 7, every level adds 3% to what customers pay for labour.</li>
+      ${had43 ? '' : '<li><b>Nuts you can always tap.</b> Near the edge of the screen, the ring of nuts stays clear of the buttons.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25206,8 +25437,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen43) { const had42 = !!S.seen42; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; save(); setTimeout(() => showWhatsNew43(had42), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen44) { const had43 = !!S.seen43; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; save(); setTimeout(() => showWhatsNew44(had43), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
