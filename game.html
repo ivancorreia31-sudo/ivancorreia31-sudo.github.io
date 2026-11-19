@@ -1814,6 +1814,10 @@ details.inv-explain:not([open]){padding-top:10px;padding-bottom:10px}
 .desk28 .d28-row{margin:6px 0 8px}
 .d46-q{margin:0 0 10px;font-style:italic;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .desk28 .btn.wide{padding-top:9px;padding-bottom:9px}
+.brief46{list-style:none;margin:2px 0 12px;padding:0;display:grid;gap:6px;text-align:left}
+.brief46-b{width:100%;display:block;text-align:left;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2,var(--panel));color:var(--ink);font:inherit;font-size:14px;line-height:1.35;cursor:pointer}
+.brief46-b::after{content:" ›";color:var(--muted);font-weight:700}
+.dv-tests li.want46:not(.on){border-color:var(--hazard);color:#fff;box-shadow:inset 0 0 0 1px var(--hazard)}
 </style>
 </head>
 <body>
@@ -2712,7 +2716,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -15897,7 +15901,7 @@ function driveUi(on) {
     const job = RT.job;
     el.innerHTML = `<div class="dv-host"></div><div class="dv-ui">
       <div class="dv-top"><button class="dv-x" data-dv="end" aria-label="End the drive">×</button><div class="dv-title"><b>${AUCRUN && !AUCRUN.arrived ? 'To the auction' : DSP && !DSP.arrived ? 'Call-out' : RT.purpose === 'road' ? 'Road test' : RT.purpose === 'fun' ? 'Out for a spin' : 'Test drive'}</b><span>${esc(job.car.model)} · ${RT.P.bhp} bhp</span></div><button class="dv-cam" data-dv="cam" aria-label="Change the camera">${camIco}</button></div>
-      ${AUCRUN && !AUCRUN.arrived ? '<div class="dv-lapchip dv-togo" aria-label="Distance to the auction"><span>To go</span><b class="dv-togo-m">…</b><small>Car auction</small></div>' : DSP && !DSP.arrived ? `<div class="dv-lapchip dv-togo" aria-label="Distance to the breakdown"><span>To go</span><b class="dv-togo-m">…</b><small>${esc(DISP_TYPES[DSP.m.type].name)}</small></div>` : RT.purpose === 'fun' ? `<div class="dv-lapchip" aria-label="Lap time"><span>Lap</span><b class="dv-lapt">0:00.0</b><small>${S.rec && S.rec.lap ? 'Record ' + lapText(S.rec.lap.v) : 'No record yet'}</small></div>` : `<ol class="dv-tests" aria-label="Tests on the route">${DTESTS.map(([k, n]) => `<li data-t="${k}">${esc(n)}</li>`).join('')}</ol>`}
+      ${AUCRUN && !AUCRUN.arrived ? '<div class="dv-lapchip dv-togo" aria-label="Distance to the auction"><span>To go</span><b class="dv-togo-m">…</b><small>Car auction</small></div>' : DSP && !DSP.arrived ? `<div class="dv-lapchip dv-togo" aria-label="Distance to the breakdown"><span>To go</span><b class="dv-togo-m">…</b><small>${esc(DISP_TYPES[DSP.m.type].name)}</small></div>` : RT.purpose === 'fun' ? `<div class="dv-lapchip" aria-label="Lap time"><span>Lap</span><b class="dv-lapt">0:00.0</b><small>${S.rec && S.rec.lap ? 'Record ' + lapText(S.rec.lap.v) : 'No record yet'}</small></div>` : `<ol class="dv-tests" aria-label="Tests on the route">${DTESTS.map(([k, n]) => `<li data-t="${k}"${driveWant46(k) ? ' class="want46" title="Worth trying"' : ''}>${esc(n)}</li>`).join('')}</ol>`}
       <div class="dv-say" aria-live="polite" hidden><i class="dv-face">${esc(RT.cust[0])}</i><p></p></div>
       <div class="dv-dash" aria-hidden="true"><span class="dv-speed"><b>0</b><small>mph</small></span><span class="dv-gear">N</span><span class="dv-wheel"><svg viewBox="-12 -12 24 24"><circle r="9.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M-9 0h18M0 0v9" stroke="currentColor" stroke-width="2.6"/></svg></span><div class="dv-rev"><i></i></div><span class="dv-temp"><i></i></span>
         <span class="dv-lamps"><i class="lp-abs">ABS</i><i class="lp-eng">ENG</i><i class="lp-bat">BAT</i><i class="lp-oil">OIL</i></span>${RT.purpose === 'fun' ? '' : '<button class="dv-notes" data-dv="notes" aria-label="What you’ve noticed so far"><span class="w40">Noticed </span><b>0</b></button>'}</div>
@@ -19520,7 +19524,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 45</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 46</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -20014,7 +20018,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 45;
+const BUILD = 46;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -20249,6 +20253,23 @@ item('tl_gold_hammer', 'tool', 'legendary', 'Golden Hammer', { slot: 'hammer', b
 item('tl_gold_torque', 'tool', 'legendary', 'Golden Torque Wrench', { slot: 'torque', boost: 0.3, col: '#F2B705', glow: true, blurb: 'A much wider green window.' });
 item('tl_plasma_impact', 'tool', 'mythic', 'Plasma Impact Gun', { slot: 'impact', boost: 0.5, col: '#A44BFF', glow: true, blurb: 'Nuts fly off the instant you touch them.' });
 item('tl_omni', 'tool', 'mythic', 'Omni-Scanner', { slot: 'scanner', boost: 1, col: '#21E6FF', glow: true, blurb: 'Plug it in and it lists every fault on the car.' });
+/* build 46: more Common things to find */
+item('p_c_red', 'paint', 'common', 'Flame Red Metallic', { col: '#B8231B', fx: 'candy', blurb: 'A deep, shiny red.' });
+item('p_c_blue', 'paint', 'common', 'Racing Blue Metallic', { col: '#1D4C9C', fx: 'candy', blurb: 'Bright blue with a glossy finish.' });
+item('p_c_yellow', 'paint', 'common', 'Sunshine Yellow', { col: '#E9B800', fx: 'candy', blurb: 'You won’t lose it in a car park.' });
+item('p_c_green', 'paint', 'common', 'Heritage Green', { col: '#1E4A33', fx: 'candy', blurb: 'The old racing green, done glossy.' });
+item('p_c_black', 'paint', 'common', 'Midnight Black', { col: '#15181B', fx: 'candy', blurb: 'Deep black that shows every reflection.' });
+item('p_c_white', 'paint', 'common', 'Arctic White', { col: '#EDF0EE', fx: 'satin', blurb: 'Clean white with a soft sheen.' });
+item('p_c_orange', 'paint', 'common', 'Burnt Orange', { col: '#C2561C', fx: 'candy', blurb: 'Seventies orange, glossed up.' });
+item('p_c_grey', 'paint', 'common', 'Graphite Satin', { col: '#55595D', fx: 'satin', blurb: 'Dark grey with a gentle sheen.' });
+item('r_c_five', 'rim', 'common', 'Five-Spoke Silver', { rim: 'five', rc: '#C9CFCC', blurb: 'Plain, clean five-spokes.' });
+item('r_c_six', 'rim', 'common', 'Six-Spoke Graphite', { rim: 'six', rc: '#4B5054', blurb: 'Six spokes in dark grey.' });
+item('r_c_twin', 'rim', 'common', 'Twin-Spoke Black', { rim: 'twin', rc: '#1C1F21', blurb: 'Black twin-spokes for a meaner look.' });
+item('r_c_split', 'rim', 'common', 'Split-Spoke Gunmetal', { rim: 'split', rc: '#6B7176', blurb: 'Split spokes in gunmetal.' });
+item('r_c_mesh', 'rim', 'common', 'Mesh Silver', { rim: 'mesh', rc: '#D5D9D7', blurb: 'A fine silver mesh.' });
+item('tb_t22', 'turbo', 'common', 'Whistler T22', { gain: 0.04, tc: '#8A918E', blurb: '+4% power. The baby of the range.' });
+item('tl_mallet', 'tool', 'common', 'Rubber Mallet', { slot: 'hammer', boost: 0.03, blurb: 'Dents come up a touch quicker.' });
+item('tl_budget_torque', 'tool', 'common', 'Budget Torque Wrench', { slot: 'torque', boost: 0.03, blurb: 'A slightly wider green window on the torque gauge.' });
 const TOOL_SLOTS = { wrench: 'Ratchet', hammer: 'Hammer', torque: 'Torque wrench', impact: 'Impact gun', gun: 'Spray gun', scanner: 'Scanner' };
 const ITEM_TYPES = [['paint', 'Paints & wraps'], ['rim', 'Wheels'], ['tyre', 'Tyres'], ['spoiler', 'Spoilers'], ['turbo', 'Turbos'], ['engine', 'Engines'], ['tool', 'Tools']];
 const ITEM_VALUE = { common: 150, uncommon: 400, rare: 1000, epic: 2600, legendary: 6500, mythic: 16000 };
@@ -24044,7 +24065,7 @@ const CRATE_ORDER = ['style', 'paint', 'wheel', 'tool', 'power', 'engine', 'lege
 function rarWeights23(types, minR, luck) {
   const lo = rarIdx(minR || 'common');
   const pools = RARITY.map((r, i) => (i < lo ? [] : Object.values(ITEMS).filter(it => types.includes(it.type) && it.rarity === r && !it.noCrate)));
-  return { pools, w: RARITY.map((r, i) => (pools[i].length ? RAR[r].w * (i >= 3 ? 1 + (luck || 0) : 1) : 0)) };
+  return { pools, w: RARITY.map((r, i) => (pools[i].length ? RAR[r].w * (i >= 3 ? 1 + (luck || 0) : 1) * (i < 3 ? Math.min(1, pools[i].length / 5) : 1) : 0)) };
 }
 function rollItem(types, minR, luck) {
   let { pools, w } = rarWeights23(types, minR, luck), tot = w.reduce((a, b) => a + b, 0);
@@ -24877,7 +24898,7 @@ function showTitle34() {
   if (window.__noTitle34) return;
   const m = document.getElementById('modal'); if (m && !m.hidden) return;
   showModal(`<div class="title34"><span class="label">Welcome back</span><h2 class="title34-h">Bonnet Up</h2>${S.gname ? `<p class="title34-g">${esc(S.gname)}</p>` : ""}
-    <p class="title34-s">Day ${S.day} · ${money(S.money)} · garage level ${levelOf(S.xp)}</p></div>
+    <p class="title34-s">Day ${S.day} · ${money(S.money)} · garage level ${levelOf(S.xp)}</p></div>${brief46Html()}
     ${saveTip42() ? '<p class="tip42">Safari can clear a website’s saved data if you don’t visit for a week. To keep your garage, add Bonnet Up to your Home Screen (Share, then Add to Home Screen), or back it up under Garage, Settings, Move your save.</p>' : ''}
     <button class="btn primary wide" data-a="close-modal">Carry on</button>
     <div class="title34-row"><button class="btn" data-a="intro">How to play</button><button class="btn" data-b="title34set">Settings</button></div>`);
@@ -25521,6 +25542,49 @@ function showWhatsNew45(had44) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 46: what's waiting, on the welcome-back screen */
+function brief46Html() {
+  const rows = [];
+  try {
+    const G = gw44(), take = gwTake44(), left = gwLeft44();
+    rows.push(['gw', take >= G.target ? `Garage of the Week: target hit (${money(take)}). Paid when the week ends.` : `Garage of the Week: ${money(take)} of ${money(G.target)}, ${left === 1 ? 'last day' : `${left} days left`}.`]);
+  } catch (e) { /* not yet */ }
+  try {
+    const dn = deskList().length, bn = (S.board || []).length - dn;
+    if (dn || bn) rows.push(['jobs', [dn ? `${dn} customer${dn > 1 ? 's' : ''} at reception` : '', bn ? `${bn} job${bn > 1 ? 's' : ''} on the board` : ''].filter(Boolean).join(' and ') + '.']);
+  } catch (e) { /* fine */ }
+  try { const un = (S.ph35 && S.ph35.un) || 0; if (un) rows.push(['phone', `${un} new text${un > 1 ? 's' : ''} on your phone.`]); } catch (e) { /* fine */ }
+  try { if (areaOpen('daily')) { const n = dailyCount22(); if (n) rows.push(['daily', `${n} reward${n > 1 ? 's' : ''} ready on Daily.`]); } } catch (e) { /* fine */ }
+  try { const bank = showBank22(); if (bank >= 20) rows.push(['show', `The showroom has taken ${money(bank)} for you.`]); } catch (e) { /* fine */ }
+  if (!rows.length) return '';
+  return `<ul class="brief46">${rows.slice(0, 4).map(([k, t]) => `<li><button class="brief46-b" data-b="brief46" data-k="${k}">${esc(t)}</button></li>`).join('')}</ul>`;
+}
+act22('brief46', b => {
+  const k = b.dataset.k; closeModal();
+  if (k === 'gw') showGoals();
+  else if (k === 'jobs') { if (deskList().length) deskGo(); else { S.view = 'jobs'; render(); toTop(); } }
+  else if (k === 'phone') phone35();
+  else if (k === 'daily') { S.view = 'daily'; render(); toTop(); }
+  else if (k === 'show') { S.view = 'collection'; S.sub = Object.assign(S.sub || {}, { collection: 'showroom' }); render(); toTop(); }
+});
+/* build 46: which route tests would show the customer's complaint */
+function driveWant46(k) {
+  try {
+    if (!RT || !RT.job || RT.purpose === 'fun') return false;
+    const j = RT.job;
+    return (j.faulty || []).some(id => j.parts[id] && !j.parts[id].isNew && CAT[id] && SYM[CAT[id].kind] && TEST_OF[SYM[CAT[id].kind].t] === k);
+  } catch (e) { return false; }
+}
+/* build 46: what's new */
+function showWhatsNew46(had45) {
+  showModal(`<div><span class="label">Build 46</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>What’s waiting.</b> Come back to your garage and the welcome screen lists what needs you: Garage of the Week, customers, texts, rewards, the showroom’s takings. Tap a line to go there.</li>
+      <li><b>Test drives that point the way.</b> The tests that would show the customer’s complaint are outlined in yellow.</li>
+      ${had45 ? '' : '<li><b>One reward currency, and better later jobs.</b> Shards are now Gold Bolts. Big two-in-one jobs arrive from level 6, and an unhappy mechanic texts you before walking out.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25528,8 +25592,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen45) { const had44 = !!S.seen44; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; save(); setTimeout(() => showWhatsNew45(had44), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen46) { const had45 = !!S.seen45; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; save(); setTimeout(() => showWhatsNew46(had45), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }

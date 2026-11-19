@@ -1,5 +1,5 @@
 /* Bonnet Up: keeps a copy of the game on the phone so it opens instantly and plays offline. */
-const VERSION = 'bonnet-up-v45-c7331419';
+const VERSION = 'bonnet-up-v46-afccd63f';
 const EXT = 'bonnet-up-ext';
 const CORE = ['./', './index.html', './game.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-192.png', './icon-maskable-512.png', './apple-touch-icon.png', './favicon-48.png', './privacy.html', './fonts/Barlow-Regular.woff', './fonts/Barlow-Medium.woff', './fonts/Barlow-SemiBold.woff', './fonts/Barlow-Bold.woff', './fonts/Barlow-MediumItalic.woff', './fonts/BigShouldersDisplay-VF.woff', './fonts/IBMPlexMono-Medium.woff', './fonts/IBMPlexMono-SemiBold.woff', './three.min.js'];
 
