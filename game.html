@@ -1818,6 +1818,12 @@ details.inv-explain:not([open]){padding-top:10px;padding-bottom:10px}
 .brief46-b{width:100%;display:block;text-align:left;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2,var(--panel));color:var(--ink);font:inherit;font-size:14px;line-height:1.35;cursor:pointer}
 .brief46-b::after{content:" ›";color:var(--muted);font-weight:700}
 .dv-tests li.want46:not(.on){border-color:var(--hazard);color:#fff;box-shadow:inset 0 0 0 1px var(--hazard)}
+.lg47 .c22-h{align-items:center}
+.lg47.hit{border-color:var(--good)}
+.lg47.hit h3{color:var(--good)}
+.lg47-s{color:var(--worn);letter-spacing:2px;font-size:18px;white-space:nowrap}
+.lg47-r{display:grid;grid-template-columns:7.5em 1fr;align-items:center;gap:10px}
+.lg47-r .gauge{height:7px}
 </style>
 </head>
 <body>
@@ -2716,7 +2722,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -2989,7 +2995,9 @@ function genBoard() {
   return S.board;
 }
 function newGame() {
-  S = fresh();
+  const keep47 = S ? { set34: S.set34, fx24: S.fx24 } : {};
+  S = fresh(); try { legacy47(); } catch (e) { /* fine */ }
+  if (keep47.set34) S.set34 = keep47.set34; if (keep47.fx24 === false) S.fx24 = false;
   const first = firstJob45(genJob('brakes'));
   first.due = S.day; first.accepted = S.day;
   S.bays[0] = first;
@@ -5514,8 +5522,8 @@ const Car3D = (() => {
     }
     return g;
   };
-  const TEXDRAW = [];
-  const canvasTex = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(fitText(c.getContext('2d')), w, h); const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 4; if (/Text\(/.test(String(draw))) TEXDRAW.push({ c, draw, t }); return t; };
+  const TEXDRAW = []; window.__texdraw47 = () => TEXDRAW.length;
+  const canvasTex = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(fitText(c.getContext('2d')), w, h); const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 4; if (/Text\(/.test(String(draw))) { const e = { c, draw, t }; TEXDRAW.push(e); if (t.addEventListener) t.addEventListener('dispose', () => { const i = TEXDRAW.indexOf(e); if (i >= 0) TEXDRAW.splice(i, 1); }); } return t; };
   /* once the shop's fonts have arrived, redraw every sign so it uses them */
   try {
     if (document.fonts && document.fonts.load) Promise.all(['900 40px "Big Shoulders Display"', '800 40px "Big Shoulders Display"', '700 40px Barlow', '600 40px Barlow'].map(f => document.fonts.load(f))).then(() => {
@@ -10006,9 +10014,24 @@ if ( uFx > 0.5 ) {
   const liteBlobGeo = new T.PlaneGeometry(1, 1); liteBlobGeo.rotateX(-PI / 2);
   const litePlinth27 = new T.BoxGeometry(0.544, 0.134, 0.05);
   let LITE_FAR = false;
+  /* build 47: keep the shapes of the most recently used body styles; an older one is built again when it's next needed.
+     A shape still on screen when it's let go is uploaded again by three.js, so it's let go again at the next trim
+     until nothing shows it and it can be collected */
+  const LITE_KEEP47 = 24, LITE_BUDGET47 = 24e6, LITE_OLD47 = [];
+  const liteBytes47 = o => { if (o.bytes47 == null) { let b = 0; for (const g of Object.values(o)) if (g && g.isBufferGeometry) { for (const a of Object.values(g.attributes || {})) b += (a && a.array && a.array.byteLength) || 0; if (g.index && g.index.array) b += g.index.array.byteLength; } Object.defineProperty(o, 'bytes47', { value: b }); } return o.bytes47; };
+  const liteFree47 = o => { for (const g of Object.values(o)) if (g && g.isBufferGeometry) g.dispose(); };
+  function liteTrim47() {
+    for (let i = LITE_OLD47.length - 1; i >= 0; i--) { const g = LITE_OLD47[i].deref(); if (g) g.dispose(); else LITE_OLD47.splice(i, 1); }
+    const ks = Object.keys(LITE); let bytes = ks.reduce((t, k) => t + liteBytes47(LITE[k]), 0);
+    for (let i = 0; i < ks.length && (ks.length - i > LITE_KEEP47 || (bytes > LITE_BUDGET47 && ks.length - i > 10)); i++) {
+      const o = LITE[ks[i]]; bytes -= liteBytes47(o); delete LITE[ks[i]]; liteFree47(o);
+      if (typeof WeakRef === 'function') for (const g of Object.values(o)) if (g && g.isBufferGeometry) LITE_OLD47.push(new WeakRef(g));
+    }
+  }
+  window.__lite47 = all => { if (all) Object.keys(STYLES).forEach(k => { liteGeo(k, false); liteGeo(k, true); }); return { keys: Object.keys(LITE).length, MB: Math.round(Object.keys(LITE).reduce((t, k) => t + liteBytes47(LITE[k]), 0) / 1e5) / 10, old: LITE_OLD47.length, styles: Object.keys(STYLES).length }; };
   function liteGeo(name, far) {
     const key26 = far ? name + '~far' : name;
-    if (LITE[key26]) return LITE[key26];
+    if (LITE[key26]) { const hit = LITE[key26]; delete LITE[key26]; LITE[key26] = hit; return hit; }
     const s = STYLES[name] || STYLES.saloon, R = s.rear, P = { paint: [], glass: [], dark: [], well: [], chrome: [], lamp: [], tail: [], tyre: [], rim: [], wood: [], cream: [], wafer: [] }, made = [];
     const bendF = (x, y) => sideF(x, y, R, s.van, s.rx);
     const bend = g => { const q = g.attributes.position; for (let i = 0; i < q.count; i++) q.setZ(i, q.getZ(i) * bendF(q.getX(i), q.getY(i))); q.needsUpdate = true; return g; };
@@ -10110,7 +10133,7 @@ if ( uFx > 0.5 ) {
     { const by = {}; for (const [k, g] of seated) (by[k] || (by[k] = [])).push([g, null]); for (const k of Object.keys(by)) { const old = out[k]; out[k] = mergeGeo((old ? [[old, null]] : []).concat(by[k])); if (old) old.dispose(); by[k].forEach(e => e[0].dispose()); } }
     for (const k of ['paint', 'glass', 'dark', 'well']) if (SKL[k]) { const old = out[k]; out[k] = old ? mergeGeo([[old, null], [SKL[k], null]]) : SKL[k]; if (old) { old.dispose(); SKL[k].dispose(); } }
     made.forEach(g => g.dispose());
-    LITE[key26] = out;
+    LITE[key26] = out; liteTrim47();
     return out;
   }
   const litePaint = c => {
@@ -16796,21 +16819,22 @@ function netWorth21() {
 }
 /* selling up: start a new garage with a legacy bonus that never goes away */
 let LEGACY21 = null;
-const legacy21 = () => { if (LEGACY21 != null) return LEGACY21; try { LEGACY21 = Math.min(5, +(localStorage.getItem('bonnet-up.legacy') || 0)) || 0; } catch (e) { LEGACY21 = 0; } return LEGACY21; };
+const legacy21 = () => { if (LEGACY21 == null) { try { LEGACY21 = Math.min(5, +(localStorage.getItem('bonnet-up.legacy') || 0)) || 0; } catch (e) { LEGACY21 = 0; } } return Math.min(5, Math.max(LEGACY21, (S && +S.legacy) || 0)); };
 const legacyMult = () => 1 + 0.08 * legacy21();
 function canSellUp() { return levelOf(S.xp) >= 8 && netWorth21() >= 250000; }
 function askSellUp() {
   const v = netWorth21(), L = legacy21();
   showModal(`<div><span class="label">Your empire</span><h2 class="sheet-title">Sell up and start again?</h2></div>
     <p>A buyer will take the whole business off your hands for <b>${money(v)}</b>. You’ll open a brand-new garage on day 1, but your name carries weight now:</p>
-    <ul class="news"><li>Legacy star ${L + 1}${L + 1 >= 5 ? ' (the most there is)' : ''}: labour pays <b>${Math.round(Math.min(5, L + 1) * 8)}% more</b> in every garage you open from now on.</li><li>You start with <b>${money(400 + 1500 * Math.min(5, L + 1))}</b> instead of £400.</li><li>Achievements can be earned again, rewards and all.</li></ul>
+    <ul class="news"><li>Legacy star ${L + 1}${L + 1 >= 5 ? ' (the most there is)' : ''}: labour pays <b>${Math.round(Math.min(5, L + 1) * 8)}% more</b> in every garage you open from now on.</li><li>You start with <b>${money(400 + 1500 * Math.min(5, L + 1))}</b> instead of £400.</li><li>You keep your Gold Bolts, your whole collection, power tokens and your garage’s name.</li><li>Cash, kit, level, cars and staff start again. Achievements can be earned again, rewards and all.</li></ul>
     <div class="row"><button class="btn primary" data-a="sellup-yes">Sell up</button><button class="btn" data-a="close-modal">Not yet</button></div>`);
 }
 function sellUp() {
   const L = Math.min(5, legacy21() + 1);
   try { localStorage.setItem('bonnet-up.legacy', String(L)); } catch (e) { /* storage unavailable */ }
   LEGACY21 = L;
-  closeModal(); newGame(); S.money = 400 + 1500 * L; S.legacy = L; save(); render();
+  const keep = {}; ['inv', 'equip', 'gold', 'crates', 'sets', 'login', 'gname', 'seen22gift', 'shards45'].forEach(k => { if (S[k] !== undefined) keep[k] = S[k]; });
+  closeModal(); newGame(); Object.assign(S, keep); S.money = 400 + 1500 * L; S.legacy = L; S.seenIntro = true; save(); render();
   toast(`A new garage, with legacy star ${L}. Labour pays ${L * 8}% more, for good.`);
 }
 /* your garage's name: on the signs, the invoices and the stickers */
@@ -19524,7 +19548,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 46</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 47</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -19691,7 +19715,7 @@ async function saveLoad() {
   if (BT) boothAbort(true);
   if (AUC) { clearInterval(AUC.timer); AUC = null; }
   HAG = null; UI.sel = null; UI.bolt = null; UI.drawer = null; UI.stepKey = null;
-  S = S2; ensureState(); save();
+  S = S2; ensureState(); try { ensure22(); } catch (e) { /* next visit */ } try { legacy47(); } catch (e) { /* fine */ } save();
   closeModal(); render();
   Sfx.cash(); toast(`Garage loaded: day ${S.day}, ${money(S.money)} in the bank.`);
 }
@@ -20018,7 +20042,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 46;
+const BUILD = 47;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -24688,7 +24712,7 @@ function renderDaily22() {
   let h = `<header class="ph ph23"><span class="label">Come back every day</span><h1>Daily</h1></header>`;
   h += `<div class="goldbar gb23"><span class="gb-big">${goldTxt(S.gold || 0)}<small>Gold Bolts</small></span><button class="btn sm ghost" data-b="goldhow" aria-label="How to earn Gold Bolts">How to earn</button></div>`;
   h += subTabsHtml('daily', dailyCounts23());
-  h += `<div data-sub="today">${loginHtml()}${wheelHtml23()}${gwHtml44()}${chalHtml()}${evHtml()}${comboHtml23()}${timersHtml22()}</div>`;
+  h += `<div data-sub="today">${loginHtml()}${wheelHtml23()}${gwHtml44()}${legacyHtml47()}${chalHtml()}${evHtml()}${comboHtml23()}${timersHtml22()}</div>`;
   h += `<div data-sub="crates">${cratesHtml()}</div>`;
   h += `<p class="build">Bonnet Up · build ${BUILD}</p>`;
   $('#view-daily').innerHTML = h;
@@ -25303,8 +25327,8 @@ const gwBase44 = () => Math.round((GW44_K.a + GW44_K.b * levelOf(S.xp)) / 50) * 
 const GW44_K = { a: 600, b: 500 };
 function gwTarget44() {
   const G = S.gw44, h = (G.hist || []).slice(-3);
-  const form = h.length ? h.reduce((x, y) => x + y, 0) / h.length : 0;
-  let t = Math.max(gwBase44(), form * 1.05);
+  const hs = h.slice().sort((x, y) => x - y), form = !hs.length ? 0 : hs.length === 2 ? (hs[0] + hs[1]) / 2 : hs[Math.floor(hs.length / 2)];
+  let t = Math.max(gwBase44(), form);
   if (perk23('gwlow')) t *= 0.9;
   return Math.max(50, Math.round(t / 50) * 50);
 }
@@ -25549,6 +25573,7 @@ function brief46Html() {
     const G = gw44(), take = gwTake44(), left = gwLeft44();
     rows.push(['gw', take >= G.target ? `Garage of the Week: target hit (${money(take)}). Paid when the week ends.` : `Garage of the Week: ${money(take)} of ${money(G.target)}, ${left === 1 ? 'last day' : `${left} days left`}.`]);
   } catch (e) { /* not yet */ }
+  try { if (canSellUp() && legacy21() < 5) rows.push(['daily', `You can sell up now for legacy star ${legacy21() + 1}.`]); } catch (e) { /* fine */ }
   try {
     const dn = deskList().length, bn = (S.board || []).length - dn;
     if (dn || bn) rows.push(['jobs', [dn ? `${dn} customer${dn > 1 ? 's' : ''} at reception` : '', bn ? `${bn} job${bn > 1 ? 's' : ''} on the board` : ''].filter(Boolean).join(' and ') + '.']);
@@ -25585,6 +25610,68 @@ function showWhatsNew46(had45) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 47: legacy stars live in the save as well as on this device */
+function legacy47() {
+  const L = legacy21();
+  if ((+S.legacy || 0) !== L) S.legacy = L;
+  if (L > (LEGACY21 || 0)) { LEGACY21 = L; try { localStorage.setItem('bonnet-up.legacy', String(L)); } catch (e) { /* storage unavailable */ } }
+}
+hookOn('ensure', () => { try { legacy47(); } catch (e) { /* later */ } });
+/* build 47: the Legacy card */
+function legacyHtml47() {
+  const L = levelOf(S.xp), st = legacy21();
+  if (L < 5 && !st) return '';
+  const stars = '★'.repeat(st) + '☆'.repeat(5 - st);
+  if (st >= 5) return `<section class="card22 lg47"><div class="c22-h"><div><span class="label">Legacy</span><h3>Every legacy star</h3></div><b class="lg47-s" aria-label="5 of 5 stars">${stars}</b></div><p class="muted sm">Labour pays 40% more in every garage you open. There are no more stars to earn.</p></section>`;
+  const v = netWorth21(), lv = Math.min(1, L / 8), vv = Math.max(0, Math.min(1, v / 250000)), ready = canSellUp();
+  const now = st ? `You have ${st} star${st > 1 ? 's' : ''}: labour pays ${st * 8}% more.` : 'Each star makes labour pay 8% more, in every garage you ever open.';
+  return `<section class="card22 lg47${ready ? ' hit' : ''}"><div class="c22-h"><div><span class="label">Legacy</span><h3>${ready ? `Ready for legacy star ${st + 1}` : `Legacy star ${st + 1}`}</h3></div><b class="lg47-s" aria-label="${st} of 5 stars">${stars}</b></div>
+    <p class="sm">Sell up and start a new garage: you need level 8 and a business worth ${money(250000)}. ${now}</p>
+    <div class="lg47-r"><span class="sm">Level ${L} of 8</span><div class="gauge" role="img" aria-label="Level ${L} of 8"><i class="good" style="width:${Math.round(lv * 100)}%"></i></div></div>
+    <div class="lg47-r"><span class="sm">${money(Math.max(0, v))}</span><div class="gauge" role="img" aria-label="Business worth ${money(Math.max(0, v))} of ${money(250000)}"><i class="good" style="width:${Math.round(vv * 100)}%"></i></div></div>
+    <p class="muted sm">You keep your Gold Bolts and your whole collection when you sell up.</p>
+    ${ready ? '<button class="btn primary wide" data-a="sellup">Sell up and start again…</button>' : ''}</section>`;
+}
+window.__lg47 = { stars: () => legacy21(), code: () => makeSaveCode(), paste: () => savePaste(), brief: () => brief46Html(), reset: () => askReset() };
+/* build 47: keep the stored photos to what the game can still show */
+const PHOTO_KEEP47 = 60;
+function photoPrune47() {
+  if (!S || !S.fame) return 0;
+  const ba = S.fame.ba = S.fame.ba || {}, now = nowMs(), keep = new Set(), live = new Set();
+  const add = j => { if (j && j.no != null) live.add(+j.no); };
+  ['bays', 'board', 'yard', 'unit'].forEach(k => (S[k] || []).forEach(add));
+  const nos = Object.keys(ba).map(Number);
+  nos.filter(no => ba[no] && ba[no].a).sort((x, y) => (ba[y].at || ba[y].t || 0) - (ba[x].at || ba[x].t || 0)).slice(0, PHOTO_KEEP47).forEach(no => keep.add(no));
+  nos.forEach(no => { const R = ba[no]; if (R && !R.a && (live.has(no) || now - (R.t || 0) < 14 * 864e5)) keep.add(no); });
+  (S.fame.posts || []).forEach(p => { if (p && p.no != null) keep.add(+p.no); });
+  let gone = 0;
+  nos.forEach(no => { if (!keep.has(no)) { delete ba[no]; gone++; } });
+  photoDb().then(db => {
+    if (!db) return;
+    try {
+      const st = db.transaction('photos', 'readwrite').objectStore('photos'); if (!st.getAllKeys) return;
+      const rq = st.getAllKeys();
+      rq.onsuccess = () => (rq.result || []).forEach(k => { const m = /^(?:ba-(\d+)-[ab]|bg-(\d+))$/.exec(String(k)); if (m && !keep.has(+(m[1] || m[2]))) { try { st.delete(k); } catch (e) { /* fine */ } delete PHOTOS.mem[k]; } });
+    } catch (e) { /* private window or storage off */ }
+  });
+  if (gone) save();
+  return gone;
+}
+hookOn('ensure', () => setTimeout(() => { try { photoPrune47(); } catch (e) { /* next time */ } }, 9000));
+hookOn('post', () => { try { const ba = (S.fame && S.fame.ba) || {}; if (Object.keys(ba).length > PHOTO_KEEP47 + 12) photoPrune47(); } catch (e) { /* next time */ } });
+window.__photos47 = { prune: () => photoPrune47(), keys: () => photoDb().then(db => new Promise(res => { if (!db) return res([]); const rq = db.transaction('photos').objectStore('photos').getAllKeys(); rq.onsuccess = () => res(rq.result.map(String)); rq.onerror = () => res([]); })), put: (k, v) => photoPut(k, v) };
+/* build 47: what's new */
+function showWhatsNew47(had46) {
+  showModal(`<div><span class="label">Build 47</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Your legacy.</b> From level 5, Daily shows how close you are to selling up for a legacy star (labour pays 8% more in every garage after). Selling up now keeps your Gold Bolts and your whole collection.</li>
+      <li><b>A fairer Garage of the Week.</b> The target is now your middle week of the last three, so an ordinary week of steady work can win it and one huge week doesn’t raise the bar for long.</li>
+      <li><b>Safer saves.</b> Legacy stars travel with your save code, a new garage keeps your settings, and old photos are tidied away so the game doesn’t fill your phone.</li>
+      <li><b>Smoother long sessions.</b> Cars and crates you’ve finished with no longer stay in memory, so an evening of play doesn’t slow the 3D garage down.</li>
+      ${had46 ? '' : '<li><b>What’s waiting.</b> The welcome screen lists what needs you, and test drives outline the tests that show the customer’s complaint.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25592,8 +25679,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen46) { const had45 = !!S.seen45; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; save(); setTimeout(() => showWhatsNew46(had45), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen47) { const had46 = !!S.seen46; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; save(); setTimeout(() => showWhatsNew47(had46), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
