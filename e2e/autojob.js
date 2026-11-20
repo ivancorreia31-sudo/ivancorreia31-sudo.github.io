@@ -47,6 +47,8 @@
       else if (read() > tgt) { const de = document.querySelector('[data-hold=deflate]'); ev(de, 'pointerdown'); while (read() > tgt && performance.now() - t1 < 90000) await wait(25); ev(de, 'pointerup'); }
       log.push('pumped to ' + read() + ' of ' + tgt); await wait(700); continue;
     }
+    const bleeds = [...document.querySelectorAll('[data-a=bleed]:not(.done)')].filter(vis);
+    if (bleeds.length) { const order = ['RR', 'RL', 'FR', 'FL'], b2 = order.map(c => bleeds.find(x => x.dataset.c === c)).find(Boolean); if (b2 && !document.querySelector('[data-a=bleed].bub')) { log.push('bleed ' + b2.dataset.c); b2.click(); } await wait(1200); continue; }
     const tnRun = document.querySelector('[data-a=tn-run]');
     if (tnRun && vis(tnRun)) {
       const save = document.querySelector('[data-a=tn-save]:not([disabled])');

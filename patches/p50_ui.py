@@ -16,6 +16,7 @@ f.s = f.s[:a] + """/* build 50: what's new */
 function showWhatsNew50(had49) {
   showModal(`<div><span class="label">Build 50</span><h2 class="sheet-title">What’s new</h2></div>
     <ul class="news">
+      <li><b>A tidier nose.</b> Raise a car on the lift and look up at the front: the black panel inside the nose no longer pokes out round the headlamps, on any of the 69 cars.</li>
       <li><b>Always something to aim for.</b> From level 8 the level sheet shows the road to your next legacy star, and once every level reward is yours it points you there.</li>
       ${had49 ? '' : '<li><b>Smoother and easier to reach.</b> No more black flicker on slower phones, and on small screens the main buttons stay at the bottom of their card.</li>'}
     </ul>
