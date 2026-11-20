@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bonnet Up</title>
+<meta name="theme-color" content="#1D2521">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Bonnet Up: a 3D car mechanic game. Diagnose faults, undo the nuts, fit the right parts and hand the car back.">
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#1E2320;touch-action:none}
+#game{position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;display:block;transform-origin:0 0;background:#1E2320;touch-action:none}
+</style>
+<script>
+/* itch.io locks phones to one way round. This page holds the game and can give it a quarter turn,
+   so it reads the right way up however the phone is held. The game calls BonnetShell.turn(). */
+window.BonnetShell = (() => {
+  const KEY = 'bonnet-up.turn';
+  let rot = 0;
+  const angle = () => {
+    try { if (screen.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle; } catch (e) {}
+    return typeof window.orientation === 'number' ? (window.orientation + 360) % 360 : 0;
+  };
+  const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } };
+  const write = () => { try { localStorage.setItem(KEY, JSON.stringify({ a: angle(), r: rot })); } catch (e) {} };
+  function layout() {
+    const f = document.getElementById('game'); if (!f) return;
+    const W = window.innerWidth, H = window.innerHeight;
+    if (rot) {
+      f.style.width = H + 'px'; f.style.height = W + 'px';
+      f.style.transform = rot > 0 ? `translate(${W}px,0) rotate(90deg)` : `translate(0,${H}px) rotate(-90deg)`;
+    } else {
+      f.style.width = W + 'px'; f.style.height = H + 'px'; f.style.transform = 'none';
+    }
+  }
+  /* a saved turn only applies while the screen is locked the same way as when it was chosen */
+  function restore() { const s = read(); rot = s && s.a === angle() && (s.r === 90 || s.r === -90) ? s.r : 0; layout(); }
+  /* first tap: the quarter turn that suits how the screen is locked; second: the other way; third: back to normal */
+  function turn() {
+    const a = angle(), wide = window.innerWidth > window.innerHeight;
+    const first = wide ? (a === 270 ? 90 : -90) : (a === 180 ? -90 : 90);
+    rot = rot === 0 ? first : rot === first ? -first : 0;
+    write(); layout();
+    return rot;
+  }
+  window.addEventListener('resize', layout);
+  try { screen.orientation.addEventListener('change', restore); } catch (e) { window.addEventListener('orientationchange', restore); }
+  return { turn, restore, layout, get rot() { return rot; } };
+})();
+</script>
+</head>
+<body>
+<iframe id="game" src="game.html" title="Bonnet Up" allow="autoplay; fullscreen; gamepad; accelerometer; gyroscope; clipboard-write; clipboard-read"></iframe>
+<script>BonnetShell.restore();</script>
+</body>
+</html>

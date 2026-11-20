@@ -21,9 +21,11 @@ open('dist/app/sw.js', 'w', encoding='utf-8').write(sw)
 for f in ['index.html', 'manifest.webmanifest', 'privacy.html', 'three.min.js', 'three-LICENSE.txt', 'apple-touch-icon.png', 'favicon-48.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png']:
     shutil.copy('static/' + f, 'dist/app/' + f)
 shutil.rmtree('dist/app/fonts', ignore_errors=True); shutil.copytree('static/fonts', 'dist/app/fonts')
-# itch.io: the game page is the zip's index.html; it needs three.js and the fonts beside it
+# itch.io: index.html is a small shell that holds the game in a frame and can give it a quarter turn (itch.io locks
+# phones to one way round; the game's turn button calls BonnetShell.turn()); game.html, three.js and the fonts beside it
 z = zipfile.ZipFile('dist/bonnet-up-itch.zip', 'w', zipfile.ZIP_DEFLATED)
-z.writestr('index.html', out)
+z.write('static/itch-index.html', 'index.html')
+z.writestr('game.html', out)
 for f in ['three.min.js', 'three-LICENSE.txt']: z.write('static/' + f, f)
 for f in sorted(os.listdir('static/fonts')): z.write('static/fonts/' + f, 'fonts/' + f)
 z.close()

@@ -22,6 +22,8 @@ run b48_flat b48.py flat.html 24
 run b48_gl b48.py gl3d.html 8
 run share48_gl share48.py gl3d.html
 run long_flat long.py flat.html 30
+(cd .. && python3 tools/build_app.py out/bonnet-up.html > /dev/null)
+run itch itch.py ../dist/bonnet-up-itch.zip
 cd ../results && python3 - <<'PY'
 import glob, json, re
 bad = 0
