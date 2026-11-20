@@ -1,0 +1,17 @@
+Build 51: better-looking cars, real reflections, sharper on phones
+
+- The simple cars outside (service van, yard, car park, showroom, street) use the workshop car's fine body skin close
+  up (the coarse one only far off), so a van's rear-door and cab windows match the workshop van; their lamps are the
+  workshop sizes and are kept in from the corners the same way (conformLamps24), so the yard van's tail lamps no longer
+  wrap round its rear corners. Close up they also get wipers and the shark-fin aerial.
+- Bodies close at the nose and tail in a superellipse instead of an ellipse (a flatter face with tighter edges) and the
+  shoulder line is tighter (8.5 cm radius → 5 cm).
+- Reflection probes: the workshop and the yard each capture a cube of themselves (the car left out), PMREM it and use
+  it as the scene environment, so paint, glass, chrome and the floor reflect the real surroundings. Retaken when the
+  garage's look changes and when the light outside changes. Captured tone-mapped in sRGB, so no shader rebuild for it.
+- Resolution: when frames are slow it now stops at one screen pixel (was 0.75, very soft on phones, and battery saver
+  always went there) and drops the glow pass instead; the still workshop picture respects the battery-saver cap.
+- Tests: b51 (lamp reach on all 69 styles, near/far detail, both probes)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01GCLxnEhkbZfWsprzYLJNVt

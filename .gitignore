@@ -10,3 +10,7 @@ __pycache__/
 *.heapsnapshot
 results/
 regress.out
+dbg/
+e2e/gl3d_dbg.html
+dbg50/
+e2e/gl3d_b50dbg.html

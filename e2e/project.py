@@ -32,7 +32,7 @@ async def main():
         if not on_ramp: t.bad.append('the car I won is not on a ramp'); t.done(); return
         await t.tab('workshop'); await t.pg.wait_for_timeout(2500)
         m0 = s['money']
-        await t.ev("window.__AJ = { limit: 400000 }")
+        await t.ev("window.__AJ = { limit: 900000 }")
         log = await t.pg.evaluate(AJ)
         t.out['fix'] = log[-6:]
         await t.pg.wait_for_timeout(1500)

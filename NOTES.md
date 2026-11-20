@@ -83,3 +83,18 @@
   even meshes that ignore taps), partBox, isolate, hideRole, nose. e2e/hl2.py/hl3.py: lift a car and look at a part
   from below, find dark pixels and name them.
 - Auto player: bleeds brakes in order (RR, RL, FR, FL), skips Customise/To the unit, tunes on the dyno.
+
+## Build 51 (published: Pages a4e4612, artifact v54)
+- p51a_lite: liteGeo uses skin24 lod 0 close up (lod 2 far; was 1/2) and seat step 0.045; lamps use the workshop sizes
+  and zL51 (the conformLamps24 clamp: |z| ≤ 0.81·SF(faceX, y) − 0.8·halfW). Wipers + aerial close up.
+  window.__lite51(style, far) → { reachT, reachH (how far lamps reach round from the tail/nose), tris, styles }.
+- p51b_shape: skin24 ends close in a superellipse (EP51 = 5, stations 1−(1−k/nc)^2.2, nc 7/4/2); shoulder rs/rsz
+  0.05/0.04 for cars (vans unchanged).
+- p51c_probe: probe51(scene, x, y, z, hide, ibl, k) → PMREM render target from a 256 cube (sRGB, tone-mapped, shadows
+  not re-rendered, lastS49/lastC49 kept). Workshop: PR51.ws flag (start, ENVS.in loaded, decorSig change) → taken in
+  frame() before the render, car hidden. Yard/drive: W.probe51 (setMood, ENVS.out loaded) → taken in driveFrameIn at
+  (5.5, 1.3, −9.5), hiding the ride, van, walker and rain, exposure ×0.8. window.__probe51() → { ws, out }.
+- p51d_sharp: adaptDpr floor min(1, DPR_MAX) (was 0.75), then POST.auto off; idle workshop DPR respects PREF34.cap.
+- Debug: tools/dbg.sh builds e2e/gl3d_dbg.html (patches/debug/dbg_pick.py: + liteShow, skinN, liteN, walkTo, run).
+  e2e/carlook.py (yard van at eye height, JS= / ANG= env), closeup.py (big hero shots), vanshot.py, litegallery.py,
+  probe.py (evaluate expressions; PAGE=).
