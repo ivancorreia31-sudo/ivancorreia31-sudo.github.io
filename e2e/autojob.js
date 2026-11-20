@@ -80,7 +80,7 @@
     }
     const bolt = document.querySelector('.bolt.next') || document.querySelector('.bolt:not(.done)');
     if (bolt && vis(bolt)) { bolt.click(); await wait(420); continue; }
-    const btns = [...document.querySelectorAll('.step button')].filter(b => vis(b) && !b.disabled && !/^(Job card|Less|More)$/.test(b.innerText.trim()) && !['oil', 'drawer', 'stepmin', 'g-drive'].includes(b.dataset.a || b.dataset.b));
+    const btns = [...document.querySelectorAll('.step button')].filter(b => vis(b) && !b.disabled && !/^(Job card|Less|More)$/.test(b.innerText.trim()) && !['oil', 'drawer', 'stepmin', 'g-drive', 'custom', 'unit-store'].includes(b.dataset.a || b.dataset.b) && !/^(Customise|To the unit)$/.test(b.innerText.trim()));
     const pref = ['handback', 'g-fit', 'g-shop', 'g-remove', 'mini-go', 'g-go', 'g-ok', 'g-lift'];
     let b = null; for (const a of pref) { b = btns.find(x => x.dataset.a === a); if (b) break; }
     b = b || btns[0];

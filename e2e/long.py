@@ -24,9 +24,10 @@ async def main():
             if s['day'] - d0 >= DAYS or s.get('over'): break
             day = s['day']; summ = await t.skip_day(); s = await t.S()
             if s['day'] == day: t.bad.append('day %d never ended' % day); break
-            row = {'day': day, 'money': s['money'], 'xp': s['xp'], 'kb': round(len(json.dumps(s)) / 1024, 1), 'ph': len(((s.get('ph35') or {}).get('list')) or []), 'staffJobs': sum((x.get('jobs') or 0) for x in (s.get('staff') or [])), 'staff': [[x.get('name'), round(x.get('mood', -1), 2) if isinstance(x.get('mood'), (int, float)) else x.get('mood'), x.get('jobs'), x.get('bay')] for x in (s.get('staff') or [])], 'bays': [(b or {}).get('staff') if isinstance(b, dict) else b for b in s.get('bays') or []]}
+            row = {'day': day, 'money': s['money'], 'xp': s['xp'], 'kb': round(len(json.dumps(s)) / 1024, 1), 'rep': round(s.get('rep', 0), 2), 'cmp': len(s.get('complaints') or []), 'warr': len([j for j in (s.get('board') or []) if j and j.get('warranty')]), 'ph': len(((s.get('ph35') or {}).get('list')) or []), 'staffJobs': sum((x.get('jobs') or 0) for x in (s.get('staff') or [])), 'staff': [[x.get('name'), round(x.get('mood', -1), 2) if isinstance(x.get('mood'), (int, float)) else x.get('mood'), x.get('jobs'), x.get('bay')] for x in (s.get('staff') or [])], 'bays': [(b or {}).get('staff') if isinstance(b, dict) else b for b in s.get('bays') or []]}
             days.append(row)
             if 'report' in summ.lower(): weeks.append({'day': day, 'gw': 'garage of the week' in summ.lower(), 'gw44': {k: (s.get('gw44') or {}).get(k) for k in ['wins', 'streak', 'hist']}})
+        t.out['rep'] = [[d['day'], d['rep'], d['cmp'], d['warr']] for d in days]
         t.out['days'] = days[::6] + days[-1:]; t.out['weeks'] = weeks; t.out['secs'] = round(time.time() - t0)
         if len(days) < DAYS: t.bad.append('only %d days' % len(days))
         if len(weeks) < DAYS // 7 - 1: t.bad.append('weekly reports missing: %d' % len(weeks))
