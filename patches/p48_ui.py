@@ -18,6 +18,7 @@ function showWhatsNew48(had47) {
     <ul class="news">
       <li><b>Days that make sense.</b> No more heatwaves in the rain: the day’s event suits the season and the weather. Winter brings cold snaps (battery and starting jobs pay 50% more), and it rains more in autumn and winter.</li>
       <li><b>Parts catalogue.</b> A new tool from level 6. In the parts shop it ticks every box that fits the car, so you only choose the quality.</li>
+      <li><b>Share your work.</b> On phones that can share pictures, photo mode and the before & after card have a Share button: send your best restorations to friends, with a link to the game.</li>
       <li><b>Tidier collection.</b> The fault book and the Items page show what you’ve found first, and sum up what’s left instead of pages of question marks.</li>
       ${had47 ? '' : '<li><b>Your legacy.</b> From level 5, Daily shows how close you are to selling up for a legacy star. Selling up keeps your Gold Bolts and your whole collection.</li>'}
     </ul>
