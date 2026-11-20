@@ -9,3 +9,4 @@ e2e/shots/
 __pycache__/
 *.heapsnapshot
 results/
+regress.out
