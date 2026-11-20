@@ -21,6 +21,7 @@ run job_gl job.py gl3d.html 2
 run b48_flat b48.py flat.html 24
 run b48_gl b48.py gl3d.html 8
 run b49_gl b49.py gl3d.html
+run b50_flat b50.py flat.html
 run share48_gl share48.py gl3d.html
 run breadth_gl breadth.py gl3d.html
 run project_gl project.py gl3d.html
