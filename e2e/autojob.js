@@ -47,6 +47,15 @@
       else if (read() > tgt) { const de = document.querySelector('[data-hold=deflate]'); ev(de, 'pointerdown'); while (read() > tgt && performance.now() - t1 < 90000) await wait(25); ev(de, 'pointerup'); }
       log.push('pumped to ' + read() + ' of ' + tgt); await wait(700); continue;
     }
+    const tnRun = document.querySelector('[data-a=tn-run]');
+    if (tnRun && vis(tnRun)) {
+      const save = document.querySelector('[data-a=tn-save]:not([disabled])');
+      if (save && vis(save)) { log.push('tune: save'); save.click(); window.__tn = 0; await wait(900); continue; }
+      window.__tn = (window.__tn || 0) + 1;
+      const hint = document.querySelector('[data-a=tn-hint]');
+      if (window.__tn <= 3 && hint && vis(hint) && !/best map/i.test((document.getElementById('toast') || {}).textContent || '')) { hint.click(); await wait(500); continue; }
+      log.push('tune: dyno run'); tnRun.click(); window.__tn = 0; await wait(3500); continue;
+    }
     const capw = document.querySelector('.capw'), hold0 = [...document.querySelectorAll('[data-hold]')].find(b => vis(b) && !['air', 'deflate'].includes(b.dataset.hold));
     if ((capw && vis(capw)) || hold0) {
       const ev = (el, ty) => el && el.dispatchEvent(new PointerEvent(ty, { bubbles: true, cancelable: true, pointerId: 8, isPrimary: true }));

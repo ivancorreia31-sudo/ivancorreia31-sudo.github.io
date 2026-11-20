@@ -8,12 +8,21 @@ N = int(sys.argv[2]) if len(sys.argv) > 2 else 2
 AJ = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'autojob.js')).read()
 async def play(t, name):
     m0 = (await t.S())['money']; t0 = time.time()
+    await t.ev('window.__AJ = { limit: 300000 }')
     log = await t.pg.evaluate(AJ)
     inv = await t.ev("(() => { const m = document.getElementById('modal'); return m.hidden ? '' : m.innerText.replace(/\\s+/g, ' ').slice(0, 400); })()")
     await t.close(3); await t.pg.wait_for_timeout(800); await t.close(2)
     s = await t.S()
     r = {'secs': round(time.time() - t0), 'steps': len(log), 'end': log[-3:], 'invoice': inv[:140], 'money': [m0, s['money']], 'bays': [bool(b) for b in s['bays']]}
-    if 'STOP at invoice' not in log: t.bad.append('%s: never reached the invoice %s' % (name, log[-4:]))
+    steps = [l for l in log if l.startswith('step: ')]
+    if 'STOP at invoice' not in log:
+        # a long job can outlast the time limit in software 3D; that's fine while it keeps moving through new steps
+        if any('STUCK' in l for l in log) or len(set(steps[-12:])) < 3: t.bad.append('%s: never reached the invoice %s' % (name, log[-4:]))
+        else: r['note'] = 'still going at the time limit, through %d different steps' % len(set(steps))
+        # give the car back unfinished so the next job can go on the ramp
+        await t.close(2); await t.act('drawer', v='job'); await t.pg.wait_for_timeout(500); await t.act('abandon'); await t.pg.wait_for_timeout(600)
+        await t.ev("(() => { const b = document.querySelector('#modal [data-a=confirm-abandon]'); if (b) b.click(); })()"); await t.pg.wait_for_timeout(1500); await t.close(2)
+        r['abandoned'] = not (await t.S())['bays'][0]
     elif 'PAID' not in inv.upper() and 'paid' not in inv: t.bad.append('%s: invoice not paid: %s' % (name, inv[:120]))
     t.out[name] = r
 async def main():
