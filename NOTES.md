@@ -62,3 +62,12 @@
   showroom walk [data-b=sh-walk], close #shw22 [data-b=shw-close]; first-person [data-a=fp-walk], exit [data-fp=exit];
   test drive [data-a=g-drive], end [data-dv=end]; phone [data-b=phone35], tabs [data-b=ph36tab]; auctions need a night
   (lots come overnight), [data-a=auction], [data-a=auc-bid], [data-a=auc-walk].
+
+## Build 49 (published: Pages 0a24150, artifact v52)
+- p49a_flash: renderer.render is wrapped to remember the last scene/camera; adaptDpr redraws straight after a resize
+  (it used to leave the canvas blank until the next frame). window.__dpr49(v) changes the resolution and reads a pixel.
+- p49b_small: the welcome card's button row is its last child and sticks to the card's bottom; the step card's
+  .st-acts.st-under sticks too. b49.py checks Let's go / Test drive are on screen at 320x568, 360x640, 390x844.
+- itch zip: static/itch-index.html (the quarter-turn shell, BonnetShell) is index.html; the game is game.html.
+  e2e/itch.py serves the zip over HTTP and checks shell, game, fonts, three.js and the turn button.
+- Test pages use static/app-head.txt (it has the [hidden]{display:none!important} rule the game relies on).

@@ -17,6 +17,7 @@ function showWhatsNew49(had48) {
   showModal(`<div><span class="label">Build 49</span><h2 class="sheet-title">What’s new</h2></div>
     <ul class="news">
       <li><b>No more black flicker.</b> On slower phones the 3D garage could flash black for a moment while it adjusted its sharpness to keep things smooth. It doesn’t any more.</li>
+      <li><b>Buttons you can always reach.</b> On small phones the welcome card’s Let’s go and the step card’s buttons stay at the bottom of the card, so you never have to scroll to find them.</li>
       ${had48 ? '' : '<li><b>Share your work, and days that make sense.</b> A Share button for your photos and before & afters, a parts catalogue from level 6, and events that suit the season and the weather.</li>'}
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);

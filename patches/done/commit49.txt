@@ -1,0 +1,10 @@
+Build 49: no black flicker, buttons you can always reach
+
+- The 3D view draws the picture again straight after it changes its resolution (which it does to keep the frame
+  rate up), so slower phones no longer flash black for a moment
+- On short screens the welcome card's Let's go and the step card's buttons stay pinned to the bottom of the card
+  while the words scroll above them (checked at 320x568, 360x640, 390x844)
+- itch.io zip: index.html is the quarter-turn shell again, with the game in game.html beside it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01GCLxnEhkbZfWsprzYLJNVt
