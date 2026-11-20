@@ -31,7 +31,7 @@
   (newest 60 before/afters); Garage of the Week target = median of the last 3 weeks; long-session memory fixes (TEXDRAW
   entries dropped on texture dispose; LITE simple-car shape cache LRU 24 styles / 24 MB).
 
-## Build 48 (in progress)
+## Build 48 (published: Pages 7fdc899, artifact v51)
 - p48a_world: events suit season and weather (heatwave: dry summer days; new cold snap: winter; potholes: not summer);
   rain chance by season (summer .12, spring .22, autumn .3, winter .32). Seasons are 14 days each from day 1 (Spring).
   window.__ev48(day, weather).

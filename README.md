@@ -3,7 +3,7 @@
 The live game is on the `main` branch (GitHub Pages). This branch holds what builds and tests it.
 
 - `src/base.html`: the last published build, as one HTML file (the Claude artifact's source). Each new build starts here.
-- `patches/pNN*.py`: the changes for the build in progress, applied in order by `tools/build.sh`.
+- `patches/pNN*.py`: the changes for the build in progress, applied in order by `tools/build.sh`; `patches/done/` holds published ones.
 - `tools/build.sh p48a ... p48_ui` → `out/bonnet-up.html`, syntax check, and the test pages `e2e/flat.html` (2D) and
   `e2e/gl3d.html` (3D).
 - `tools/build_app.py out/bonnet-up.html` → `dist/app/` (the files for `main`) and `dist/bonnet-up-itch.zip`.

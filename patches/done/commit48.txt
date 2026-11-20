@@ -1,0 +1,13 @@
+Build 48: days that make sense, a parts catalogue, sharing, a tidier collection
+
+- The day's event suits the season and the weather: heatwaves only on dry summer days, a new winter cold snap
+  (battery and starting jobs pay 50% more), no pothole season in summer, and more rain in autumn and winter
+- Parts catalogue tablet (tool, level 6): the parts shop ticks every box that fits the car
+- Share button in photo mode and on the before & after card, on phones that can share pictures: the picture, a
+  line about the car and a link to the game
+- Legacy card reads "Level 7 of 8" / "Business worth £x of £250,000" with ticks when done; the fault book and the
+  Items page list what you've found first and sum up the rest
+- Build tools and tests now live on the dev branch
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01GCLxnEhkbZfWsprzYLJNVt

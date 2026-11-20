@@ -478,6 +478,9 @@ input.txt{width:100%;box-sizing:border-box;font:inherit;font-size:17px;padding:1
 .box-q{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
 .box-price{font-family:var(--font-mono);font-weight:600;font-size:15px;margin-top:4px}
 .box.bad{opacity:.4;border-style:dashed;animation:shake .25s;cursor:default}
+.box.fit48{border-color:var(--good)}
+.box-tag.fit48t{background:var(--good);color:var(--on-sem,#fff)}
+.boxes.cat48 .box:not(.fit48):not(.bad){opacity:.5}
 .shop-msg{color:var(--bad);font-weight:600;background:var(--panel-2);border-radius:10px;padding:8px 10px}
 .box-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:6px}
 .box-stars{font-size:12px;letter-spacing:1px;color:var(--hazard-ink,#7A5A00);opacity:.9}
@@ -905,6 +908,11 @@ html{touch-action:none}
 .itc b{font-size:12.5px;line-height:1.15}
 .itc.locked{border-style:dashed;opacity:.65;align-content:center}
 .itc-q{font-family:var(--font-display);font-weight:900;font-size:34px;color:var(--muted);line-height:1}
+.lk48-h{margin:14px 0 6px;font-size:13px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.itgrid.lk48{grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px}
+.itgrid.lk48 .itc{min-height:46px;padding:4px;border-width:1.5px;align-content:center}
+.itgrid.lk48 .itc small{display:none}
+.itgrid.lk48 .itc-q{font-size:18px}
 .itc-n{position:absolute;top:5px;right:6px;font-style:normal;font-weight:800;font-size:12px;background:var(--ink);color:var(--panel);border-radius:8px;padding:0 5px}
 .rar-b-uncommon{border-color:#3FA34D}.rar-b-rare{border-color:#2F7BD8}.rar-b-epic{border-color:#9B4FD6;box-shadow:0 0 12px rgba(155,79,214,.25)}.rar-b-legendary{border-color:#F2A900;box-shadow:0 0 16px rgba(242,169,0,.35)}.rar-b-mythic{border-color:#E5386D;box-shadow:0 0 20px rgba(229,56,109,.45)}
 .itc.big{border:0;box-shadow:none;background:none;padding:0}
@@ -1726,6 +1734,10 @@ body.lefty34 .dv-ctrl{flex-direction:row-reverse}body.lefty34 .dv-pedals{flex-di
 .b38-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
 .b38-c{border:1.5px solid var(--line);border-radius:12px;padding:9px 11px}.b38-c b{display:block;font-size:14px}.b38-c p{margin:4px 0;font-size:13px;line-height:1.35}.b38-c small{color:var(--muted);font-size:11.5px}
 .b38-c.off{border-style:dashed;opacity:.7}.b38-c.off b{color:var(--muted)}
+.b38-left{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.b38-left > b{width:100%;font-size:13px;color:var(--muted)}
+.b38-left .b38-c{padding:6px 10px;font-size:13px}
+.b38-left .b38-c b{display:inline;font-size:13px;color:var(--ink)}
 .h38{display:block}
 .ph36-tabs .seg34-b{flex:1 0 auto;padding:0 10px}
 .ph35{max-height:min(52vh,520px)}
@@ -1818,7 +1830,9 @@ details.inv-explain:not([open]){padding-top:10px;padding-bottom:10px}
 .lg47.hit{border-color:var(--good)}
 .lg47.hit h3{color:var(--good)}
 .lg47-s{color:var(--worn);letter-spacing:2px;font-size:18px;white-space:nowrap}
-.lg47-r{display:grid;grid-template-columns:7.5em 1fr;align-items:center;gap:10px}
+.lg47-r{display:grid;grid-template-columns:1fr auto;align-items:center;gap:3px 10px}
+.lg47-r .gauge{grid-column:1 / -1}
+.lg47-r b.ok48{color:var(--good)}
 .lg47-r .gauge{height:7px}
 </style>
 
@@ -2504,6 +2518,7 @@ const UPGRADES = [
   { id: 'heater', cat: 'tools', name: 'Induction heater', desc: 'Heats seized nuts red hot, so two quick taps free them instead of five.', price: 400, lvl: 2 },
   { id: 'tyremc', cat: 'tools', name: 'Tyre machine and balancer', desc: 'Wheel jobs take 40% less time, and tyres cost you 20% less.', price: 800, lvl: 2 },
   { id: 'diag', cat: 'tools', name: 'Diagnostic laptop', desc: 'Live data rules out a wrong answer on every fault, not just the ones with a code.', price: 1100, lvl: 3 },
+  { id: 'catalogue', cat: 'tools', name: 'Parts catalogue tablet', desc: 'The trade catalogue on a tablet. In the parts shop every box that fits the car gets a green tick, so you only have to choose the quality.', price: 1500, lvl: 6 },
   { id: 'dyno', cat: 'tools', name: 'Dyno kit', levels: [
     { name: 'Wideband lambda sensor', desc: 'The dyno tells you exactly how much fuel the map needs.', price: 350, lvl: 1 },
     { name: 'Pro tuning software', desc: 'Every map makes 4% more power, and customers pay £2 for every bhp over their target.', price: 1200, lvl: 3 }] },
@@ -2611,6 +2626,7 @@ const CONSUMABLE = ['oil', 'airfilter', 'plugs', 'pads', 'brakefluid', 'hose', '
 const EV_TAGS = {
   heatwave: ['m_aircon', 'm_puddle', 'overheat', 'coolant', 'mwayhot', 'steam', 'cooling', 'u_cooling', 'coldheater', 'puddle'],
   motrush: ['m_mot', 'm_spongy', 'tyres', 'onceover', 'mot', 'spring', 'reartyre', 'frontpads', 'prepurchase', 'exhaust'],
+  coldsnap: ['flatbatt', 'winter', 'nostart', 'clicks', 'coldheater', 'starting', 'charging', 'dimlights', 'washers', 'm_wipers'],
   potholes: ['m_kerbed', 'm_bangspring', 'clunk', 'knock', 'wander', 'pothole', 'frontend', 'tyrewear', 'bouncy', 'spring', 'rear', 'u_frontend', 'u_droplinks'],
 };
 const EVENTS = [
@@ -2622,8 +2638,18 @@ const EVENTS = [
   { id: 'payday', title: 'Payday', text: 'Customers are flush. Tips are doubled today.', tip: 2 },
   { id: 'inspector', title: 'Trading Standards visit', text: 'An inspector is watching. Reputation gains and losses are doubled today.', rep: 2 },
   { id: 'busy', title: 'Busy morning', text: 'Two extra customers are already waiting on the board.', extra: 2 },
+  { id: 'coldsnap', title: 'Cold snap', text: 'A hard frost overnight. Flat batteries, non-starters and cold heaters pay 50% more labour.', match: c => EV_TAGS.coldsnap.includes(c.id), labour: 1.5 },
 ];
+/* build 48: an event has to suit the day - a heatwave only on a dry summer day, a cold snap only in winter, pothole
+   season any time but summer - and it rains more in autumn and winter */
+const evFits48 = e => { const se = seasonOf(S.day), wet = S.weather === 'rain';
+  if (e.id === 'heatwave') return se === 'Summer' && !wet;
+  if (e.id === 'coldsnap') return se === 'Winter';
+  if (e.id === 'potholes') return se !== 'Summer';
+  return true; };
+const rain48 = d => ({ Spring: 0.22, Summer: 0.12, Autumn: 0.3, Winter: 0.32 })[seasonOf(d)] || 0.2;
 const evNow = () => (S && S.event ? EVENTS.find(e => e.id === S.event) : null) || null;
+window.__ev48 = (day, wx) => { const d0 = S.day, w0 = S.weather; if (day) S.day = day; if (wx) S.weather = wx; const out = { season: seasonOf(S.day), fits: EVENTS.filter(e => evFits48(e)).map(e => e.id), rain: rain48(S.day), now: S.event, weather: w0 }; S.day = d0; S.weather = w0; return out; };
 
 const GOAL_POOL = [
   { type: 'jobs', lvl: 1, target: L => (L >= 3 ? 3 : 2), text: n => `Hand back ${n} cars` },
@@ -2715,7 +2741,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -3852,8 +3878,8 @@ function endDay() {
   sum.rentParts = rentParts();
   S.money -= rent; loanNight(); S.day++; S.clock = DAY_START; S.today = { jobs: 0, earned: 0 };
   const L = levelOf(S.xp);
-  S.event = chance(0.7) ? pick(EVENTS.filter(e => !e.minLvl || e.minLvl <= L)).id : null;
-  S.weather = S.wx36 === 'rain' || S.wx36 === 'dry' ? S.wx36 : (chance(0.2) ? 'rain' : 'dry'); S.wx36 = chance(0.2) ? 'rain' : 'dry';
+  S.weather = S.wx36 === 'rain' || S.wx36 === 'dry' ? S.wx36 : (chance(rain48(S.day)) ? 'rain' : 'dry'); S.wx36 = chance(rain48(S.day + 1)) ? 'rain' : 'dry';
+  S.event = chance(0.7) ? pick(EVENTS.filter(e => (!e.minLvl || e.minLvl <= L) && evFits48(e))).id : null;
   sum.cmp = complaintsOvernight();
   staffOvernight(sum); fleetNight(sum); S.callout = null;
   bizNight(sum); weekNight(sum);
@@ -15189,6 +15215,7 @@ function answerQuiz(x) {
     work(mins, `Checking the ${lc(partLabel(x))}`, () => toast(`You checked the ${lc(partLabel(x))}. It’s fine: ${mins} minutes gone. ${blind ? 'A test drive would tell you more.' : 'Read the clue again.'}`));
   }
 }
+window.__shop48 = { open: (id) => { const j = cur(); if (!j) return null; id = id || Object.keys(j.parts).find(k => CAT[k] && j.parts[k].state === 'fitted'); openShop(id, false); return id; }, fits: () => (UI.shop ? UI.shop.opts.map(o => !!o.fits) : null) };
 function openShop(id, up) {
   const job = cur(); if (!job || !job.parts[id]) return;
   UI.shop = { id, up: !!up, opts: shopOptions(job, id, !!up), msg: '', wrong: 0 };
@@ -15207,19 +15234,20 @@ function renderShop() {
   const tip = sh.up ? 'Street parts do the job. Track parts make more power. Cheap copies save money, but they make less power and customers notice.' : PWR[p.kind] ? 'This part makes power: cheap copies and budget boxes cost you a few bhp, premium ones are bang on spec.' : 'Budget parts are cheap but wear out sooner. Premium parts impress the customer.';
   const boxHtml = (o, i) => {
     const T = TIER[o.q];
-    return `<button class="box${o.bad ? ' bad' : ''}" data-a="shop-pick" data-i="${i}"${o.bad ? ' disabled' : ''}>
+    const fit48 = own('catalogue') && o.fits;
+    return `<button class="box${o.bad ? ' bad' : ''}${fit48 ? ' fit48' : ''}" data-a="shop-pick" data-i="${i}"${o.bad ? ' disabled' : ''}>
       <span class="box-top">${badgeSvg(o.make, 34)}<span class="box-stars" aria-label="${T.stars} out of 5 stars">${'★'.repeat(T.stars)}${'☆'.repeat(5 - T.stars)}</span></span>
       <span class="box-maker">${(() => { const sw = /^Genuine /.test(o.maker) ? { bg: (MAKES[o.make] || MAKES.calder).color, fg: '#fff' } : makerSwatch(o.maker); return `<i class="mk-sw" style="background:${sw.bg};border-color:${sw.fg}"></i>`; })()}${esc(o.maker)}</span><span class="box-line">${esc(o.line)}</span>
       <span class="box-fit">Fits ${esc(MAKES[o.make].name)} <span class="yrs">${o.years}</span></span>
-      <span class="box-tags"><span class="box-tag t-${o.q}">${T.label}</span>${o.deal ? '<span class="box-tag box-deal">Deal −25%</span>' : ''}${o.axle ? `<span class="box-tag box-axle">${o.axle} ${unit}</span>` : ''}${o.size ? `<span class="box-tag box-size">${esc(o.size)}</span>` : ''}</span>
+      <span class="box-tags">${fit48 ? '<span class="box-tag fit48t">✓ Fits</span>' : ''}<span class="box-tag t-${o.q}">${T.label}</span>${o.deal ? '<span class="box-tag box-deal">Deal −25%</span>' : ''}${o.axle ? `<span class="box-tag box-axle">${o.axle} ${unit}</span>` : ''}${o.size ? `<span class="box-tag box-size">${esc(o.size)}</span>` : ''}</span>
       ${o.gain ? `<span class="box-gain">+${o.gain} bhp</span>` : o.pwr ? `<span class="box-gain${o.pwr < 0 ? ' neg' : ''}">${o.pwr > 0 ? '+' : ''}${o.pwr} bhp</span>` : ''}<span class="box-price">${money(o.price)}</span></button>`;
   };
   showModal(`<div><span class="label">Parts shop</span><h2 class="sheet-title">${esc(nm)}</h2></div>
     <div class="shop-car">${badgeSvg(job.car.make, 36)}<span>Your car<b>${esc(job.car.model)} · ${job.car.year}${wheel ? ' · ' + esc(job.car.tyre) : ''}${axle ? ' · ' + axle + ' ' + unit : ''}</b></span></div>
-    <p class="muted">Pick a box with ${how}. ${tip}</p>
+    <p class="muted">${own('catalogue') ? 'Your parts catalogue has ticked every box that fits. Choose the quality.' : `Pick a box with ${how}.`} ${tip}</p>
     ${(() => { const d = dealToday(); return d ? `<p class="shop-deal">Deal of the day: <b>${esc(d.maker)}</b>, a quarter off everything.</p>` : ''; })()}
     ${sh.msg ? `<p class="shop-msg" role="alert">${esc(sh.msg)}</p>` : ''}
-    <div class="boxes">${sh.opts.map(boxHtml).join('')}</div>
+    <div class="boxes${own('catalogue') ? ' cat48' : ''}">${sh.opts.map(boxHtml).join('')}</div>
     <button class="btn wide" data-a="shop-close">Not now</button>`);
 }
 function shopPick(i) {
@@ -16853,6 +16881,21 @@ let PHOTO21 = null, DL21 = null;
 const FRAMED21 = (() => { try { return !!(window.claude && typeof window.claude.use === 'function'); } catch (e) { return false; } })();
 if (FRAMED21) { try { window.claude.use('downloads').then(d => { DL21 = d || null; }, () => { DL21 = null; }); } catch (e) { /* no viewer */ } }
 const photoName21 = () => `${garageName21().replace(/\W+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'bonnet-up'}-day-${S.day}.jpg`;
+/* build 48: the share sheet */
+const SHARE_URL48 = (() => { try { if (/\.github\.io$/.test(location.hostname)) return location.origin + '/'; } catch (e) { /* no location */ } return 'https://ivancorreia31-sudo.github.io/'; })();
+const canShare48 = () => { try { return !!(navigator.share && navigator.canShare && navigator.canShare({ files: [new File([new Blob(['x'], { type: 'image/jpeg' })], 'x.jpg', { type: 'image/jpeg' })] })); } catch (e) { return false; } };
+async function share48(url, name, text) {
+  if (!url) { toast('Couldn’t make the picture.'); return false; }
+  try {
+    await navigator.share({ files: [new File([photoBlob21(url)], name, { type: 'image/jpeg' })], text: `${text} ${SHARE_URL48}` });
+    S.stats.shares48 = (S.stats.shares48 || 0) + 1; save();
+    return true;
+  } catch (e) {
+    if (e && e.name === 'AbortError') return false;
+    toast('Sharing didn’t work here. Save the picture and share it from your photos instead.'); return false;
+  }
+}
+window.__share48 = { can: () => canShare48(), url: SHARE_URL48 };
 function photoBlob21(url) {
   const i = url.indexOf(','), bin = atob(url.slice(i + 1)), u8 = new Uint8Array(bin.length);
   for (let k = 0; k < bin.length; k++) u8[k] = bin.charCodeAt(k);
@@ -16866,7 +16909,7 @@ function takePhoto() {
   showModal(`<div><span class="label">Photo mode</span><h2 class="sheet-title">Say cheese</h2></div>
     <img class="photo21" src="${url}" alt="A photo of your workshop">
     <p class="muted">${canSave ? 'Happy with it? Save it to your device.' : 'Press and hold the picture (or right-click it) to save it.'}</p>
-    <div class="photo21-acts">${canSave ? '<button class="btn primary" data-a="photo-save">Save photo</button>' : ''}<button class="btn" data-a="close-modal">Close</button></div>`);
+    <div class="photo21-acts">${canShare48() ? '<button class="btn primary" data-b="photo-share48">Share</button>' : ''}${canSave ? `<button class="btn${canShare48() ? '' : ' primary'}" data-a="photo-save">Save photo</button>` : ''}<button class="btn" data-a="close-modal">Close</button></div>`);
 }
 async function savePhoto21() {
   const url = PHOTO21; if (!url) return;
@@ -19541,7 +19584,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 47</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 48</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -20035,7 +20078,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 47;
+const BUILD = 48;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -20897,7 +20940,9 @@ function partsHtml22() {
   return `<div class="coll-h"><div><b>${seen} of ${all.length}</b> found <span class="bar22 wide"><i style="width:${Math.round(seen / all.length * 100)}%"></i></span></div><button class="btn sm" data-b="goto" data-v="daily" data-s="crates">Get more</button></div>
     <div class="chips2 ptypes">${[['all', 'All']].concat(ITEM_TYPES).map(([k, l]) => `<button class="zchip" aria-selected="${k === f}" data-b="ptype" data-v="${k}">${esc(l)}</button>`).join('')}</div>
     <p class="muted sm">Fit parts, paints and engines from the Customise sheet on one of your project cars. Each one fitted goes with the car when it’s sold, and adds to its value.</p>
-    <div class="itgrid">${list.map(id => `<button class="itbtn" data-b="item" data-id="${id}">${itemCard(id)}</button>`).join('')}</div>`;
+    ${(() => { const got = list.filter(id => S.inv.seen[id]), left = list.filter(id => !S.inv.seen[id]), btn = id => `<button class="itbtn" data-b="item" data-id="${id}">${itemCard(id)}</button>`;
+      return (got.length ? `<div class="itgrid">${got.map(btn).join('')}</div>` : '')
+        + (left.length ? `<h4 class="lk48-h">Still to find · ${left.length}</h4><div class="itgrid lk48">${left.map(btn).join('')}</div>` : ''); })()}`;
 }
 act22('ptype', b => { S.sub.ptype = b.dataset.v; render(); });
 act22('item', b => {
@@ -21963,7 +22008,8 @@ function baShow22(jOrNo, why) {
       <div class="ba22" style="--x:100%"><img class="ba-a" src="${a}" alt="After"><div class="ba-b"><img src="${b}" alt="Before"></div><div class="ba-bar"><i></i></div><span class="ba-tag l">Before</span><span class="ba-tag r">After</span></div>
       <p class="ba-cap">${R.paid ? `Bought for ${money(R.paid)}` : 'Came in like this'}${R.worth ? ` · ${R.project ? 'worth' : 'paid'} ${money(R.worth)} now` : ''}${R.items && R.items.length ? ` · ${R.items.length} collector part${R.items.length > 1 ? 's' : ''}` : ''}</p>
       ${R.fans ? `<p class="muted sm ba-fans">This one won you ${R.fans.toLocaleString('en-GB')} fans.</p>` : ''}
-      <div class="row ba-acts"><button class="btn primary" data-b="ba-save" data-no="${no}">Save the picture</button><button class="btn" data-a="close-modal">Close</button></div>`);
+      <div class="row ba-acts">${canShare48() ? `<button class="btn primary" data-b="ba-share48" data-no="${no}">Share</button>` : ''}<button class="btn${canShare48() ? '' : ' primary'}" data-b="ba-save" data-no="${no}">Save the picture</button><button class="btn" data-a="close-modal">Close</button></div>`);
+    if (canShare48()) baCompose22(no).then(u => { if (BAV && BAV.no === no) BAV.share = u; }, () => {});
     const fr = document.querySelector('#sheet .ba22'); if (!fr) return;
     const set = x => { const r = fr.getBoundingClientRect(); fr.style.setProperty('--x', Math.max(0, Math.min(100, (x - r.left) / r.width * 100)) + '%'); };
     let down = false;
@@ -22082,6 +22128,8 @@ const ago22 = t => { const m = Math.round((nowMs() - t) / 60000); return m < 1 ?
 act22('ba-open', b => baShow22(+b.dataset.no));
 act22('ba-post', b => bgPost22(+b.dataset.no));
 act22('ba-save', b => baSave22(+b.dataset.no));
+act22('ba-share48', async b => { const no = +b.dataset.no, R = baRec(no); const url = (BAV && BAV.no === no && BAV.share) || await baCompose22(no); share48(url, `bonnet-up-before-after-${no}.jpg`, `Before and after: I fixed up this ${R ? R.model : 'car'} in Bonnet Up 🔧 Play it free:`); });
+act22('photo-share48', () => share48(PHOTO21, photoName21(), `My garage in Bonnet Up 🔧 Play it free:`));
 /* test hook */
 window.__hero = o => (Car3D.ok && Car3D.heroShot ? Car3D.heroShot(720, 480, o) : null);
 window.__extCam = () => (Car3D.extCamInfo ? Car3D.extCamInfo() : null);
@@ -25069,7 +25117,7 @@ act22('map36shops', () => {
 });
 act22('ph36tab', b => { UI.ph36 = b.dataset.v === 'map' ? 'map' : b.dataset.v === 'cal' ? 'cal' : b.dataset.v === 'paper' ? 'paper' : b.dataset.v === 'radio' ? 'radio' : 'msgs'; const sh = $('#sheet'); if (sh) { sh.innerHTML = phone35Html(); const t = sh.querySelector('[data-b="ph36tab"][aria-pressed="true"]'); if (t) t.focus(); } });
 /* build 36: tomorrow's weather is decided a day ahead, so the phone can tell you */
-const wx36 = () => (S.wx36 === 'rain' || S.wx36 === 'dry' ? S.wx36 : (S.wx36 = chance(0.2) ? 'rain' : 'dry'));
+const wx36 = () => (S.wx36 === 'rain' || S.wx36 === 'dry' ? S.wx36 : (S.wx36 = chance(rain48(S.day + 1)) ? 'rain' : 'dry'));
 const wxLine36 = () => wx36() === 'rain' ? 'Rain tomorrow: wet roads, and the cars come in dirtier.' : 'Dry tomorrow.';
 window.__map36 = cmd => {
   if (cmd === 'open') { UI.ph36 = 'map'; phone35(); return true; }
@@ -25153,9 +25201,10 @@ function book38Html() {
   return `<section class="card22 book38"><div class="c22-h"><div><span class="label">Every fault you’ve fixed</span><h3>Fault book</h3></div><b class="b38-n">${got} / ${BOOK38.length}</b></div>
     <div class="b38-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${BOOK38.length}" aria-valuenow="${got}"><i style="width:${(got / BOOK38.length * 100).toFixed(1)}%"></i></div>
     <p class="muted b38-next">${got >= BOOK38.length ? 'You’ve found every fault there is. Proper mechanic.' : `Find ${next - got} more for 5 Gold Bolts.`}</p>
-    <div class="b38-grid">${order.map(x => { const e = B[x.k]; let say = ''; try { say = HINT[x.k](x.corner); } catch (er) { say = ''; }
-      return e ? `<div class="b38-c"><b>${esc(x.name)}</b><p>“${esc(say)}”</p><small>Fixed ${e.n} time${e.n > 1 ? 's' : ''} · first on day ${e.d}</small></div>`
-        : `<div class="b38-c off"><b>Not found yet</b><p>${where(x.zone)}</p></div>`; }).join('')}</div></section>`;
+    ${got ? `<div class="b38-grid">${order.filter(x => B[x.k]).map(x => { const e = B[x.k]; let say = ''; try { say = HINT[x.k](x.corner); } catch (er) { say = ''; }
+      return `<div class="b38-c"><b>${esc(x.name)}</b><p>“${esc(say)}”</p><small>Fixed ${e.n} time${e.n > 1 ? 's' : ''} · first on day ${e.d}</small></div>`; }).join('')}</div>` : '<p class="muted sm">Every fault you find and fix on a customer’s car goes in here, with what the customer said about it.</p>'}
+    ${got < BOOK38.length ? (() => { const left = {}; BOOK38.filter(x => !B[x.k]).forEach(x => { const w = where(x.zone); left[w] = (left[w] || 0) + 1; });
+      return `<div class="b38-left"><b>Still to find</b>${Object.keys(left).map(w => `<span class="b38-c off"><b>${left[w]}</b> ${esc(w.toLowerCase())}</span>`).join('')}</div>`; })() : ''}</section>`;
 }
 /* build 38: a regular's service history, on the ticket */
 function hist38Html(job) {
@@ -25620,8 +25669,8 @@ function legacyHtml47() {
   const now = st ? `You have ${st} star${st > 1 ? 's' : ''}: labour pays ${st * 8}% more.` : 'Each star makes labour pay 8% more, in every garage you ever open.';
   return `<section class="card22 lg47${ready ? ' hit' : ''}"><div class="c22-h"><div><span class="label">Legacy</span><h3>${ready ? `Ready for legacy star ${st + 1}` : `Legacy star ${st + 1}`}</h3></div><b class="lg47-s" aria-label="${st} of 5 stars">${stars}</b></div>
     <p class="sm">Sell up and start a new garage: you need level 8 and a business worth ${money(250000)}. ${now}</p>
-    <div class="lg47-r"><span class="sm">Level ${L} of 8</span><div class="gauge" role="img" aria-label="Level ${L} of 8"><i class="good" style="width:${Math.round(lv * 100)}%"></i></div></div>
-    <div class="lg47-r"><span class="sm">${money(Math.max(0, v))}</span><div class="gauge" role="img" aria-label="Business worth ${money(Math.max(0, v))} of ${money(250000)}"><i class="good" style="width:${Math.round(vv * 100)}%"></i></div></div>
+    <div class="lg47-r"><span class="sm">Level</span><b class="sm${L >= 8 ? ' ok48' : ''}">${L >= 8 ? `${L} ✓` : `${L} of 8`}</b><div class="gauge" role="img" aria-label="Level ${L}, level 8 needed"><i class="good" style="width:${Math.round(lv * 100)}%"></i></div></div>
+    <div class="lg47-r"><span class="sm">Business worth</span><b class="sm${v >= 250000 ? ' ok48' : ''}">${money(Math.max(0, v))}${v >= 250000 ? ' ✓' : ` of ${money(250000)}`}</b><div class="gauge" role="img" aria-label="Business worth ${money(Math.max(0, v))} of ${money(250000)}"><i class="good" style="width:${Math.round(vv * 100)}%"></i></div></div>
     <p class="muted sm">You keep your Gold Bolts and your whole collection when you sell up.</p>
     ${ready ? '<button class="btn primary wide" data-a="sellup">Sell up and start again…</button>' : ''}</section>`;
 }
@@ -25665,6 +25714,18 @@ function showWhatsNew47(had46) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 48: what's new */
+function showWhatsNew48(had47) {
+  showModal(`<div><span class="label">Build 48</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Days that make sense.</b> No more heatwaves in the rain: the day’s event suits the season and the weather. Winter brings cold snaps (battery and starting jobs pay 50% more), and it rains more in autumn and winter.</li>
+      <li><b>Parts catalogue.</b> A new tool from level 6. In the parts shop it ticks every box that fits the car, so you only choose the quality.</li>
+      <li><b>Share your work.</b> On phones that can share pictures, photo mode and the before & after card have a Share button: send your best restorations to friends, with a link to the game.</li>
+      <li><b>Tidier collection.</b> The fault book and the Items page show what you’ve found first, and sum up what’s left instead of pages of question marks.</li>
+      ${had47 ? '' : '<li><b>Your legacy.</b> From level 5, Daily shows how close you are to selling up for a legacy star. Selling up keeps your Gold Bolts and your whole collection.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25672,8 +25733,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen47) { const had46 = !!S.seen46; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; save(); setTimeout(() => showWhatsNew47(had46), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen48) { const had47 = !!S.seen47; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; save(); setTimeout(() => showWhatsNew48(had47), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
