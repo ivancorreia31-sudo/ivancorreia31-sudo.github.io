@@ -1,0 +1,10 @@
+out/
+dist/
+fx/
+e2e/flat*.html
+e2e/gl3d*.html
+e2e/three.min.js
+e2e/s24/
+e2e/shots/
+__pycache__/
+*.heapsnapshot
