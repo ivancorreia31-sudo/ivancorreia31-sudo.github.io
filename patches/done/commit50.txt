@@ -1,0 +1,12 @@
+Build 50: a tidier nose, always something to aim for
+
+- The black front-end carrier inside the nose (slam panel, its posts, the boxes behind the headlamps, the
+  crossmember) and the inner wing walls are fitted inside each car's real nose shape with a 1.5 cm gap. They were
+  one size for every car and poked through the paint at the corners by up to 12 cm: a black L round the headlamps
+  from under a raised car, and a pale plate at the front corners. Checked on all 69 models.
+- From level 8 the level sheet shows the road to the next legacy star (business worth against £250,000), with a
+  button to the Legacy card once selling up is possible
+- Tests: carrier (every model), breadth sweep, project-car loop
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01GCLxnEhkbZfWsprzYLJNVt

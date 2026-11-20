@@ -71,3 +71,15 @@
 - itch zip: static/itch-index.html (the quarter-turn shell, BonnetShell) is index.html; the game is game.html.
   e2e/itch.py serves the zip over HTTP and checks shell, game, fonts, three.js and the turn button.
 - Test pages use static/app-head.txt (it has the [hidden]{display:none!important} rule the game relies on).
+
+## Build 50 (published: Pages a0019ae, artifact v53)
+- p50a_next: level41Html shows next50(L) from level 8 (legacy star goal, business worth gauge, data-b=nx50 button to
+  the Daily Legacy card when canSellUp).
+- p50b_carrier: bayShell21 fits the black front-end carrier (crossmember, slam panel in stepped segments, posts at
+  z ±0.66, headlamp backs) and the inner wing walls inside the nose using SK24.fx (foremost paint x at y,z) with a
+  1.5 cm gap. Owner saw a black L round the headlamps from under a lifted car. window.__bayNose50() lists any bay piece
+  ahead of the nose; e2e/carrier.py runs it on all 69 models (was 69/69 poking out, now 0).
+- Debug-only tools (patches/debug/dbg_pick.py, never published): __dbg.pick/pickAll (what's under a screen point,
+  even meshes that ignore taps), partBox, isolate, hideRole, nose. e2e/hl2.py/hl3.py: lift a car and look at a part
+  from below, find dark pixels and name them.
+- Auto player: bleeds brakes in order (RR, RL, FR, FL), skips Customise/To the unit, tunes on the dyno.
