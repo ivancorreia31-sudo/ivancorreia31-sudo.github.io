@@ -26,6 +26,25 @@ rep("window.__probe32 = (x, y, z) =>", r"""window.__dbg = {
     car.traverse(o => { if (!o.isMesh || !o.userData.role || !o.visible) return; for (let q = o.parent; q && q !== car; q = q.parent) if (!q.visible) return; const P = o.geometry.attributes.position, key = o.userData.role + (o.parent && o.parent.userData.part ? '@' + o.parent.userData.part : '');
       for (let i = 0; i < P.count; i += 2) { v.fromBufferAttribute(P, i).applyMatrix4(o.matrixWorld).applyMatrix4(inv); if (v.x < 1.8 || v.y < 0.25) continue; const nx = SK24.fx(true, v.y, v.z); if (nx !== nx) continue; const d = v.x - nx; if (!out[key] || d > out[key][0]) out[key] = [+d.toFixed(3), +v.x.toFixed(2), +v.y.toFixed(2), +v.z.toFixed(2)]; } });
     return Object.entries(out).filter(e => e[1][0] > -0.005).sort((a, b) => b[1][0] - a[1][0]); },
+  outside: () => { if (!car) return null; car.updateMatrixWorld(true); const body = [], tests = [];
+    car.traverse(o => { if (!o.isMesh || !o.visible) return; for (let q = o.parent; q && q !== car; q = q.parent) if (!q.visible) return; const m = o.material;
+      if (o.userData.role || o.userData.int32) tests.push(o); else if (m === M.paint || m === M.glass || m === M.trim || m === M.well || (m && m.isMeshPhysicalMaterial)) body.push(o); });
+    const sides = body.map(o => o.material.side); body.forEach(o => { o.material.side = T.DoubleSide; });
+    const inv = new T.Matrix4().copy(car.matrixWorld).invert(), rot = new T.Matrix3().getNormalMatrix(car.matrixWorld), rc = new T.Raycaster(), v = new T.Vector3(), loc = new T.Vector3(), out = {};
+    const escapes = d => { rc.set(v, d.clone().applyMatrix3(rot).normalize()); rc.far = 1.6; for (const b of body) { const a = []; T.Mesh.prototype.raycast.call(b, rc, a); if (a.length) return false; } return true; };
+    try { for (const o of tests) { const P = o.geometry.attributes.position, key = (o.userData.role || 'int:' + o.userData.int32) + (o.parent && o.parent.userData.part ? '@' + o.parent.userData.part : ''), step = Math.max(1, Math.floor(P.count / 300));
+      for (let i = 0; i < P.count; i += step) { v.fromBufferAttribute(P, i).applyMatrix4(o.matrixWorld); loc.copy(v).applyMatrix4(inv); if (loc.y < 0.3) continue;
+        const sz = Math.sign(loc.z) || 1; let why = null;
+        if (Math.abs(loc.z) > 0.25 && escapes(new T.Vector3(0, 0, sz))) why = 'side';
+        else if (loc.x > 1.6 && escapes(new T.Vector3(1, 0, 0))) why = 'front';
+        else if (loc.x < -1.4 && escapes(new T.Vector3(-1, 0, 0))) why = 'rear';
+        if (why) { const e = out[key] || (out[key] = { n: 0, at: null }); e.n++; if (!e.at) e.at = [why, +loc.x.toFixed(2), +loc.y.toFixed(2), +loc.z.toFixed(2)]; } } } }
+    finally { body.forEach((o, i) => { o.material.side = sides[i]; }); }
+    return { body: body.length, tested: tests.length, out }; },
+  tailOut: () => { if (!car || !SK24) return null; car.updateMatrixWorld(true); const inv = new T.Matrix4().copy(car.matrixWorld).invert(), v = new T.Vector3(), out = {};
+    car.traverse(o => { if (!o.isMesh || !o.visible) return; for (let q = o.parent; q && q !== car; q = q.parent) if (!q.visible) return; if (o.userData.noShape) return; const P = o.geometry.attributes.position; let key = o.userData.role || (o.userData.int32 ? 'int:' + o.userData.int32 : '') || o.name || ''; for (let q = o; q && q !== car && !key.includes('@'); q = q.parent) if (q.userData.part) key += '@' + q.userData.part; key += '{' + (o.userData.zone || '') + '}' + (o.material && o.material.color ? o.material.color.getHexString() : '');
+      for (let i = 0; i < P.count; i += 2) { v.fromBufferAttribute(P, i).applyMatrix4(o.matrixWorld).applyMatrix4(inv); if (v.y < 0.3) continue; const front = v.x > 1.7, rear = v.x < SK24.tipR + 0.25; if (!front && !rear) continue; const nx = SK24.fx(front, v.y, v.z); if (nx !== nx) continue; const d = front ? v.x - nx : nx - v.x; if (!out[key] || d > out[key][0]) out[key] = [+d.toFixed(3), +v.x.toFixed(2), +v.y.toFixed(2), +v.z.toFixed(2)]; } });
+    return Object.entries(out).filter(e => e[1][0] > 0.01).sort((a, b) => b[1][0] - a[1][0]).slice(0, 25); },
   carPos: () => car ? [car.position.x, car.position.y, car.position.z, car.rotation.y] : null,
   pick: (x, y) => { const r = canvas.getBoundingClientRect(); const nd = new T.Vector2(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1); const rc = new T.Raycaster(); rc.setFromCamera(nd, camera); const hits = rc.intersectObjects(scene.children, true).filter(h => h.object.visible).slice(0, 5);
     return hits.map(h => { let p = h.object, path = []; while (p && path.length < 6) { path.push((p.name || p.type) + (p.userData.part ? '[' + p.userData.part + ']' : '') + (p.userData.zone ? '{' + p.userData.zone + '}' : '') + (p.userData.int32 ? '(int ' + p.userData.int32 + ')' : '')); p = p.parent; }
