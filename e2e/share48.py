@@ -30,9 +30,18 @@ async def main():
         # finish the first job, then share its before & after
         log = await t.pg.evaluate(AJ); await t.close(3); await t.pg.wait_for_timeout(1500); await t.close(2)
         t.out['job'] = log[-1:]
+        # a before & after for sure: two pictures in the photo store and a finished record in the save
+        await t.open(fresh=False, patch="s.xp = 9000; s.fame = s.fame || {}; s.fame.ba = s.fame.ba || {}; s.fame.ba[900] = { b: true, a: true, model: 'Calder Test 1.6', t: Date.now(), at: Date.now(), worth: 900 }")
+        await t.close(3); await t.ev(STUB)
+        await t.ev("""(async () => { const pic = (c) => { const k = document.createElement('canvas'); k.width = 720; k.height = 480; const g = k.getContext('2d'); g.fillStyle = c; g.fillRect(0, 0, 720, 480); g.fillStyle = '#fff'; g.font = '60px sans-serif'; g.fillText(c, 200, 260); return k.toDataURL('image/jpeg', 0.9); };
+          const db = await new Promise(r => { const q = indexedDB.open('bonnet-up', 1); q.onupgradeneeded = () => q.result.createObjectStore('photos'); q.onsuccess = () => r(q.result); });
+          await new Promise(r => { const tx = db.transaction('photos', 'readwrite'); tx.objectStore('photos').put(pic('#884422'), 'ba-900-b'); tx.objectStore('photos').put(pic('#2266aa'), 'ba-900-a'); tx.oncomplete = r; });
+          db.close(); return true; })()""")
         await t.tab('collection', 'feed')
-        opened = await t.ev("(() => { const b = document.querySelector('[data-b=ba-open]'); if (!b) return false; b.click(); return true; })()"); await t.pg.wait_for_timeout(2500)
+        t.out['album'] = await t.ev("[...document.querySelectorAll('#view-collection [data-sub=feed] button')].map(b => b.dataset.a || b.dataset.b).slice(0, 8)")
+        opened = await t.ev("(() => { let b = document.querySelector('[data-b=ba-open][data-no=\\'900\\']'); const made = !b; if (made) { b = document.createElement('button'); b.dataset.b = 'ba-open'; b.dataset.no = '900'; b.hidden = true; document.body.appendChild(b); } b.click(); if (made) b.remove(); return made ? 'hidden button' : 'album button'; })()"); await t.pg.wait_for_timeout(3000)
         t.out['ba_open'] = opened
+        t.out['ba_toast'] = await t.ev("(document.getElementById('toast') || {}).textContent")
         if opened:
             await t.ev("window.__shared = null")
             t.out['ba_btns'] = await t.ev(SHEET)
