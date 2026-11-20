@@ -9,7 +9,7 @@ WIDE = """(() => { const out = []; for (const e of document.querySelectorAll('ma
 async def main():
     async with T(PAGE, W, H, init="window.__allSubs = false; window.__noDriveIn37 = true;") as t:
         await t.open(fresh=True)
-        first = await t.ev("(() => { const m = document.getElementById('modal'); const o = document.querySelector('.ov-card'); return { modal: m.hidden ? null : m.innerText.slice(0, 80), card: o ? o.innerText.replace(/\\s+/g, ' ').slice(0, 80) : null, step: ((document.querySelector('.step h3') || {}).innerText || null), bays: JSON.parse(localStorage.getItem('bonnet-up.v1') || '{}').bays }; })()")
+        first = await t.ev("(() => { const m = document.getElementById('modal'); const o = document.querySelector('.ov-card'); return { modal: m.hidden ? null : m.innerText.slice(0, 80), card: o ? o.innerText.replace(/\\s+/g, ' ').slice(0, 80) : (document.querySelector('.welcome') ? document.querySelector('.welcome').innerText.replace(/\\s+/g, ' ').slice(0, 80) : null), step: ((document.querySelector('.step h3') || {}).innerText || null), bays: JSON.parse(localStorage.getItem('bonnet-up.v1') || '{}').bays }; })()")
         t.out['first'] = {k: first[k] for k in ['modal', 'card', 'step']}
         t.out['first_car'] = bool(first['bays'] and first['bays'][0])
         if not t.out['first_car']: t.bad.append('no car on the ramp at the start')

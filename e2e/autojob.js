@@ -47,8 +47,8 @@
       else if (read() > tgt) { const de = document.querySelector('[data-hold=deflate]'); ev(de, 'pointerdown'); while (read() > tgt && performance.now() - t1 < 90000) await wait(25); ev(de, 'pointerup'); }
       log.push('pumped to ' + read() + ' of ' + tgt); await wait(700); continue;
     }
-    const capw = document.querySelector('.capw');
-    if (capw && vis(capw)) {
+    const capw = document.querySelector('.capw'), hold0 = [...document.querySelectorAll('[data-hold]')].find(b => vis(b) && !['air', 'deflate'].includes(b.dataset.hold));
+    if ((capw && vis(capw)) || hold0) {
       const ev = (el, ty) => el && el.dispatchEvent(new PointerEvent(ty, { bubbles: true, cancelable: true, pointerId: 8, isPrimary: true }));
       const hb = [...document.querySelectorAll('[data-hold]')].find(b => vis(b) && !['air', 'deflate'].includes(b.dataset.hold));
       let held = false;

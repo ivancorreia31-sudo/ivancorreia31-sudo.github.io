@@ -58,6 +58,8 @@ async def main():
         await t.close(3)
         # 6. an auction (lots come in overnight): start, bid once, walk away
         await t.tab('workshop'); await t.skip_day(); await t.close(3)
+        # in 3D the first auction of the day is a drive to the car park in the van (that's the drive test's job): mark today's as done
+        if GL: await t.open(fresh=False, patch='s.aucDay = s.day'); await t.close(3)
         await t.tab('jobs', 'auctions')
         t.out['lots'] = await t.ev("[document.querySelectorAll('[data-a=auction]').length, document.querySelectorAll('[data-a=auction]:not([disabled])').length, ((document.getElementById('view-jobs') || {}).innerText || '').replace(/\\s+/g, ' ').slice(0, 200)]")
         st = await t.ev("(() => { const b = document.querySelector('[data-a=auction]:not([disabled])'); if (!b) return false; b.click(); return true; })()"); await t.pg.wait_for_timeout(1200)
