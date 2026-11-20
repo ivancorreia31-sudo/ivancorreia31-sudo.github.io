@@ -8,3 +8,4 @@ e2e/s24/
 e2e/shots/
 __pycache__/
 *.heapsnapshot
+results/
