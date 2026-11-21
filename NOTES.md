@@ -98,3 +98,10 @@
 - Debug: tools/dbg.sh builds e2e/gl3d_dbg.html (patches/debug/dbg_pick.py: + liteShow, skinN, liteN, walkTo, run).
   e2e/carlook.py (yard van at eye height, JS= / ANG= env), closeup.py (big hero shots), vanshot.py, litegallery.py,
   probe.py (evaluate expressions; PAGE=).
+
+## Build 52 (published: Pages 1277344, artifact v55)
+- p52a_outside: forecourt stains = TX.stains atlas quads merged into one M.stain mesh (userData.stain52) in
+  buildWorld19; POST.thr 0.93 outside / 0.8 elsewhere and toneMappingExposure expoWs52 × 0.9 outside / expoWs52
+  elsewhere, set per frame in driveFrameIn, frame, fpFrame and extFrame. window.__out52() → { stain, expo, ws, thr }.
+- e2e/outlook.py: six eye-height views round the yard at phone size (JS= runs code in the debug page first).
+- SwiftShader has no anisotropic filtering, so ground textures look blurrier in test pictures than on phones.

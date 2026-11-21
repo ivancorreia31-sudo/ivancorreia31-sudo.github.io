@@ -1,0 +1,12 @@
+Build 52: a cleaner forecourt, clearer daylight
+
+- The forecourt's oil stains were soft radial blobs in an unlit material, so they read as shadows of nothing beside the
+  player. They are now one mesh of the workshop floor's stain atlas (oil drips, tyre scuffs, a dried puddle ring) in the
+  lit, slightly glossy stain material.
+- Outside (drive and yard) the glow pass starts at 0.93 instead of 0.8, so sunlit concrete no longer blooms into a
+  haze, and the exposure is 0.9 of the workshop's. The workshop, first-person walk and the small 3D scenes set their own
+  exposure (expoWs52, kept by updateDecor) and the 0.8 threshold back each frame.
+- Tests: b52 (stain mesh, outside exposure and threshold, restored in the workshop)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01GCLxnEhkbZfWsprzYLJNVt
