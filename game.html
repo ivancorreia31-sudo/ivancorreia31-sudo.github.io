@@ -2751,7 +2751,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5388,7 +5388,7 @@ const Car3D = (() => {
   /* scene, lights, materials */
   const scene = new T.Scene();
   const camera = new T.PerspectiveCamera(40, 1, 0.05, 140);
-  let HEMI0 = 0.1, EXPO0 = 1.0;
+  let HEMI0 = 0.1, EXPO0 = 1.0, expoWs52 = 1.0;
   const hemi = new T.HemisphereLight(0xffffff, 0x7d8580, HEMI0); scene.add(hemi);
   /* the key light casts real shadows from the car and lift onto the floor */
   const sun = new T.DirectionalLight(0xfff1dc, 1.3); sun.position.set(2.5, 9, 3.5); sun.castShadow = true;
@@ -9775,7 +9775,7 @@ if ( uFx > 0.5 ) {
     if (sig === decorSig) return;
     decorSig = sig; PR51.ws = true;
     DEC.neon.visible = lv('neon') > 0; DEC.panels.visible = lv('lights') > 0; DEC.plants.visible = lv('plants') > 0;
-    renderer.toneMappingExposure = EXPO0 * (lv('lights') ? 1.12 : 1.0); M.light.color.copy(col(lv('lights') ? '#F4FAFF' : '#FFF8E1'));
+    expoWs52 = EXPO0 * (lv('lights') ? 1.12 : 1.0); renderer.toneMappingExposure = expoWs52; M.light.color.copy(col(lv('lights') ? '#F4FAFF' : '#FFF8E1'));
     const f = lv('floor'); M.floor.map = f >= 2 ? DEC.chequerTex : f ? DEC.epoxyTex : DEC.floorTex; M.floor.roughnessMap = f ? null : TX.concreteR; M.floor.roughness = f >= 2 ? 0.3 : f ? 0.22 : 1; M.floor.needsUpdate = true;
     const w = lv('walls'); DEC.stripe.visible = w >= 1; DEC.mural.visible = w >= 2; wallMats.forEach(m => { m.emissive.copy(col(w ? '#2A2A2A' : '#000000')); });
     DEC.trophy.visible = lv('trophy') > 0; DEC.arcade.visible = lv('arcade') > 0;
@@ -10853,6 +10853,7 @@ if ( uFx > 0.5 ) {
     const pa22 = paintTick22(now);
     if (bayLayer22(camera.position.y) || sceneMv22 || wk || dyn || shadowDirty) { renderer.shadowMap.needsUpdate = true; shadowDirty = false; }
     if (canvas.isConnected && canvas.clientWidth) {
+      POST.thr = 0.8; renderer.toneMappingExposure = expoWs52;
       if (PR51.ws && !booth) {
         PR51.ws = false; const c = car && car.position, rt = probe51(scene, c ? c.x - 0.1 : 0, 1.25, c ? c.z : 0, [car], ENVS.in);
         if (rt) { if (PR51.wsRT) PR51.wsRT.dispose(); PR51.wsRT = rt; scene.environment = rt.texture; }
@@ -11102,7 +11103,7 @@ if ( uFx > 0.5 ) {
     if (f.pT > 0.25) { f.pT = 0; const h = fpHit(0, 0), p = h && h.d < 4.2 ? FP_SAY[h.kind] : null; if (p !== f.prompt) { f.prompt = p; if (api.onFpPrompt) api.onFpPrompt(p); } }
     stepWorkers(now);
     camera.layers.enable(2); ray.layers.enableAll(); occl.layers.enableAll(); bayShown22 = null;
-    if (canvas.isConnected && canvas.clientWidth) { renderer.shadowMap.needsUpdate = true; renderer.render(scene, camera); adaptDpr(dt); }
+    if (canvas.isConnected && canvas.clientWidth) { renderer.shadowMap.needsUpdate = true; POST.thr = 0.8; renderer.toneMappingExposure = expoWs52; renderer.render(scene, camera); adaptDpr(dt); }
     raf = requestAnimationFrame(frame);
   }
   const FPP = { id: null, x: 0, y: 0, t: 0, moved: false, side: null, lx: null, ly: null };
@@ -11266,6 +11267,7 @@ if ( uFx > 0.5 ) {
   api.look40 = id => { const c = id && partCenterLocal(id); let y = null; if (c && car) { const v = c.clone(); car.updateMatrixWorld(true); car.localToWorld(v); y = +v.y.toFixed(3); } return { py: +cam.T.py.toFixed(3), lift: +st.lift.toFixed(3), carY: car ? +car.position.y.toFixed(3) : null, partY: y }; };
   api.camTo = (o, raw) => { if (raw) { Object.assign(cam.R, o); Object.assign(cam.T, o); } else { cam.animate(o); cam.snap(); } kick(); };
   api.envState = () => ({ in: !!ENVS.in, out: !!ENVS.out });
+  window.__out52 = () => { let st = null; if (dW) dW.scene.traverse(o => { if (o.userData.stain52) st = { lit: !!(o.material && o.material.isMeshStandardMaterial), verts: o.geometry.attributes.position.count }; }); return { stain: st, expo: +renderer.toneMappingExposure.toFixed(3), ws: +expoWs52.toFixed(3), thr: POST.thr }; };
   window.__probe51 = () => ({ ws: !!(PR51.wsRT && scene.environment === PR51.wsRT.texture), out: !!(dW && dW.probeRT51 && dW.scene.environment === dW.probeRT51.texture) });
   api.renderInfo = () => { const i = renderer.info; return { calls: i.render.calls, tris: i.render.triangles, geos: i.memory.geometries, tex: i.memory.textures }; };
   api.focusPart = id => { if (curJob) focusPart(curJob, id); };
@@ -12265,9 +12267,13 @@ if ( uFx > 0.5 ) {
     }
     /* -- the forecourt: oil stains, an air and water machine, cones, and a bench by the door -- */
     {
-      const stainTex = canvasTex(128, 128, (c, w, h) => { c.clearRect(0, 0, w, h); for (let k = 0; k < 5; k++) { const x = 30 + Math.random() * 68, y = 30 + Math.random() * 68, r = 10 + Math.random() * 22, g = c.createRadialGradient(x, y, 1, x, y, r); g.addColorStop(0, 'rgba(18,16,14,.55)'); g.addColorStop(1, 'rgba(18,16,14,0)'); c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); } });
-      const sm = new T.MeshBasicMaterial({ map: stainTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
-      for (const [x, z] of [[-4, -10], [5, -12.5], [1, -7], [24, -14], [33, -18], [-30, -9]]) { const m = new T.Mesh(new T.PlaneGeometry(2.4, 2.4), sm); m.rotation.x = -PI / 2; m.rotation.z = Math.random() * 6; m.position.set(x, 0.026, z); sc.add(m); }
+      { const spots = [[-4, -10, 2.0, 0], [5, -12.5, 1.6, 1], [1, -7, 1.3, 2], [24, -14, 1.8, 3], [33, -18, 1.5, 0], [-30, -9, 1.6, 1], [0.4, -13.6, 2.6, 4], [-2.6, -8.2, 1.2, 5], [6.4, -9.2, 1.0, 6]];
+        const geos = {}, list = [];
+        for (const [x, z, s, k] of spots) {
+          if (!geos[k]) { const gg = new T.PlaneGeometry(1, 1), u = gg.attributes.uv; for (let i = 0; i < u.count; i++) u.setXY(i, ((k % 4) + u.getX(i)) / 4, 1 - (Math.floor(k / 4) + 1 - u.getY(i)) / 2); gg.rotateX(-PI / 2); geos[k] = gg; }
+          list.push([geos[k], new T.Matrix4().compose(new T.Vector3(x, 0.026, z), new T.Quaternion().setFromEuler(new T.Euler(0, rnd20() * 6.28, 0)), new T.Vector3(s, 1, s))]);
+        }
+        const sm = new T.Mesh(mergeGeo(list), M.stain); sm.renderOrder = 1; sm.receiveShadow = true; sm.userData.stain52 = true; sc.add(sm); Object.values(geos).forEach(g => g.dispose()); }
       B.add('red', new T.BoxGeometry(0.6, 1.4, 0.45), at4(12.9, 0.7, -17.42)); B.add('metal', new T.BoxGeometry(0.5, 0.3, 0.05), at4(12.9, 1.1, -17.18));
       for (const [x, z] of [[-11.6, -5], [-11.6, -7.5], [12.4, -5]]) { B.add('cone', new T.ConeGeometry(0.2, 0.55, 10), at4(x, 0.3, z)); }
     }
@@ -13425,7 +13431,7 @@ if ( uFx > 0.5 ) {
     if (api.onDriveTick) api.onDriveTick(d, dt);
     if (!drv) { kick(); return; }
     driveCam(d, dt, d.t < 0.05);
-    paintTick22(now);
+    paintTick22(now); POST.thr = 0.93; renderer.toneMappingExposure = expoWs52 * 0.9;
     if (dW.probe51 && canvas.isConnected) {
       dW.probe51 = false; const rt = probe51(dW.scene, 5.5, 1.3, -9.5, [dW.ride, van33G, d.walk && d.walk.me, dW.rain], ENVS.out, 0.45);
       if (rt) { if (dW.probeRT51) dW.probeRT51.dispose(); dW.probeRT51 = rt; dW.scene.environment = rt.texture; }
@@ -13544,7 +13550,7 @@ if ( uFx > 0.5 ) {
       try { if (ext.tick) ext.tick(dt, now); } catch (e) { /* a broken frame shouldn't stop the loop */ }
       if (!ext) return;
       renderer.shadowMap.needsUpdate = true;
-      renderer.render(ext.scene, ext.camera);
+      POST.thr = 0.8; renderer.toneMappingExposure = expoWs52; renderer.render(ext.scene, ext.camera);
       adaptDpr(dt);
     }
     raf = requestAnimationFrame(frame);
@@ -19650,7 +19656,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 51</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 52</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -20144,7 +20150,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 51;
+const BUILD = 52;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -25835,6 +25841,16 @@ function showWhatsNew51(had50) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 52: what's new */
+function showWhatsNew52(had51) {
+  showModal(`<div><span class="label">Build 52</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>A cleaner forecourt.</b> The dark round blobs outside the garage door were oil stains that looked like shadows. They’re proper oil drips and tyre scuffs now, lit by the sun like the concrete round them.</li>
+      <li><b>Clearer daylight.</b> Outside is no longer washed out: sunlit concrete doesn’t glow into a haze, and colours are richer.</li>
+      ${had51 ? '' : '<li><b>Better-looking cars everywhere.</b> The cars outside are built like the car on your ramp, your van’s rear lights and windows are fixed, and paint and glass reflect the garage and street round them.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25842,8 +25858,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen51) { const had50 = !!S.seen50; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; save(); setTimeout(() => showWhatsNew51(had50), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen52) { const had51 = !!S.seen51; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; save(); setTimeout(() => showWhatsNew52(had51), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
