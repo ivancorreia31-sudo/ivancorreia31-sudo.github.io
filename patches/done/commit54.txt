@@ -1,0 +1,17 @@
+Build 54: cars up close (shut lines, boot trim and lettering, pillars, mirrors)
+
+- Interior lining no longer stands outside the car: the A-pillar trims sat on the windscreen's own line (a pale strip up
+  the outside of the pillar on many models); they're set back by their half-thickness, in from the body found by a ray
+  across the cabin (zIn54), and each end is pulled in until all corners are inside (inside54: a ray from the cabin's
+  middle reaches the point before the skin). The roof lining and sun visors are fitted the same way.
+- Shut lines: 4.5 mm grooves instead of 8 mm bars; the doors' bottom edge; a rear door's back edge starts just above
+  the arch; a fuel flap on the right rear quarter.
+- trim54: on the tail, the boot lid's sides beside the lamps and the bumper's top line round to the corners, red
+  reflectors, the model and engine in chrome letters (28 mm, laid on the curved boot with seatGeo27); on the nose, the
+  bumper's top line broken round the grille. Not on vans, open cars or chrome-bumpered classics.
+- Mirrors: housing rounded at the front, a black frame at the back holding the glass (its corners used to stick out of
+  the fully rounded back). Wheel-arch liners matt (metalness 0, env 0.3): no pale sheen at their edges.
+- Tests: b54 (lining inside the body on all 69 models, boot lettering)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01GCLxnEhkbZfWsprzYLJNVt

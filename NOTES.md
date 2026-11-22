@@ -119,3 +119,18 @@
   in a 26 × 24 m room), stronger point lights.
 - e2e: wslook.py (phone workshop views, fixed car MODEL/PAINT), roomlook.py (first-person room views via __dbg.fpTo),
   tools: dbgb/ + e2e/gl3d_base.html = debug page of src/base.html for before/after pictures.
+
+## Build 54 (published: Pages d629674, artifact v57)
+- p54a_pillar: zIn54(x, y, s) = distance from the centre line to the skin (paint, glass, dark) along ±z (raycast on
+  SK24 meshes, cached per skin); inside54(v) = a ray from (−0.1, 1.05, 0) reaches v before the skin. A-pillar beams,
+  roof lining (lower / shorter / narrower in turn until its corners are inside) and sun visors (0.29 wide at ±0.27).
+  window.__pillar54() → { n, out } liner vertices (every 3rd) outside.
+- p54b_seams: door shut lines 4.5 × 5 mm at z 0.9025 (shaped by shapeBody), bottom line at y 0.375 between the seams
+  clipped by the arches, archTop(x) start for seams over an arch, fuel flap ring (s > 0, not open cars).
+- p54c_mirror: housing rbox(0.10, 0.08, 0.16, 0.03) at x 0.67 + black frame rbox(0.02, …, 0.006) at 0.611 + glass
+  0.136 × 0.05 at 0.6005. M.well metalness 0, envMapIntensity 0.3.
+- p54d_rear: trim54() after conformLamps24 (not van/open/classic): line(front, y0, y1, z0, z1) = thin box seated with
+  seatGeo27 (lift −0.0026); boot sides at the tail lamps' inner edge, bumper line at max(0.40, plateY − 0.085),
+  reflectors, chrome lettering (canvas 512×96, plane height 0.04 / 0.036, BADGE54 texture cache, userData.badge54),
+  nose bumper line under the lamps split round GR32. window.__badges54().
+- e2e: b54.py (ONLY="a;b" limits models), closeup.py (views 0–10, PICK=[[view,x,y]], JS=), insidelook.py.
