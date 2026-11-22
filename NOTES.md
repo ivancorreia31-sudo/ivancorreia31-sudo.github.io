@@ -134,3 +134,9 @@
   reflectors, chrome lettering (canvas 512×96, plane height 0.04 / 0.036, BADGE54 texture cache, userData.badge54),
   nose bumper line under the lamps split round GR32. window.__badges54().
 - e2e: b54.py (ONLY="a;b" limits models), closeup.py (views 0–10, PICK=[[view,x,y]], JS=), insidelook.py.
+
+## Build 55 (published: Pages ac36b30, artifact v58)
+- p55a_seal: skin24 lod 0 fc = [0, .07, .3, .53, .77, .935, 1]; side glass rows with uLo > 0.93 are 'dark' (top seal).
+  M.amber; side repeater rbox(0.05, 0.02, 0.012) at x max(seam + 0.12, 0.88) (< 1.0), y 0.735, z ±0.906.
+  window.__b55() → { rep }.
+- autojob.js: spark plug gap (reads .gp-gap, closes/opens 0.05 at a time to 0.8, then Check); checked on a stub page.

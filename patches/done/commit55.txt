@@ -1,0 +1,9 @@
+Build 55: window rubbers and side repeaters
+
+- skin24 lod 0 side-glass rows get a band at the top (fc 0.77 → 0.935 → 1) classed 'dark': a black seal along the top of
+  the side windows as well as the bottom one, on the car on the ramp and every car close up outside.
+- An amber side repeater (M.amber) on each front wing, just ahead of the front door's shut line.
+- Tests: b55 (two repeaters on the Rowan)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01GCLxnEhkbZfWsprzYLJNVt

@@ -49,6 +49,12 @@
     }
     const bleeds = [...document.querySelectorAll('[data-a=bleed]:not(.done)')].filter(vis);
     if (bleeds.length) { const order = ['RR', 'RL', 'FR', 'FL'], b2 = order.map(c => bleeds.find(x => x.dataset.c === c)).find(Boolean); if (b2 && !document.querySelector('[data-a=bleed].bub')) { log.push('bleed ' + b2.dataset.c); b2.click(); } await wait(1200); continue; }
+    const gapw = document.querySelector('.gapw');
+    if (gapw && vis(gapw)) {
+      const ge = gapw.querySelector('.gp-gap'), d = (ge && ge.getAttribute('d')) || '', m = d.match(/M60 ([\d.]+)V([\d.]+)/), gap = m ? (+m[2] - +m[1]) / 20 : 0.8;
+      const b = Math.abs(gap - 0.8) < 0.03 ? gapw.querySelector('[data-a=gap-check]') : gapw.querySelector('[data-a=gap][data-v="' + (gap > 0.8 ? -1 : 1) + '"]');
+      if (b) { log.push('gap ' + gap.toFixed(2) + ' ' + b.innerText.trim()); b.click(); } await wait(450); continue;
+    }
     const tnRun = document.querySelector('[data-a=tn-run]');
     if (tnRun && vis(tnRun)) {
       const save = document.querySelector('[data-a=tn-save]:not([disabled])');

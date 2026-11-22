@@ -2744,7 +2744,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, seen53: true, seen54: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, seen53: true, seen54: true, seen55: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5482,6 +5482,7 @@ const Car3D = (() => {
   const hlMat = new T.MeshBasicMaterial({ color: col('#F2B705'), transparent: true, opacity: 0.3, depthTest: false, depthWrite: false, toneMapped: false });
   const XRAY = [M.paint, M.glass, M.trim, M.well];
   M.well.metalness = 0; M.well.envMapIntensity = 0.3;
+  M.amber = std('#F2A33A', { emissive: col('#4a2a06'), roughness: 0.2 });
   const M32c = { cream: M.cream32, wafer: M.wafer32 };
   /* how each part looks once upgraded: material swaps by part kind */
   const UPG_MAT = {
@@ -6247,7 +6248,7 @@ const Car3D = (() => {
     const xs = must.concat(auto.filter(a => must.every(m => Math.abs(m - a) > 0.014))).sort((a, b) => a - b).filter((x, i, arr) => i === 0 || x - arr[i - 1] > 1e-4);
     /* one half cross-section: roof or deck, roof edge, side glass, shelf, shoulder, flank, sill, wheel housing, floor */
     const fa = lod > 1 ? [0, 0.5, 1] : lod ? [0, 0.34, 0.68, 0.94, 1] : [0, 0.06, 0.24, 0.42, 0.6, 0.78, 0.94, 1];
-    const fc = lod > 1 ? [0, 0.07, 1] : lod ? [0, 0.07, 0.55, 1] : [0, 0.07, 0.3, 0.53, 0.77, 1];
+    const fc = lod > 1 ? [0, 0.07, 1] : lod ? [0, 0.07, 0.55, 1] : [0, 0.07, 0.3, 0.53, 0.77, 0.935, 1];
     const nA = fa.length, nB = [4, 2, 1][lod], nC = fc.length - 1, nS = [5, 3, 2][lod], nE = [8, 4, 2][lod];
     const iB = nA, iC = iB + nB, iSh = iC + nC, iS = iSh + 1, iE = iS + nS, iL = iE + nE, iG = iL + 1, iH = iG + 1, iI = iH + 1, N = iI + 1;
     const rs = van ? 0.035 : 0.05, rsz = van ? 0.03 : 0.04, shelf = van ? 0 : 0.012, tumble = s.tum != null ? s.tum : van ? 0.10 : 0.42, crown = 0.034;
@@ -6318,7 +6319,7 @@ const Car3D = (() => {
         if (bands.some(b => Math.abs(xm - b) < 0.04)) return 'dark';
         if (s.blankRear && xm < -0.40) return 'paint';
         if (hm < (xm > 0 ? 0.13 : 0.2)) return 'paint';
-        return uLo < 0.01 ? 'dark' : 'glass';
+        return uLo < 0.01 || uLo > 0.93 ? 'dark' : 'glass';
       }
       if (j === iSh - 1) return 'paint';
       if (j <= iL - 2) return s.clad && ym < 0.46 ? 'dark' : 'paint';
@@ -7203,6 +7204,8 @@ const Car3D = (() => {
       });
       { const xa = Math.max(Math.min.apply(null, seams), sty.rx + 0.40), xb = Math.min(Math.max.apply(null, seams), 1.35 - 0.40);
         if (xb - xa > 0.2) fixed(at(new T.Mesh(new T.BoxGeometry(xb - xa, 0.0045, 0.005, 24, 1, 1), M.trim), (xa + xb) / 2, yB, s * ZS), 'auto', true); }
+      /* build 55: the side repeater on the front wing */
+      if (!sty.open || sty.cabrio) { const rx0 = Math.max(Math.max.apply(null, seams) + 0.12, 0.88); if (rx0 < 1.0) fixed(rbox(0.05, 0.02, 0.012, 0.008, M.amber, rx0, 0.735, s * 0.906), 'auto', true); }
       /* the fuel flap, on the rear quarter of the right-hand side */
       if (s > 0 && !sty.open) {
         const fxp = Math.min(sty.rx - 0.05, Math.min.apply(null, seams) - 0.2), fyp = 0.78;
@@ -11366,6 +11369,7 @@ if ( uFx > 0.5 ) {
   window.__b53 = () => { let pad = 0, clad = 0; if (car) car.traverse(o => { if (o.isMesh && PAD53 && o.material === PAD53) pad++; }); if (dW) dW.scene.traverse(o => { if (o.isMesh && o.name === 'b19:cladWall') clad += o.geometry.attributes.position.count / 3 | 0; }); return { pad, clad, lights: LT53.filter(l => l.visible).length }; };
   window.__pillar54 = () => { if (!car || !SK24) return null; zIn54(0, 1, 1); const rc = ray54.rc, o = new T.Vector3(-0.1, 1.05, 0), v = new T.Vector3(), d = new T.Vector3(); let n = 0, out = 0; car.traverse(m => { if (!m.isMesh || m.userData.int32 !== 'liner') return; const q = m.geometry.attributes.position; for (let i = 0; i < q.count; i += 3) { v.fromBufferAttribute(q, i).applyMatrix4(m.matrix); d.copy(v).sub(o); const L = d.length(); rc.set(o, d.normalize()); rc.far = L; n++; const h = rc.intersectObjects(ray54.ms, false); if (h.length && h[0].distance < L - 0.004) out++; } }); return { n, out }; };
   window.__badges54 = () => { const o = []; if (car) car.traverse(m => { if (m.isMesh && m.userData.badge54) o.push(m.userData.badge54); }); return o; };
+  window.__b55 = () => { let rep = 0; if (car) car.traverse(m => { if (m.isMesh && m.material === M.amber) rep++; }); return { rep }; };
   window.__probe51 = () => ({ ws: !!(PR51.wsRT && scene.environment === PR51.wsRT.texture), out: !!(dW && dW.probeRT51 && dW.scene.environment === dW.probeRT51.texture) });
   api.renderInfo = () => { const i = renderer.info; return { calls: i.render.calls, tris: i.render.triangles, geos: i.memory.geometries, tex: i.memory.textures }; };
   api.focusPart = id => { if (curJob) focusPart(curJob, id); };
@@ -19770,7 +19774,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 54</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 55</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -20264,7 +20268,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 54;
+const BUILD = 55;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -25986,6 +25990,16 @@ function showWhatsNew54(had53) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 55: what's new */
+function showWhatsNew55(had54) {
+  showModal(`<div><span class="label">Build 55</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Window rubbers.</b> The side windows sit in black seals along the top as well as the bottom, on the car on your ramp and every car outside.</li>
+      <li><b>Side repeaters.</b> Each front wing has its amber indicator.</li>
+      ${had54 ? '' : '<li><b>Cars up close.</b> Fine shut lines round every door, a fuel flap, the boot outlined with the model and engine in chrome letters, and no more pale strip up the windscreen pillars.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25993,8 +26007,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen54) { const had53 = !!S.seen53; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; save(); setTimeout(() => showWhatsNew54(had53), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen55) { const had54 = !!S.seen54; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; save(); setTimeout(() => showWhatsNew55(had54), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
