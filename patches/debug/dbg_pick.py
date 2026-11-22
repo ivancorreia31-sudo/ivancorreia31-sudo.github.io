@@ -50,6 +50,7 @@ rep("window.__probe32 = (x, y, z) =>", r"""window.__dbg = {
   liteN: (name, far) => { delete LITE[far ? name + '~far' : name]; const t0 = performance.now(); const g = liteGeo(name, far); let n = 0; for (const k of Object.keys(g)) if (g[k] && g[k].isBufferGeometry) n += g[k].attributes.position.count; return [n / 3 | 0, +(performance.now() - t0).toFixed(1)]; },
   walkTo: (x, z, yaw, pitch, fp) => { const w = drv && drv.walk; if (!w) return false; w.x = x; w.z = z; w.yaw = yaw; w.phi = yaw + PI; w.pitch = pitch || 0; w.fp = fp !== false; w.v = 0; kick(); return true; },
   run: src => eval(src),
+  fpTo: (x, z, yaw, pitch) => { if (!fp) return false; fp.x = x; fp.z = z; fp.yaw = yaw; fp.pitch = pitch || 0; fp.v = 0; kick(); return true; },
   carPos: () => car ? [car.position.x, car.position.y, car.position.z, car.rotation.y] : null,
   pick: (x, y) => { const r = canvas.getBoundingClientRect(); const nd = new T.Vector2(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1); const rc = new T.Raycaster(); rc.setFromCamera(nd, camera); const hits = rc.intersectObjects(scene.children, true).filter(h => h.object.visible).slice(0, 5);
     return hits.map(h => { let p = h.object, path = []; while (p && path.length < 6) { path.push((p.name || p.type) + (p.userData.part ? '[' + p.userData.part + ']' : '') + (p.userData.zone ? '{' + p.userData.zone + '}' : '') + (p.userData.int32 ? '(int ' + p.userData.int32 + ')' : '')); p = p.parent; }

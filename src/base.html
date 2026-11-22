@@ -2744,7 +2744,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, seen53: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5384,7 +5384,7 @@ const Car3D = (() => {
   let HEMI0 = 0.1, EXPO0 = 1.0, expoWs52 = 1.0;
   const hemi = new T.HemisphereLight(0xffffff, 0x7d8580, HEMI0); scene.add(hemi);
   /* the key light casts real shadows from the car and lift onto the floor */
-  const sun = new T.DirectionalLight(0xfff1dc, 1.3); sun.position.set(2.5, 9, 3.5); sun.castShadow = true;
+  const sun = new T.DirectionalLight(0xfff1dc, 0.9); sun.position.set(2.5, 9, 3.5); sun.castShadow = true;
   const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 700;
   sun.shadow.mapSize.set(smallScreen ? 1024 : 2048, smallScreen ? 1024 : 2048);
   Object.assign(sun.shadow.camera, { left: -5.5, right: 5.5, top: 5.5, bottom: -5.5, near: 1, far: 26 });
@@ -5392,6 +5392,8 @@ const Car3D = (() => {
   sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
   scene.add(sun); scene.add(sun.target);
   const back = new T.DirectionalLight(0xdfe8ff, 0.15); back.position.set(-6, 5, -5); scene.add(back);
+  /* build 53: three of the roof fittings give light, the one over the bay and the two beside it (no shadows; off in battery saver) */
+  const LT53 = [[0, 0], [-7, 0], [7, 0]].map(([x, z]) => { const p = new T.PointLight(0xfff4e6, 0.95, 16, 2); p.position.set(x, 5.05, z); scene.add(p); return p; });
   /* a blurred image of a bright workshop, used for reflections on paint, chrome and glass */
   try {
     const env = new T.Scene();
@@ -5879,7 +5881,7 @@ const Car3D = (() => {
   });
   for (const k of ['clad', 'roofP', 'rooflight', 'grime', 'stain', 'girder', 'liftPaint', 'liftArm', 'zinc', 'plate', 'toolRed', 'craneRed', 'benchSteel', 'benchTop', 'drumBlue', 'drumBlack', 'safety', 'enclosure', 'yellowPaint', 'rack', 'galv', 'card2', 'blackPlastic']) M[k].name = k;
   /* the floor and walls themselves */
-  M.floor.map = TX.concrete; M.floor.roughnessMap = TX.concreteR; M.floor.roughness = 1; M.floor.envMapIntensity = 0.74; M.floor.color.copy(col('#FFFFFF')); M.floor.needsUpdate = true;
+  M.floor.map = TX.concrete; M.floor.roughnessMap = TX.concreteR; M.floor.roughness = 0.72; M.floor.envMapIntensity = 0.8; M.floor.color.copy(col('#FFFFFF')); M.floor.needsUpdate = true;
   M.wall.map = TX.block; M.wall.bumpMap = TX.blockB; M.wall.bumpScale = 0.02; M.wall.color.copy(col('#BDBCB4')); M.wall.roughness = 0.9; M.wall.needsUpdate = true;
   M.dado.map = TX.block; M.dado.bumpMap = TX.blockB; M.dado.bumpScale = 0.02; M.dado.color.copy(col('#59625C')); M.dado.roughness = 0.75; M.dado.needsUpdate = true;
   M.ceil.color.copy(col('#2E3331'));
@@ -6083,6 +6085,17 @@ const Car3D = (() => {
     return out;
   }
   /* a prism with its depth split into steps, so it can bend across its width */
+  /* build 53: bonnet pad felt, 1 m a tile: speckled dark grey, quilted in diamonds every 125 mm */
+  let PAD53 = null;
+  const padMat53 = () => {
+    if (PAD53) return PAD53;
+    const tx = canvasTex(256, 256, (c, w, h) => {
+      speckle(c, w, h, '#3A3D40', 0.09, 7000);
+      for (const s of [1, -1]) for (let k = -8; k <= 16; k++) { const x0 = k * 32; c.strokeStyle = 'rgba(0,0,0,.34)'; c.lineWidth = 2; c.beginPath(); c.moveTo(x0, s > 0 ? 0 : h); c.lineTo(x0 + w, s > 0 ? h : 0); c.stroke(); c.strokeStyle = 'rgba(255,255,255,.07)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x0 + 3, s > 0 ? 0 : h); c.lineTo(x0 + 3 + w, s > 0 ? h : 0); c.stroke(); }
+    });
+    tx.wrapS = tx.wrapT = T.RepeatWrapping;
+    return (PAD53 = std('#FFFFFF', { map: tx, bumpMap: tx, bumpScale: 0.0012, roughness: 0.93 }));
+  };
   const prismS = (pts, depth, mat, bevel, steps) => new T.Mesh(new T.ExtrudeGeometry(shapeOf(pts), { depth, steps: steps || 10, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2, curveSegments: 8 }), mat);
   /* a rounded slab (the roof), split across its width */
   function slabS(w, h, d, r, steps) {
@@ -6363,7 +6376,7 @@ const Car3D = (() => {
     /* where the skin's centre line is at a given height on the nose or the tail */
     const faceX = (front, y) => {
       if (!front && cab && y > S0R.yd + 0.03) { let lo = gxR, hi = xRr; for (let k = 0; k < 24; k++) { const m = (lo + hi) / 2; if (topAt(m) < y) lo = m; else hi = m; } return (lo + hi) / 2; }
-      const x0 = front ? x0F : x0R, e = front ? eF : eR, mid = front ? midF : midR, hh = mid - 0.26, r = Math.min(1, Math.abs(y - mid) / hh), q = Math.sqrt(1 - r * r);
+      const x0 = front ? x0F : x0R, e = front ? eF : eR, mid = front ? midF : midR, hh = mid - 0.26, r = Math.min(1, Math.abs(y - mid) / hh), q = Math.pow(1 - Math.pow(r, EP51), 1 / EP51);
       return front ? x0 + e * q : x0 - e * q;
     };
     /* build 27: every triangle of the nose (or the tail) is dropped onto a grid over height and width, keeping the
@@ -6765,7 +6778,8 @@ const Car3D = (() => {
     for (const x of [sty.rx]) fixed(box(0.84, 0.36, 1.10, M.well, x, 0.48, 0), 'auto', true);
     bonnet = new T.Group(); bonnet.position.set(0.80, 0.95, 0); car.add(bonnet);
     /* sound-deadening pad under the bonnet, seen when it's open */
-    { const pad = prismS([[0.12, -0.0654], [1.08, -0.1564], [1.08, -0.1644], [0.12, -0.0734]], 1.2, M.dark, 0, 8); pad.geometry.translate(0, 0, -0.6); setZone(pad, 'engine', true); bonnet.add(pad);
+    { const pad = prismS([[0.12, -0.0654], [1.08, -0.1564], [1.08, -0.1644], [0.12, -0.0734]], 1.2, padMat53(), 0, 8); pad.geometry.translate(0, 0, -0.6);
+      { const P = pad.geometry.attributes.position, U = pad.geometry.attributes.uv; for (let i = 0; i < P.count; i++) U.setXY(i, P.getX(i), P.getZ(i)); U.needsUpdate = true; } setZone(pad, 'engine', true); bonnet.add(pad);
       Object.assign(pad.userData, { crown: 0.028, crownHW: 0.862, mode: 'bend', frontX: 2.08 }); }
     const lid = new T.Mesh(SK.lid, M.paint); lid.userData.noShape = true; setZone(lid, 'engine', true); bonnet.add(lid);
   }
@@ -9769,7 +9783,7 @@ if ( uFx > 0.5 ) {
     decorSig = sig; PR51.ws = true;
     DEC.neon.visible = lv('neon') > 0; DEC.panels.visible = lv('lights') > 0; DEC.plants.visible = lv('plants') > 0;
     expoWs52 = EXPO0 * (lv('lights') ? 1.12 : 1.0); renderer.toneMappingExposure = expoWs52; M.light.color.copy(col(lv('lights') ? '#F4FAFF' : '#FFF8E1'));
-    const f = lv('floor'); M.floor.map = f >= 2 ? DEC.chequerTex : f ? DEC.epoxyTex : DEC.floorTex; M.floor.roughnessMap = f ? null : TX.concreteR; M.floor.roughness = f >= 2 ? 0.3 : f ? 0.22 : 1; M.floor.needsUpdate = true;
+    const f = lv('floor'); M.floor.map = f >= 2 ? DEC.chequerTex : f ? DEC.epoxyTex : DEC.floorTex; M.floor.roughnessMap = f ? null : TX.concreteR; M.floor.roughness = f >= 2 ? 0.3 : f ? 0.22 : 0.72; M.floor.needsUpdate = true;
     const w = lv('walls'); DEC.stripe.visible = w >= 1; DEC.mural.visible = w >= 2; wallMats.forEach(m => { m.emissive.copy(col(w ? '#2A2A2A' : '#000000')); });
     DEC.trophy.visible = lv('trophy') > 0; DEC.arcade.visible = lv('arcade') > 0;
     DEC.cat.visible = !!S.garageCat; DEC.prize.visible = (S.prizes || []).includes('rally');
@@ -11261,6 +11275,9 @@ if ( uFx > 0.5 ) {
   api.camTo = (o, raw) => { if (raw) { Object.assign(cam.R, o); Object.assign(cam.T, o); } else { cam.animate(o); cam.snap(); } kick(); };
   api.envState = () => ({ in: !!ENVS.in, out: !!ENVS.out });
   window.__out52 = () => { let st = null; if (dW) dW.scene.traverse(o => { if (o.userData.stain52) st = { lit: !!(o.material && o.material.isMeshStandardMaterial), verts: o.geometry.attributes.position.count }; }); return { stain: st, expo: +renderer.toneMappingExposure.toFixed(3), ws: +expoWs52.toFixed(3), thr: POST.thr }; };
+  window.__light53 = () => ({ on: LT53.filter(l => l.visible).length, sun: sun.intensity, floor: M.floor.roughness });
+  window.__gfx53 = g => api.prefs34({ gfx: g });
+  window.__b53 = () => { let pad = 0, clad = 0; if (car) car.traverse(o => { if (o.isMesh && PAD53 && o.material === PAD53) pad++; }); if (dW) dW.scene.traverse(o => { if (o.isMesh && o.name === 'b19:cladWall') clad += o.geometry.attributes.position.count / 3 | 0; }); return { pad, clad, lights: LT53.filter(l => l.visible).length }; };
   window.__probe51 = () => ({ ws: !!(PR51.wsRT && scene.environment === PR51.wsRT.texture), out: !!(dW && dW.probeRT51 && dW.scene.environment === dW.probeRT51.texture) });
   api.renderInfo = () => { const i = renderer.info; return { calls: i.render.calls, tris: i.render.triangles, geos: i.memory.geometries, tex: i.memory.textures }; };
   api.focusPart = id => { if (curJob) focusPart(curJob, id); };
@@ -11825,6 +11842,12 @@ if ( uFx > 0.5 ) {
     disp: [[-42.5, -19.2, -0.42], [-36, -19.6, 0], [-29.5, -19.2, 0.42]],
     store: [[-46.4, -34.6], [-43.5, -34.6], [-40.6, -34.6], [-37.7, -34.6], [-34.8, -34.6], [-31.9, -34.6], [-29, -34.6]] };
   const WASH = { x0: -21.2, x1: -14.6, z0: -32, z1: -16 };
+  /* build 53: a box for cladding: each face's texture coordinates in metres over the cladding tile (2 m along, 1 m up) */
+  function cladBox53(w, h, d) {
+    const g = new T.BoxGeometry(w, h, d), u = g.attributes.uv, span = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
+    for (let fc = 0; fc < 6; fc++) for (let k = 0; k < 4; k++) { const i = fc * 4 + k; u.setXY(i, u.getX(i) * span[fc][0] / 2.0, u.getY(i) * span[fc][1] / 1.0); }
+    return g;
+  }
   function mergeCol(list) {
     const pos = [], nor = [], uv = [], colA = [], tmp = new T.Color();
     for (const [g0, mtx, c] of list) {
@@ -12083,15 +12106,24 @@ if ( uFx > 0.5 ) {
       const lines = [];
       const unitOpp = (x0, x1, hh, wallC, doorC, name, nameC, id, accent) => {
         const zf = 14, d = 11, cx = (x0 + x1) / 2, w = x1 - x0, S29 = SHOPS29.find(s => s.id === id), dcx = S29.dcx, rx0 = S29.rx0, rx1 = S29.rx1, RD = 5.2, DW = 1.7, DH = 2.3, CH = 3.3;
-        B.add('plainWall', new T.BoxGeometry(w, hh, d - RD), at4(cx, hh / 2, zf + RD + (d - RD) / 2), wallC);
-        B.add('plainWall', new T.BoxGeometry(rx0 - x0, hh, RD), at4((x0 + rx0) / 2, hh / 2, zf + RD / 2), wallC);
-        B.add('plainWall', new T.BoxGeometry(x1 - rx1, hh, RD), at4((rx1 + x1) / 2, hh / 2, zf + RD / 2), wallC);
-        B.add('plainWall', new T.BoxGeometry(rx1 - rx0, hh - CH, RD), at4((rx0 + rx1) / 2, CH + (hh - CH) / 2, zf + RD / 2), wallC);
+        B.add('cladWall', cladBox53(w, hh, d - RD), at4(cx, hh / 2, zf + RD + (d - RD) / 2), wallC);
+        B.add('cladWall', cladBox53(rx0 - x0, hh, RD), at4((x0 + rx0) / 2, hh / 2, zf + RD / 2), wallC);
+        B.add('cladWall', cladBox53(x1 - rx1, hh, RD), at4((rx1 + x1) / 2, hh / 2, zf + RD / 2), wallC);
+        B.add('cladWall', cladBox53(rx1 - rx0, hh - CH, RD), at4((rx0 + rx1) / 2, CH + (hh - CH) / 2, zf + RD / 2), wallC);
+        for (const xx of [x0 - 0.03, x1 + 0.03]) B.add('plainWall', new T.BoxGeometry(0.06, 0.55, d), at4(xx, 0.275, zf + d / 2), '#5F5D58');
+        B.add('plainWall', new T.BoxGeometry(w + 0.12, 0.55, 0.06), at4(cx, 0.275, zf + d + 0.03), '#5F5D58');
         B.add('roofDark', new T.BoxGeometry(w + 0.4, 0.3, d + 0.4), at4(cx, hh + 0.15, zf + d / 2));
         /* the front: one picture over three panels, with the doorway left out of it */
         const px = x => Math.round((0.5 - (x - cx) / w) * 512), py = y => Math.round((1 - y / hh) * 256);
-        const f = signTex(512, 256, (c, cw, ch) => {
-          c.fillStyle = wallC; c.fillRect(0, 0, cw, ch); c.strokeStyle = 'rgba(0,0,0,.12)'; c.lineWidth = 2; for (let xx = 0; xx < cw; xx += 10) { c.beginPath(); c.moveTo(xx, 50); c.lineTo(xx, ch); c.stroke(); }
+        const f = signTex(1024, 512, (c, cw2, ch2) => {
+          c.scale(2, 2); const cw = cw2 / 2, ch = ch2 / 2;
+          /* build 53: profiled cladding, a rib every 250 mm (pan, a lit rising flank, the crown, a shaded falling flank) */
+          c.fillStyle = wallC; c.fillRect(0, 0, cw, ch);
+          { const pitch = cw * 0.25 / w; for (let xx = 0; xx < cw; xx += pitch) { c.fillStyle = 'rgba(255,255,255,.16)'; c.fillRect(xx + pitch * 0.62, 0, pitch * 0.08, ch); c.fillStyle = 'rgba(255,255,255,.07)'; c.fillRect(xx + pitch * 0.70, 0, pitch * 0.16, ch); c.fillStyle = 'rgba(0,0,0,.2)'; c.fillRect(xx + pitch * 0.86, 0, pitch * 0.08, ch); } }
+          { const gr = c.createLinearGradient(0, ch - py(0) + py(1.4), 0, ch); gr.addColorStop(0, 'rgba(60,52,40,0)'); gr.addColorStop(1, 'rgba(60,52,40,.35)'); c.fillStyle = gr; c.fillRect(0, py(1.4), cw, ch - py(1.4)); }
+          c.fillStyle = '#5F5D58'; c.fillRect(0, py(0.55), cw, ch - py(0.55)); c.fillStyle = 'rgba(0,0,0,.25)'; c.fillRect(0, py(0.55), cw, 1.5);
+          for (let xx = 0; xx < cw; xx += cw * 0.44 / w) { c.fillStyle = 'rgba(0,0,0,.16)'; c.fillRect(xx, py(0.55), 1, ch - py(0.55)); }
+          c.fillStyle = 'rgba(0,0,0,.16)'; c.fillRect(0, (py(0.55) + ch) / 2, cw, 1);
           c.fillStyle = '#1D2521'; c.fillRect(30, 8, cw - 60, 38); c.fillStyle = nameC; c.font = '900 30px "Big Shoulders Display", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(name, cw / 2, 28);
           c.fillStyle = doorC; c.fillRect(60, 96, 200, ch - 96); c.fillStyle = 'rgba(0,0,0,.18)'; for (let yy = 100; yy < ch; yy += 9) c.fillRect(60, yy, 200, 2);
           /* the shop end: a lit window, and a board over the door */
@@ -12212,7 +12244,7 @@ if ( uFx > 0.5 ) {
         pathAt(R, 315, ROAD_W / 2 + 34, q); const fxp = q.x, fzp = q.z, fy = groundH(fxp, fzp), fr = -q.phi, fnx = q.nx, fnz = q.nz;
         const FM = at4(fxp, fy, fzp, fr);
         const P = (x, y, z, w, h, d, key, c) => B.add(key, new T.BoxGeometry(w, h, d), FM.clone().multiply(M4w(x, y, z)), c);
-        P(0, 3, 0, 14, 6, 9, 'plainWall', '#8E2A22');
+        B.add('cladWall', cladBox53(14, 6, 9), FM.clone().multiply(M4w(0, 3, 0)), '#8E2A22');
         B.add('roof', quadG(new T.Vector3(-7.4, 6, 4.9).applyMatrix4(FM).toArray(), new T.Vector3(7.4, 6, 4.9).applyMatrix4(FM).toArray(), new T.Vector3(7.4, 8.6, 0).applyMatrix4(FM).toArray(), new T.Vector3(-7.4, 8.6, 0).applyMatrix4(FM).toArray(), [0, 0, 12, 5]), null, '#4B4B4F');
         B.add('roof', quadG(new T.Vector3(7.4, 6, -4.9).applyMatrix4(FM).toArray(), new T.Vector3(-7.4, 6, -4.9).applyMatrix4(FM).toArray(), new T.Vector3(-7.4, 8.6, 0).applyMatrix4(FM).toArray(), new T.Vector3(7.4, 8.6, 0).applyMatrix4(FM).toArray(), [0, 0, 12, 5]), null, '#4B4B4F');
         for (const sx of [-7, 7]) B.add('plainWall', triG(new T.Vector3(sx, 6, sx > 0 ? 4.5 : -4.5).applyMatrix4(FM).toArray(), new T.Vector3(sx, 6, sx > 0 ? -4.5 : 4.5).applyMatrix4(FM).toArray(), new T.Vector3(sx, 8.6, 0).applyMatrix4(FM).toArray()), null, '#8E2A22');
@@ -12378,6 +12410,7 @@ if ( uFx > 0.5 ) {
     B.mat('awning', std('#FFFFFF', { map: WT.awning, roughness: 0.7, vertexColors: true, side: DS }), { cast: true });
     B.mat('terracotta', std('#B5502B', { roughness: 0.8 }));
     B.mat('plainWall', std('#FFFFFF', { roughness: 0.88, vertexColors: true }), { cast: true });
+    B.mat('cladWall', pbr('#FFFFFF', { map: TX.clad, bumpMap: TX.cladB, bumpScale: 0.025, roughness: 0.55, metalness: 0.25, vertexColors: true }), { cast: true });
     B.mat('fields', std('#FFFFFF', { map: WT.fields, roughness: 1 }));
     B.mat('stone', std('#FFFFFF', { map: WT.stone, roughness: 0.95 }), { cast: true });
     B.mat('pole', std('#6B5034', { roughness: 0.9 }), { cast: true });
@@ -13962,7 +13995,7 @@ window.__probe32 = (x, y, z) => { if (!car) return null; car.updateMatrixWorld(t
     PREF34.gfx = o.gfx === 'save' || o.gfx === 'sharp' ? o.gfx : 'auto';
     PREF34.cap = PREF34.gfx === 'save' ? Math.min(1, DPR_MAX) : PREF34.gfx === 'sharp' ? Math.min(window.devicePixelRatio || 1, 2) : DPR_MAX;
     if (!window.__fixedDpr && dprNow > PREF34.cap) setDpr22(PREF34.cap);
-    POST.user = PREF34.gfx === 'save' ? false : o.fx !== false; shadowDirty = true; kick();
+    POST.user = PREF34.gfx === 'save' ? false : o.fx !== false; shadowDirty = true; LT53.forEach(l => { l.visible = PREF34.gfx !== 'save'; }); PR51.ws = true; kick();
     return Object.assign({}, PREF34);
   };
   api.prefsGet34 = () => Object.assign({ camK: window.__camK34 || 1, dpr: dprNow }, PREF34);
@@ -19649,7 +19682,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 52</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 53</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -20143,7 +20176,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 52;
+const BUILD = 53;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -25844,6 +25877,17 @@ function showWhatsNew52(had51) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 53: what's new */
+function showWhatsNew53(had52) {
+  showModal(`<div><span class="label">Build 53</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Lights in the workshop.</b> The lights over your ramp really light it now: highlights move over the paint as you go round a car, and the sealed concrete floor catches the light.</li>
+      <li><b>Under the bonnet.</b> Open a bonnet and you’ll see a quilted sound-deadening pad instead of a black slab.</li>
+      <li><b>Proper buildings over the road.</b> The units and the farm barn are clad in ribbed steel on a blockwork base, with dirt splashed up from the ground.</li>
+      ${had52 ? '' : '<li><b>A cleaner forecourt.</b> The dark blobs outside the garage door are proper oil drips and tyre marks now, and daylight is no longer washed out.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25851,8 +25895,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen52) { const had51 = !!S.seen51; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; save(); setTimeout(() => showWhatsNew52(had51), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen53) { const had52 = !!S.seen52; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; save(); setTimeout(() => showWhatsNew53(had52), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }

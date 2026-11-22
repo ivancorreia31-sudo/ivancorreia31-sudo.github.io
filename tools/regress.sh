@@ -24,6 +24,7 @@ run b49_gl b49.py gl3d.html
 run b50_flat b50.py flat.html
 run b51_gl b51.py gl3d.html
 run b52_gl b52.py gl3d.html
+run b53_gl b53.py gl3d.html
 run carrier_gl carrier.py gl3d.html
 run share48_gl share48.py gl3d.html
 run breadth_gl breadth.py gl3d.html

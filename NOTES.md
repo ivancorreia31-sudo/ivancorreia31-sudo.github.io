@@ -105,3 +105,17 @@
   elsewhere, set per frame in driveFrameIn, frame, fpFrame and extFrame. window.__out52() → { stain, expo, ws, thr }.
 - e2e/outlook.py: six eye-height views round the yard at phone size (JS= runs code in the debug page first).
 - SwiftShader has no anisotropic filtering, so ground textures look blurrier in test pictures than on phones.
+
+## Build 53 (published: Pages 1249922, artifact v56)
+- p53a_light: LT53 = point lights at the roof fittings (0,0), (±7,0), y 5.05 (0.95, 16 m, decay 2, no shadows);
+  visible = PREF34.gfx !== 'save' (set in api.prefs34). Workshop sun 0.9 (was 1.3). Bare concrete roughness 0.72
+  (×TX.concreteR), envMapIntensity 0.8. window.__light53(), window.__gfx53(gfx) (test only: resets other prefs).
+- p53b_units: 'cladWall' batch material (TX.clad map + TX.cladB bump, vertex colours); cladBox53(w,h,d) maps box faces
+  2 m × 1 m per tile. unitOpp walls and the farm barn use it; unit plinth boxes '#5F5D58'; shop front canvas 1024×512
+  (drawn at 2×) with lit ribs, plinth, dirt.
+- p53c_face: skin24 faceX inverts the superellipse (EP51) ends.
+- p53d_pad: padMat53() quilted felt for the bonnet pad (UVs = lid-space x, z). window.__b53() → { pad, clad, lights }.
+- Tried and dropped: floor-only gloss (no visible change), contact-shadow decals under workshop props (too small to see
+  in a 26 × 24 m room), stronger point lights.
+- e2e: wslook.py (phone workshop views, fixed car MODEL/PAINT), roomlook.py (first-person room views via __dbg.fpTo),
+  tools: dbgb/ + e2e/gl3d_base.html = debug page of src/base.html for before/after pictures.
