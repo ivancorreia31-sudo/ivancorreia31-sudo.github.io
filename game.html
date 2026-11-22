@@ -2751,7 +2751,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, seen53: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, seen53: true, seen54: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5488,6 +5488,7 @@ const Car3D = (() => {
   const ghostMat = new T.MeshBasicMaterial({ color: col('#E5483A'), transparent: true, opacity: 0.32, depthWrite: false, toneMapped: false });
   const hlMat = new T.MeshBasicMaterial({ color: col('#F2B705'), transparent: true, opacity: 0.3, depthTest: false, depthWrite: false, toneMapped: false });
   const XRAY = [M.paint, M.glass, M.trim, M.well];
+  M.well.metalness = 0; M.well.envMapIntensity = 0.3;
   const M32c = { cream: M.cream32, wafer: M.wafer32 };
   /* how each part looks once upgraded: material swaps by part kind */
   const UPG_MAT = {
@@ -6893,6 +6894,20 @@ const Car3D = (() => {
     return TX32;
   };
   const SHM32 = new Map(), shm32 = (k, make) => { let m = SHM32.get(k); if (!m) { m = make(); SHM32.set(k, m); } return m; };
+  /* build 54: how far out the body (paint or glass) is from the centre line at (x, y) on side s, by casting a ray across */
+  let ray54 = null;
+  function zIn54(x, y, s) {
+    const sk = SK24; if (!sk) return 9;
+    if (!ray54 || ray54.sk !== sk) { const mat = new T.MeshBasicMaterial({ side: T.DoubleSide }); ray54 = { sk, rc: new T.Raycaster(), ms: [sk.paint, sk.glass, sk.dark].filter(Boolean).map(g => new T.Mesh(g, mat)) }; }
+    ray54.rc.set(new T.Vector3(x, y, 0), new T.Vector3(0, 0, s > 0 ? 1 : -1)); ray54.rc.far = 2;
+    const h = ray54.rc.intersectObjects(ray54.ms, false); return h.length ? h[0].distance : 9;
+  }
+  /* a point is inside the cabin when a ray from the middle of it (x -0.1, y 1.05) reaches the point before the body or glass */
+  function inside54(v) {
+    if (!SK24) return true; zIn54(0, 1, 1);
+    const o = new T.Vector3(-0.1, 1.05, 0), d = v.clone().sub(o), L = d.length(); ray54.rc.set(o, d.normalize()); ray54.rc.far = L;
+    const h = ray54.rc.intersectObjects(ray54.ms, false); return !(h.length && h[0].distance < L - 0.004);
+  }
   function interior32() {
     const c = car32 || {}, I = int32Of(c) || INT32_DEF, A = I.arch, Tm = I.trim, S = sty, open = !!S.open, van = !!S.van;
     const G = van ? S.box : open ? (S.lowScreen ? [[0.80, 0.94], [0.68, 1.08]] : [[0.80, 0.94], [0.515, 1.24]]) : S.glass;
@@ -7022,11 +7037,27 @@ const Car3D = (() => {
         RB('bol', Math.min(0.5, (xf - xb) * 0.4), 0.05, 0.07, 0.02, seatX + 0.12, seatY + 0.17, s * 0.765);
         BX('inl', (xf - xb) * 0.7, 0.025, 0.008, (xf + xb) / 2, 0.87, s * 0.788);
         const tum = S.tum != null ? S.tum : van ? 0.1 : 0.42, pz = 0.7, pt = 0.7 - tum * 0.25;
-        put('liner', beam3([gx0 - 0.03, G[0][1] + 0.03, s * pz], [G[1][0] + 0.02, G[1][1] - 0.02, s * pt], 0.055, M.dash));
+        /* build 54: moved back off the windscreen by its own half-thickness and a little, and in from the body's side */
+        const a0 = [gx0 - 0.03, G[0][1] + 0.03], a1 = [G[1][0] + 0.02, G[1][1] - 0.02], ddx = a1[0] - a0[0], ddy = a1[1] - a0[1], dl = Math.hypot(ddx, ddy) || 1, nx = -ddy / dl, ny = ddx / dl, k = 0.045;
+        const b0 = [a0[0] + nx * k, a0[1] + ny * k], b1 = [a1[0] + nx * k, a1[1] + ny * k];
+        const zAt = b => Math.min(zIn54(b[0], b[1], s), zIn54(b[0] - 0.04, b[1] + 0.03, s), zIn54(b[0], b[1] + 0.02, s)) - 0.04, z0 = Math.min(pz, zAt(b0)), z1 = Math.min(pt, zAt(b1));
+        /* then each end is pulled further in until all eight corners are inside the cabin, seen from its middle */
+        let e0 = [b0[0], b0[1], z0], e1 = [b1[0], b1[1], z1], bm = null;
+        for (let it = 0; it < 10; it++) {
+          if (bm) bm.geometry.dispose();
+          bm = beam3([e0[0], e0[1], s * e0[2]], [e1[0], e1[1], s * e1[2]], 0.055, M.dash); bm.updateMatrix();
+          const q = bm.geometry.attributes.position, v = new T.Vector3(); let p0 = false, p1 = false;
+          for (let i = 0; i < q.count; i++) { v.fromBufferAttribute(q, i).applyMatrix4(bm.matrix); if (!inside54(v)) { if (v.y > (e0[1] + e1[1]) / 2) p1 = true; else p0 = true; } }
+          if (!p0 && !p1) break;
+          if (p0) e0 = [e0[0] + nx * 0.012, e0[1] + ny * 0.012, e0[2] - 0.012]; if (p1) e1 = [e1[0] + nx * 0.012, e1[1] + ny * 0.012, e1[2] - 0.012];
+        }
+        put('liner', bm);
       }
       const ly = Math.min(G[1][1], G[2][1]) + (van ? 0.02 : -0.005), lx1 = G[1][0] - 0.04, lx0 = van ? seatX - 0.45 : G[2][0] + 0.06;
-      if (lx1 > lx0) BX('liner', lx1 - lx0, 0.02, 1.16, (lx0 + lx1) / 2, ly, 0);
-      for (const s of [-1, 1]) BX('liner', 0.2, 0.012, 0.34, G[1][0] - 0.1, ly - 0.025, s * 0.32);
+      if (lx1 > lx0) { let hz = Math.min(0.58, ...[lx0, (lx0 + lx1) / 2, lx1].map(x => zIn54(x, ly + 0.012, 1) - 0.02)), y = ly, a = lx0, b = lx1; const ok = () => [a, b].every(x => inside54(new T.Vector3(x, y + 0.011, hz)) && inside54(new T.Vector3(x, y + 0.011, -hz)));
+        for (let it = 0; it < 24 && !ok(); it++) { if (it % 3 === 0) y -= 0.008; else if (it % 3 === 1) { a += 0.02; b -= 0.02; } else hz -= 0.015; }
+        BX('liner', b - a, 0.02, 2 * hz, (a + b) / 2, y, 0); }
+      for (const s of [-1, 1]) BX('liner', 0.2, 0.012, 0.29, G[1][0] - 0.15, ly - 0.03, s * 0.27);
       RB('dark', 0.025, 0.06, 0.22, 0.02, G[1][0] + 0.06, G[1][1] - 0.07, 0); BX('dark', 0.03, 0.05, 0.02, G[1][0] + 0.03, G[1][1] - 0.025, 0);
       if (van) { const bt = roofIn(seatX - 0.48) - 0.08; BX('dash', 0.03, bt - floorY, 1.3, seatX - 0.48, (bt + floorY) / 2, 0); }
     }
@@ -7166,15 +7197,29 @@ const Car3D = (() => {
       };
       part('taillamp_R' + sd, tail(false), tail(true));
       if (sty.tl && TL32[sty.tl] && TL32[sty.tl].bar) { const F = TL32[sty.tl], y = sty.tailY, z0 = 0.08, z1 = F.z - F.w / 2 - 0.01; fixed(seat27(rbox(0.03, 0.035, z1 - z0, 0.012, M.tail, rearXAt(y) - 0.02, y, s * (z0 + z1) / 2), false, { lift: -0.012 }), 'auto'); }
-      fixed(rbox(0.12, 0.08, 0.16, 0.03, M.paint, 0.66, sty.van ? 1.08 : 1.0, s * 0.97), 'block', true);
-      { const mg = new T.Mesh(new T.PlaneGeometry(0.11, 0.06), M.chrome); mg.rotation.y = -PI / 2; fixed(at(mg, 0.598, sty.van ? 1.08 : 1.0, s * 0.97), 'block', true); }
+      fixed(rbox(0.10, 0.08, 0.16, 0.03, M.paint, 0.67, sty.van ? 1.08 : 1.0, s * 0.97), 'block', true);
+      fixed(rbox(0.02, 0.076, 0.156, 0.006, M.trim, 0.611, sty.van ? 1.08 : 1.0, s * 0.97), 'block', true);
+      { const mg = new T.Mesh(new T.PlaneGeometry(0.136, 0.05), M.chrome); mg.rotation.y = -PI / 2; fixed(at(mg, 0.6005, sty.van ? 1.08 : 1.0, s * 0.97), 'block', true); }
       const seams = sty.seams || [0.78, -0.35].concat(sty.doors > 1 ? [-1.15] : []);
+      /* build 54: fine grooves, the bottom edge too; a line in an arch's reach starts just above the arch */
+      const ZS = 0.9025, yB = 0.375, archTop = x => { const ax = Math.abs(x - 1.35) < Math.abs(x - sty.rx) ? 1.35 : sty.rx, dx = Math.abs(x - ax); return dx < 0.405 ? 0.30 + Math.sqrt(0.405 * 0.405 - dx * dx) + 0.012 : 0; };
       seams.forEach((x, i) => {
-        const inArch = Math.abs(x - 1.35) < 0.45 || Math.abs(x - sty.rx) < 0.45;
-        const y0 = inArch ? 0.66 : 0.35;
-        fixed(at(new T.Mesh(new T.BoxGeometry(0.008, 0.885 - y0, 0.008, 1, 10, 1), M.trim), x, (0.885 + y0) / 2, s * 0.905), 'auto', true);
+        const y0 = Math.max(yB, archTop(x));
+        fixed(at(new T.Mesh(new T.BoxGeometry(0.0045, 0.885 - y0, 0.005, 1, 10, 1), M.trim), x, (0.885 + y0) / 2, s * ZS), 'auto', true);
         if (i > 0) fixed(rbox(0.11, 0.025, 0.02, 0.008, M.trim, x + 0.15, 0.82, s * 0.91), 'auto', true);
       });
+      { const xa = Math.max(Math.min.apply(null, seams), sty.rx + 0.40), xb = Math.min(Math.max.apply(null, seams), 1.35 - 0.40);
+        if (xb - xa > 0.2) fixed(at(new T.Mesh(new T.BoxGeometry(xb - xa, 0.0045, 0.005, 24, 1, 1), M.trim), (xa + xb) / 2, yB, s * ZS), 'auto', true); }
+      /* the fuel flap, on the rear quarter of the right-hand side */
+      if (s > 0 && !sty.open) {
+        const fxp = Math.min(sty.rx - 0.05, Math.min.apply(null, seams) - 0.2), fyp = 0.78;
+        if (fxp - 0.09 > R + 0.25) {
+          const rr = (sh, w, h, r) => { sh.moveTo(-w / 2 + r, -h / 2); sh.lineTo(w / 2 - r, -h / 2); sh.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r); sh.lineTo(w / 2, h / 2 - r); sh.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2); sh.lineTo(-w / 2 + r, h / 2); sh.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r); sh.lineTo(-w / 2, -h / 2 + r); sh.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2); return sh; };
+          const ring = rr(new T.Shape(), 0.165, 0.12, 0.03); ring.holes.push(rr(new T.Path(), 0.156, 0.111, 0.026));
+          const g = new T.ExtrudeGeometry(ring, { depth: 0.004, bevelEnabled: false, curveSegments: 4 }); g.translate(0, 0, -0.002);
+          fixed(at(new T.Mesh(g, M.trim), fxp, fyp, ZS), 'auto', true);
+        }
+      }
       if (sty.clad) {
         for (const ax of [1.35, sty.rx]) {
           const sh = new T.Shape(); sh.absarc(ax, 0.30, 0.45, 0, PI, false); sh.absarc(ax, 0.30, 0.385, PI, 0, true);
@@ -7208,6 +7253,47 @@ const Car3D = (() => {
     badgeR = new T.Mesh(new T.PlaneGeometry(0.11, 0.11), new T.MeshBasicMaterial({ transparent: true, toneMapped: false })); badgeR.userData.ownMat = true;
     badgeR.position.set(R, sty.plateY + 0.15, 0); fitPlate27(badgeR, false, 0.004); fixed(badgeR, 'auto');
     conformLamps24();
+    trim54();
+  }
+  /* build 54: shut lines, reflectors and boot lettering on the nose and tail (not vans, open cars or chrome-bumpered classics) */
+  let BADGE54 = {};
+  function trim54() {
+    const SK = SK24; if (!SK || !SK.fx || sty.van || sty.open || sty.classic) return;
+    const line = (front, y0, y1, z0, z1, mat) => {
+      const h = Math.max(0.0045, y1 - y0), w = Math.max(0.0045, z1 - z0);
+      const g = new T.BoxGeometry(0.004, h, w, 1, Math.max(1, Math.round(h / 0.04)), Math.max(1, Math.round(w / 0.04))); g.translate(0, (y0 + y1) / 2, (z0 + z1) / 2);
+      const m = new T.Mesh(seatGeo27(SK, g, front, null, -0.0026, false, 0.03), mat || M.trim); m.userData.noShape = true; fixed(m, 'auto'); return m;
+    };
+    const sideAt = (front, y) => 0.81 * SK.SF(SK.faceX(front, y), y);
+    /* the tail: lamp inner edges, the bumper line just under the plate */
+    const F = sty.tl && TL32[sty.tl], ty = sty.tailY, lw = F ? (F.round ? F.r + (F.two || 0) / 2 : F.w / 2) : 0.18, lz = F ? F.z : 0.58;
+    const lzc = Math.min(lz, sideAt(false, ty) - lw * 0.8), zs = Math.max(0.22, lzc - lw - 0.014), lh = F ? (F.round ? F.r : F.h / 2) : 0.056;
+    const yb = Math.max(0.40, sty.plateY - 0.085), yt = ty - lh - 0.012, zw = sideAt(false, yb) - 0.03;
+    if (yt - yb > 0.08) { for (const s of [-1, 1]) line(false, yb, yt, s * zs - 0.00225, s * zs + 0.00225); }
+    line(false, yb - 0.00225, yb + 0.00225, -zw, zw);
+    for (const s of [-1, 1]) { const g = new T.BoxGeometry(0.008, 0.022, 0.085); g.translate(0, yb - 0.07, s * (zw - 0.09)); const m = new T.Mesh(seatGeo27(SK, g, false, null, -0.004, true), M.tail); m.userData.noShape = true; fixed(m, 'auto'); }
+    /* chrome letters, 28 mm tall: the model on one side of the boot, the engine on the other */
+    const nm = String((car32 && car32.model) || '').replace(new RegExp('^' + String((car32 && car32.make) || '#').replace(/[^A-Za-z]/g, '') + '\\s+', 'i'), '').trim().split(/\s+/);
+    const eng = /^\d\.\d/.test(nm[nm.length - 1] || '') ? nm.pop() : '', word = (nm[0] || '').toUpperCase();
+    const letters = (txt, w, z) => {
+      if (!txt) return;
+      const key = txt + '|' + w; let tx = BADGE54[key];
+      if (!tx) {
+        tx = BADGE54[key] = canvasTex(512, 96, (c, cw, ch) => {
+          c.clearRect(0, 0, cw, ch); c.font = '700 80px "Barlow", Arial, sans-serif'; const fw = c.measureText(txt).width; if (fw > cw - 24) c.font = '700 ' + Math.floor(80 * (cw - 24) / fw) + 'px "Barlow", Arial, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+          const g = c.createLinearGradient(0, 14, 0, 82); g.addColorStop(0, '#FFFFFF'); g.addColorStop(0.45, '#BFC4C8'); g.addColorStop(0.55, '#6E7479'); g.addColorStop(1, '#E3E6E8');
+          c.lineWidth = 5; c.strokeStyle = 'rgba(20,22,24,.55)'; c.strokeText(txt, cw / 2, ch / 2 + 2); c.fillStyle = g; c.fillText(txt, cw / 2, ch / 2);
+        });
+      }
+      const y = Math.min(yt - 0.05, yb + 0.21), pg = new T.PlaneGeometry(w * 512 / 96, w, 16, 1); pg.rotateY(-PI / 2); pg.translate(0, y, z);
+      const m = new T.Mesh(seatGeo27(SK, pg, false, null, 0.0015, false, 0.02), new T.MeshStandardMaterial({ map: tx, transparent: true, depthWrite: false, alphaTest: 0.04, metalness: 0.6, roughness: 0.3, polygonOffset: true, polygonOffsetFactor: -2 }));
+      m.userData.ownMat = true; m.userData.noShape = true; m.userData.badge54 = txt; fixed(m, 'auto');
+    };
+    if (zs > 0.3) { letters(word, 0.04, -Math.min(zs - 0.13, 0.3)); letters(eng, 0.036, Math.min(zs - 0.08, 0.3)); }
+    /* the nose: the bumper's top line, under the lamps, broken round the grille */
+    const HF = sty.hl && HL32[sty.hl], hy = HF ? HF.y : 0.635, hh = HF ? (HF.round ? HF.r : HF.h / 2) : 0.058, yf = hy - hh - 0.03;
+    const GR = sty.gr && GR32 && GR32[sty.gr], gw = GR ? GR[0] / 2 + 0.03 : 0.42, gy0 = GR ? GR[2] - GR[1] / 2 - 0.02 : 0.5, gy1 = GR ? GR[2] + GR[1] / 2 + 0.02 : 0.68, zf = sideAt(true, yf) - 0.03;
+    if (yf > 0.42 && zf > gw + 0.1) { if (yf > gy0 && yf < gy1) { for (const s of [-1, 1]) line(true, yf - 0.00225, yf + 0.00225, s > 0 ? gw : -zf, s > 0 ? zf : -gw); } else line(true, yf - 0.00225, yf + 0.00225, -zf, zf); }
   }
 
   function rimFace(wheel, s, rim, cfg) {
@@ -11285,6 +11371,8 @@ if ( uFx > 0.5 ) {
   window.__light53 = () => ({ on: LT53.filter(l => l.visible).length, sun: sun.intensity, floor: M.floor.roughness });
   window.__gfx53 = g => api.prefs34({ gfx: g });
   window.__b53 = () => { let pad = 0, clad = 0; if (car) car.traverse(o => { if (o.isMesh && PAD53 && o.material === PAD53) pad++; }); if (dW) dW.scene.traverse(o => { if (o.isMesh && o.name === 'b19:cladWall') clad += o.geometry.attributes.position.count / 3 | 0; }); return { pad, clad, lights: LT53.filter(l => l.visible).length }; };
+  window.__pillar54 = () => { if (!car || !SK24) return null; zIn54(0, 1, 1); const rc = ray54.rc, o = new T.Vector3(-0.1, 1.05, 0), v = new T.Vector3(), d = new T.Vector3(); let n = 0, out = 0; car.traverse(m => { if (!m.isMesh || m.userData.int32 !== 'liner') return; const q = m.geometry.attributes.position; for (let i = 0; i < q.count; i += 3) { v.fromBufferAttribute(q, i).applyMatrix4(m.matrix); d.copy(v).sub(o); const L = d.length(); rc.set(o, d.normalize()); rc.far = L; n++; const h = rc.intersectObjects(ray54.ms, false); if (h.length && h[0].distance < L - 0.004) out++; } }); return { n, out }; };
+  window.__badges54 = () => { const o = []; if (car) car.traverse(m => { if (m.isMesh && m.userData.badge54) o.push(m.userData.badge54); }); return o; };
   window.__probe51 = () => ({ ws: !!(PR51.wsRT && scene.environment === PR51.wsRT.texture), out: !!(dW && dW.probeRT51 && dW.scene.environment === dW.probeRT51.texture) });
   api.renderInfo = () => { const i = renderer.info; return { calls: i.render.calls, tris: i.render.triangles, geos: i.memory.geometries, tex: i.memory.textures }; };
   api.focusPart = id => { if (curJob) focusPart(curJob, id); };
@@ -19689,7 +19777,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 53</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 54</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -20183,7 +20271,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 53;
+const BUILD = 54;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -25895,6 +25983,16 @@ function showWhatsNew53(had52) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 54: what's new */
+function showWhatsNew54(had53) {
+  showModal(`<div><span class="label">Build 54</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Cars up close.</b> Doors have fine shut lines all round, there’s a fuel flap, the boot is outlined above the bumper, and the model and engine size are in chrome letters on the back.</li>
+      <li><b>Tidier details.</b> No more pale strip up the windscreen pillars or grey corners sticking out of the mirrors; mirrors have a proper black frame round the glass, and the wheel-arch liners are matt.</li>
+      ${had53 ? '' : '<li><b>Lights and buildings.</b> The lights over your ramp now light the car, an open bonnet shows a quilted pad, and the buildings over the road are clad in ribbed steel.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -25902,8 +26000,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen53) { const had52 = !!S.seen52; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; save(); setTimeout(() => showWhatsNew53(had52), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen54) { const had53 = !!S.seen53; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; save(); setTimeout(() => showWhatsNew54(had53), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
