@@ -1,0 +1,13 @@
+Build 56: lamps in sections, a tidier bumper chin
+
+- Tail lamps are built in sections, each its own solid lens: a clear reversing lamp nearest the middle (lowest on tall
+  lamps), amber indicator, then red with the LED bar(s); twin round lamps have a clear inner one; red lenses glossier
+  (roughness 0.14). The default tail lamp is 34 cm at z 0.555.
+- Headlamps: an amber indicator at the outer end and a projector lens in the inner bowl.
+- skirt27 (the chin under the nose and tail): its half-width is fitted to the body (skinW56: a ray from the centre
+  line against the paint and cladding) and its ends taper to nothing; it stood outside the crisper corners from Build 51
+  as a spike under each bumper corner.
+- Tests: b56 (chin inside the body on all 69 models, lamp sections)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01GCLxnEhkbZfWsprzYLJNVt

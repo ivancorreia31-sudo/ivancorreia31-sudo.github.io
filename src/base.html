@@ -2744,7 +2744,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, seen53: true, seen54: true, seen55: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, seen53: true, seen54: true, seen55: true, seen56: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5428,7 +5428,7 @@ const Car3D = (() => {
     spring: std('#D4561F', { roughness: 0.45 }),
     hazard: std('#F2B705', { roughness: 0.55 }),
     lamp: std('#F3F0DC', { emissive: col('#5a5539'), roughness: 0.2 }),
-    tail: std('#A3231C', { emissive: col('#3d0c08'), roughness: 0.3 }),
+    tail: std('#A3231C', { emissive: col('#3d0c08'), roughness: 0.14 }),
     ceramic: std('#EDEBE4', { roughness: 0.4 }),
     tank: std('#EEF1EC', { roughness: 0.3, transparent: true, opacity: 0.55 }),
     coolant: std('#E0508A', { roughness: 0.3 }),
@@ -5483,6 +5483,7 @@ const Car3D = (() => {
   const XRAY = [M.paint, M.glass, M.trim, M.well];
   M.well.metalness = 0; M.well.envMapIntensity = 0.3;
   M.amber = std('#F2A33A', { emissive: col('#4a2a06'), roughness: 0.2 });
+  M.rev = std('#E6EAEB', { roughness: 0.08, metalness: 0.55 }); M.amberL = M.amber.clone(); M.proj = std('#1E2428', { roughness: 0.04, metalness: 0.5 });
   const M32c = { cream: M.cream32, wafer: M.wafer32 };
   /* how each part looks once upgraded: material swaps by part kind */
   const UPG_MAT = {
@@ -6494,11 +6495,20 @@ const Car3D = (() => {
     return obj;
   }
   /* a lip under the nose (or the tail): it drops from the body's own lower edge, following the corners round */
+  /* build 56: the body's half-width at (x, y) on a skin (paint or cladding), by a ray from the centre line (cached per skin) */
+  function skinW56(SK, x, y) {
+    if (!SK.paint) return 9;
+    if (!SK.ray56) { const mt = new T.MeshBasicMaterial({ side: T.DoubleSide }); SK.ray56 = { rc: new T.Raycaster(), ms: [SK.paint, SK.dark].filter(Boolean).map(g => new T.Mesh(g, mt)) }; }
+    const r = SK.ray56; r.rc.set(new T.Vector3(x, y, 0), new T.Vector3(0, 0, 1)); r.rc.far = 2;
+    const h = r.rc.intersectObjects(r.ms, false); return h.length ? h[0].distance : 9;
+  }
   function skirt27(SK, front, n) {
-    const yTop = 0.318, yBot = 0.2, zH = 0.76, sg = front ? 1 : -1, pos = [];
+    const yTop = 0.318, yBot = 0.2, sg = front ? 1 : -1, pos = [];
+    let zH = 0.76;
+    for (; zH > 0.45; zH -= 0.01) { const x = SK.fx(front, yTop, zH); if (zH <= skinW56(SK, x - sg * 0.006, 0.3) && zH * 0.985 <= skinW56(SK, x - sg * 0.04, 0.3) - 0.012 && zH * 0.97 <= skinW56(SK, x - sg * 0.11, 0.3) - 0.012) break; }
     n = n || 18;
     const P = [];
-    for (let i = 0; i <= n; i++) { const z = -zH + 2 * zH * i / n, x = SK.fx(front, yTop, z); P.push([[x - sg * 0.006, yTop, z], [x - sg * 0.04, yBot, z * 0.985], [x - sg * 0.11, yBot + 0.012, z * 0.97]]); }
+    for (let i = 0; i <= n; i++) { const z = -zH + 2 * zH * i / n, x = SK.fx(front, yTop, z), u = Math.min(1, (1 - Math.abs(z) / zH) / 0.22), t = u * u * (3 - 2 * u); P.push([[x - sg * 0.006, yTop, z], [x - sg * (0.006 + 0.034 * t), yTop - (yTop - yBot) * t, z * (1 - 0.015 * t)], [x - sg * (0.006 + 0.104 * t), yTop - (yTop - yBot - 0.012) * t, z * (1 - 0.03 * t)]]); }
     const tri = (a, b, c) => { pos.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]); };
     for (let i = 0; i < n; i++) {
       const a = P[i], b = P[i + 1];
@@ -7145,6 +7155,8 @@ const Car3D = (() => {
               if (led) { const halo = new T.Mesh(new T.TorusGeometry(br * 0.86, 0.004, 6, 24), M.drl); halo.rotation.y = PI / 2; g.add(at(halo, 0.03, 0, dz)); }
             }
             g.add(box(0.008, Math.max(0.005, Math.min(0.009, F.h * 0.2)), F.w * 0.86, M.drl, 0.025, -F.h * 0.36, 0));
+            if (F.w > 0.22) g.add(box(0.004, Math.min(0.045, F.h * 0.55), 0.03, M.amberL, 0.027, 0, s * (F.w / 2 - 0.028)));
+            if (nb === 2) { const pj = new T.Mesh(new T.SphereGeometry(br * 0.55, 14, 10), M.proj); pj.scale.set(0.6, 1, 1); g.add(at(pj, 0.03, 0, -s * 0.25 * F.w)); }
             g.add(rbox(0.006, F.h + 0.004, F.w + 0.004, Math.min(0.024, F.h / 2), M.lens, 0.028, 0, 0));
           }
           return at(g, 2.148, F.y, s * F.z);
@@ -7162,11 +7174,32 @@ const Car3D = (() => {
           if (led) { const halo = new T.Mesh(new T.TorusGeometry(0.026, 0.004, 6, 24), M.drl); halo.rotation.y = PI / 2; g.add(at(halo, 0.03, 0.006, dz)); }
         }
         g.add(box(0.008, 0.009, led ? 0.31 : 0.27, M.drl, 0.025, -0.029, 0));
+        g.add(box(0.004, 0.05, 0.032, M.amberL, 0.027, 0.004, s * 0.142));
+        { const pj = new T.Mesh(new T.SphereGeometry(0.017, 14, 10), M.proj); pj.scale.set(0.6, 1, 1); g.add(at(pj, 0.03, 0.006, s > 0 ? -0.075 : 0.065)); }
         g.add(rbox(0.006, 0.084, 0.334, 0.024, M.lens, 0.028, 0, 0));
         return at(g, 2.148, 0.635, s * 0.545);
       };
       part('headlamp_F' + sd, head(false), head(true));
       /* tail light with an LED bar; the upgrade is smoked with two bars */
+      /* build 56: a tail lamp in sections, each its own solid lens: clear reversing lamp nearest the middle (or lowest), amber, then red with its LED bar */
+      const zones56 = (g, w, h, vert, led, lens) => {
+        const r = Math.min(0.02, h / 2, w / 2);
+        if (!vert) {
+          const zi = -s * w / 2, rw = w * 0.28, aw = w * 0.12, red = w - rw - aw, zr = s * (w / 2 - red / 2);
+          g.add(rbox(0.05, h, red, r, lens, 0, 0, zr));
+          g.add(rbox(0.048, h, aw - 0.004, Math.min(0.006, h / 2), M.amberL, 0.001, 0, zi + s * (rw + aw / 2)));
+          g.add(rbox(0.05, h, rw - 0.004, r, M.rev, 0, 0, zi + s * rw / 2));
+          g.add(box(0.006, Math.max(0.008, h * 0.18), red * 0.86, M.led, -0.027, h * 0.2, zr));
+          if (led) g.add(box(0.006, Math.max(0.008, h * 0.14), red * 0.86, M.led, -0.027, -h * 0.22, zr));
+        } else {
+          const yb = -h / 2, rh = h * 0.27, ah = h * 0.15, red = h - rh - ah, yr = h / 2 - red / 2;
+          g.add(rbox(0.05, red, w, r, lens, 0, yr, 0));
+          g.add(rbox(0.048, ah - 0.004, w, Math.min(0.006, ah / 2), M.amberL, 0.001, yb + rh + ah / 2, 0));
+          g.add(rbox(0.05, rh - 0.004, w, Math.min(r, rh / 2), M.rev, 0, yb + rh / 2, 0));
+          g.add(box(0.006, red * 0.8, Math.max(0.008, w * 0.18), M.led, -0.027, yr, led ? -w * 0.2 : 0));
+          if (led) g.add(box(0.006, red * 0.8, Math.max(0.008, w * 0.18), M.led, -0.027, yr, w * 0.2));
+        }
+      };
       const tail = led => {
         const g = new T.Group(), lens = led ? M.smoke : M.tail, F = sty.tl && TL32[sty.tl];
         if (F) {
@@ -7175,19 +7208,17 @@ const Car3D = (() => {
             for (const dz of F.two ? [-F.two / 2, F.two / 2] : [0]) {
               g.add(cyl(F.r, 0.04, lens, 0, 0, dz, 'x', 20));
               const ring = new T.Mesh(new T.TorusGeometry(F.r + 0.003, 0.007, 6, 20), M.chrome); ring.rotation.y = PI / 2; g.add(at(ring, -0.018, 0, dz));
-              g.add(cyl(F.r * 0.45, 0.006, M.led, -0.022, 0, dz, 'x', 16));
+              g.add(cyl(F.r * 0.45, 0.006, F.two && Math.sign(dz) === -s ? M.rev : M.led, -0.022, 0, dz, 'x', 16));
               if (led) { const lr = new T.Mesh(new T.TorusGeometry(F.r * 0.75, 0.004, 6, 20), M.led); lr.rotation.y = PI / 2; g.add(at(lr, -0.022, 0, dz)); }
             }
           } else {
-            g.add(rbox(0.05, F.h, F.w, Math.min(0.02, F.h / 2), lens)); g.add(box(0.006, Math.max(0.008, F.h * 0.18), F.w * 0.84, M.led, -0.027, F.h * 0.2, 0));
-            if (led) g.add(box(0.006, Math.max(0.008, F.h * 0.14), F.w * 0.84, M.led, -0.027, -F.h * 0.22, 0));
+            zones56(g, F.w, F.h, F.h > F.w * 0.9, led, lens);
           }
           return at(g, rearXAt(y) - 0.032, y, s * F.z);
         }
-        if (sty.van) { g.add(rbox(0.05, 0.30, 0.12, 0.02, lens)); g.add(box(0.006, led ? 0.26 : 0.22, 0.02, M.led, -0.027, 0, 0)); return at(g, tailX, 1.08, s * 0.74); }
-        g.add(rbox(0.05, 0.08, 0.36, 0.02, lens)); g.add(box(0.006, 0.014, 0.30, M.led, -0.027, 0.016, 0));
-        if (led) g.add(box(0.006, 0.01, 0.30, M.led, -0.027, -0.018, 0));
-        return at(g, tailX, sty.tailY, s * 0.58);
+        if (sty.van) { zones56(g, 0.12, 0.30, true, led, lens); return at(g, tailX, 1.08, s * 0.74); }
+        zones56(g, 0.34, 0.08, false, led, lens);
+        return at(g, tailX, sty.tailY, s * 0.555);
       };
       part('taillamp_R' + sd, tail(false), tail(true));
       if (sty.tl && TL32[sty.tl] && TL32[sty.tl].bar) { const F = TL32[sty.tl], y = sty.tailY, z0 = 0.08, z1 = F.z - F.w / 2 - 0.01; fixed(seat27(rbox(0.03, 0.035, z1 - z0, 0.012, M.tail, rearXAt(y) - 0.02, y, s * (z0 + z1) / 2), false, { lift: -0.012 }), 'auto'); }
@@ -10162,7 +10193,7 @@ if ( uFx > 0.5 ) {
     well: std('#0B0D0C', { roughness: 1, side: DS }),
     chrome: std('#DDE2E0', { roughness: 0.1, metalness: 1 }),
     lamp: std('#F3F0DC', { emissive: col('#4a4632'), roughness: 0.18 }),
-    tail: std('#A3231C', { emissive: col('#3d0c08'), roughness: 0.3 }),
+    tail: std('#A3231C', { emissive: col('#3d0c08'), roughness: 0.14 }),
     tyre: std('#151716', { roughness: 0.9 }),
     wood: std('#A57B4E', { roughness: 0.8 }), cream: std('#F3EBDC', { roughness: 0.75 }), wafer: std('#D49A55', { roughness: 0.85 }),
   };
@@ -11370,6 +11401,8 @@ if ( uFx > 0.5 ) {
   window.__pillar54 = () => { if (!car || !SK24) return null; zIn54(0, 1, 1); const rc = ray54.rc, o = new T.Vector3(-0.1, 1.05, 0), v = new T.Vector3(), d = new T.Vector3(); let n = 0, out = 0; car.traverse(m => { if (!m.isMesh || m.userData.int32 !== 'liner') return; const q = m.geometry.attributes.position; for (let i = 0; i < q.count; i += 3) { v.fromBufferAttribute(q, i).applyMatrix4(m.matrix); d.copy(v).sub(o); const L = d.length(); rc.set(o, d.normalize()); rc.far = L; n++; const h = rc.intersectObjects(ray54.ms, false); if (h.length && h[0].distance < L - 0.004) out++; } }); return { n, out }; };
   window.__badges54 = () => { const o = []; if (car) car.traverse(m => { if (m.isMesh && m.userData.badge54) o.push(m.userData.badge54); }); return o; };
   window.__b55 = () => { let rep = 0; if (car) car.traverse(m => { if (m.isMesh && m.material === M.amber) rep++; }); return { rep }; };
+  window.__lamps56 = () => { const o = { rev: 0, amber: 0, proj: 0 }; if (car) car.traverse(m => { if (!m.isMesh || !m.visible) return; let p = m; while (p && !p.userData.part) p = p.parent; const part = p && p.userData.part || ''; if (m.material === M.rev && /taillamp/.test(part)) o.rev++; if (m.material === M.amberL && /lamp/.test(part)) o.amber++; if (m.material === M.proj) o.proj++; }); return o; };
+  window.__skirt56 = () => { if (!SK24) return null; const o = []; for (const fr of [true, false]) { const g = skirt27(SK24, fr), q = g.attributes.position; let out = 0; for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = Math.abs(q.getZ(i)); if (z > skinW56(SK24, x, Math.max(0.3, y)) + 0.004) out++; } o.push(out); g.dispose(); } return o; };
   window.__probe51 = () => ({ ws: !!(PR51.wsRT && scene.environment === PR51.wsRT.texture), out: !!(dW && dW.probeRT51 && dW.scene.environment === dW.probeRT51.texture) });
   api.renderInfo = () => { const i = renderer.info; return { calls: i.render.calls, tris: i.render.triangles, geos: i.memory.geometries, tex: i.memory.textures }; };
   api.focusPart = id => { if (curJob) focusPart(curJob, id); };
@@ -19774,7 +19807,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 55</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 56</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -20268,7 +20301,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 55;
+const BUILD = 56;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -26000,6 +26033,17 @@ function showWhatsNew55(had54) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 56: what's new */
+function showWhatsNew56(had55) {
+  showModal(`<div><span class="label">Build 56</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Proper rear lights.</b> Tail lights are in sections now: red with its LED bar, an amber indicator and a clear reversing light.</li>
+      <li><b>Headlights.</b> A projector lens in the inner bowl and an amber indicator at the outer end.</li>
+      <li><b>Tidier bumpers.</b> No more blue spike hanging under the bumper corners.</li>
+      ${had55 ? '' : '<li><b>Window rubbers and side repeaters.</b> Black seals along the tops of the side windows, and an amber indicator on each front wing.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -26007,8 +26051,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen55) { const had54 = !!S.seen54; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; save(); setTimeout(() => showWhatsNew55(had54), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; S.seen56 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen56) { const had55 = !!S.seen55; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; S.seen56 = true; save(); setTimeout(() => showWhatsNew56(had55), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }

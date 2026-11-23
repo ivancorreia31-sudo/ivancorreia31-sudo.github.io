@@ -140,3 +140,12 @@
   M.amber; side repeater rbox(0.05, 0.02, 0.012) at x max(seam + 0.12, 0.88) (< 1.0), y 0.735, z ±0.906.
   window.__b55() → { rep }.
 - autojob.js: spark plug gap (reads .gp-gap, closes/opens 0.05 at a time to 0.8, then Check); checked on a stub page.
+
+## Build 56 (published: Pages 5498e04, artifact v59)
+- p56a_lamps: M.rev (clear), M.proj (projector); zones56(g, w, h, vert, led, lens) builds a tail lamp from sections
+  (horizontal: clear 28% inner, amber 12%, red; vertical: clear 27% bottom, amber 15%, red). Headlamp amber at the outer
+  end (w > 0.22) and projector in the inner bowl. window.__lamps56() → { rev, amber, proj }.
+- p56b_skirt: skinW56(SK, x, y) half-width by raycast (paint + dark, cached as SK.ray56); skirt27 zH from 0.76 down to
+  where its points are inside, ends taper over the outer 22%. window.__skirt56() → [front, rear] points outside.
+- closeup.py view 11 = front wheel close (px 1.35, pz 0.8).
+- Lamp ambers use M.amberL (a clone), so __b55 still counts only the side repeaters.
