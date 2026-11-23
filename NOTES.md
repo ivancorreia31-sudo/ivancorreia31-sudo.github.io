@@ -149,3 +149,13 @@
   where its points are inside, ends taper over the outer 22%. window.__skirt56() → [front, rear] points outside.
 - closeup.py view 11 = front wheel close (px 1.35, pz 0.8).
 - Lamp ambers use M.amberL (a clone), so __b55 still counts only the side repeaters.
+
+## Build 57 (published: Pages d16be5b, artifact v60)
+- p57a_fast: LT53 = [] (roof lights removed; P26.balance pads the other scene's lights to match, so a light in one
+  scene costs in both). batcher57(root, scene): see the commit; window.__batch57() → { room, car, all }, __nob57 = true
+  turns it off, window.__pick57() compares 900 tap points with the merge on and off. adaptDpr: < 30 fps with glow off →
+  0.85.
+- Measuring: e2e/perfcmp.py PAGE N (debug pages; draw calls, triangles, programs, lights, ms per synchronous render in
+  the workshop and yard; NODRIVE=1, YJS= runs code in the yard first). e2e/b57same.py: same car and views with the merge
+  on and off, pixel diffs. /tmp-style probes: count draw calls per group by wrapping renderer.renderBufferDirect.
+- Build 56 workshop: 570 calls (car 440 of them); yard 124 main + 66 shadow calls, shadows redrawn every frame.

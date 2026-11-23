@@ -46,5 +46,6 @@ async def main():
             if not took: t.bad.append('no job to take (%d): %s' % (k, await t.ev("[document.querySelectorAll('[data-a=accept]').length, document.querySelectorAll('[data-a=accept]:not([disabled])').length, document.getElementById('modal').hidden ? '' : document.getElementById('modal').innerText.slice(0, 80), JSON.parse(localStorage.getItem('bonnet-up.v1')).bays.map(b => !!b)]"))); break
             t.out['took%d' % k] = took
             await play(t, 'job%d' % k)
+            t.out['batch%d' % k] = await t.ev("window.__batch57 ? __batch57() : null")
         t.done()
 asyncio.run(main())

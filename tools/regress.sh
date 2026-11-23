@@ -28,6 +28,7 @@ run b53_gl b53.py gl3d.html
 run b54_gl b54.py gl3d.html
 run b55_gl b55.py gl3d.html
 run b56_gl b56.py gl3d.html
+run b57_gl b57.py gl3d.html
 run carrier_gl carrier.py gl3d.html
 run share48_gl share48.py gl3d.html
 run breadth_gl breadth.py gl3d.html

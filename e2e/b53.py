@@ -1,4 +1,4 @@
-# build 53: three roof fittings light the workshop (off in battery saver), the bonnet's pad uses the quilted felt, and
+# build 53: (the roof lights were removed again in build 57), the bonnet's pad uses the quilted felt, and
 # the units over the road are clad
 # usage: python3 b53.py PAGE
 import asyncio, sys
@@ -11,9 +11,9 @@ async def main():
         await t.pg.wait_for_timeout(2000)
         t.out['ws'] = w = await t.ev("__b53()")
         if w['pad'] < 1: t.bad.append('the bonnet has no felt pad')
-        if w['lights'] != 3: t.bad.append('%d roof lights on, expected 3' % w['lights'])
+        if w['lights'] != 0: t.bad.append('%d roof lights on, expected none (removed in build 57)' % w['lights'])
         t.out['save'] = s = await t.ev("(() => { __gfx53('save'); const a = __b53().lights; __gfx53('auto'); return [a, __b53().lights]; })()")
-        if s != [0, 3]: t.bad.append('battery saver should turn the roof lights off and back on: %s' % s)
+        if s != [0, 0]: t.bad.append('roof lights after battery saver on and off: %s' % s)
         await t.act('yard'); await t.pg.wait_for_timeout(5000)
         t.out['yard'] = y = await t.ev("__b53()")
         if y['clad'] < 100: t.bad.append('no cladding on the units over the road')

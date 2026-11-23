@@ -1,0 +1,17 @@
+Build 57: smoother (half the draw calls in the workshop, yard back to its old speed)
+
+- The three workshop roof point lights from Build 53 are removed (sun back to 1.1): the workshop and the drive world
+  share materials, so P26.balance padded the yard with three dummy point lights and every lit fragment outside paid
+  for them (the yard drew ~34% slower than Build 50 in SwiftShader; now equal).
+- Static batching (batcher57): the car on the ramp and the workshop room merge their pieces per material (and layer
+  mask, shadow flags, render order, attribute set) into one mesh each, baked in the root's own space and drawn in a
+  group that follows the root. Originals move to layer 5, which every Raycaster also tests (intersectObject(s) patched),
+  so taps, occlusion and picking are unchanged. Each frame it checks the pieces: shown/hidden → that batch is rebaked;
+  moved, repainted or re-layered → that piece is drawn on its own from then on; meshes added or removed → only the
+  affected batches are rebaked. See-through materials are left alone (their draw order matters).
+  Workshop draw calls 570 → ~285; merged and unmerged pictures match pixel for pixel; 900 tap points find the same.
+- adaptDpr: when still under 30 fps with the glow pass already off, it steps to 0.85 of a screen pixel.
+- Tests: b57 (merged room and car, no roof lights, taps identical); b53 expects no roof lights.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01GCLxnEhkbZfWsprzYLJNVt
