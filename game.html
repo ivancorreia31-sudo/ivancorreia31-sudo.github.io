@@ -2751,7 +2751,7 @@ const TIER = {
 
 /* ---------- state ---------- */
 let S = null, busy = false, arriving = false;
-const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, seen53: true, seen54: true, seen55: true, seen56: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
+const fresh = () => ({ v: 1, seen20: true, seen21: true, seen22: true, seen23: true, seen24: true, seen25: true, seen26: true, seen27: true, seen28: true, seen29: true, seen30: true, seen31: true, seen32: true, seen33: true, seen34: true, seen35: true, seen36: true, seen37: true, seen38: true, seen39: true, seen40: true, seen41: true, seen42: true, seen43: true, seen44: true, seen45: true, seen46: true, seen47: true, seen48: true, seen49: true, seen50: true, seen51: true, seen52: true, seen53: true, seen54: true, seen55: true, seen56: true, seen57: true, eco28: 1, day: 1, clock: DAY_START, money: 400, rep: 3, xp: 0, owned: {}, bays: [null], activeBay: 0, board: [], jobNo: 40, stats: { jobs: 0, earned: 0, perfect: 0, spent: 0, flips: 0 }, today: { jobs: 0, earned: 0 }, view: 'workshop', seenIntro: false, over: false, recent: [], streak: 0, best: 0, goals: null, lots: [], lotsDay: 0, event: null, yard: [], complaints: [], cmpQueue: [], unit: [] });
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
 /* older saves: add any parts the catalogue has gained and fill in new car details */
 function migrateJob(j) {
@@ -5391,7 +5391,7 @@ const Car3D = (() => {
   let HEMI0 = 0.1, EXPO0 = 1.0, expoWs52 = 1.0;
   const hemi = new T.HemisphereLight(0xffffff, 0x7d8580, HEMI0); scene.add(hemi);
   /* the key light casts real shadows from the car and lift onto the floor */
-  const sun = new T.DirectionalLight(0xfff1dc, 0.9); sun.position.set(2.5, 9, 3.5); sun.castShadow = true;
+  const sun = new T.DirectionalLight(0xfff1dc, 1.1); sun.position.set(2.5, 9, 3.5); sun.castShadow = true;
   const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 700;
   sun.shadow.mapSize.set(smallScreen ? 1024 : 2048, smallScreen ? 1024 : 2048);
   Object.assign(sun.shadow.camera, { left: -5.5, right: 5.5, top: 5.5, bottom: -5.5, near: 1, far: 26 });
@@ -5400,7 +5400,7 @@ const Car3D = (() => {
   scene.add(sun); scene.add(sun.target);
   const back = new T.DirectionalLight(0xdfe8ff, 0.15); back.position.set(-6, 5, -5); scene.add(back);
   /* build 53: three of the roof fittings give light, the one over the bay and the two beside it (no shadows; off in battery saver) */
-  const LT53 = [[0, 0], [-7, 0], [7, 0]].map(([x, z]) => { const p = new T.PointLight(0xfff4e6, 0.95, 16, 2); p.position.set(x, 5.05, z); scene.add(p); return p; });
+  const LT53 = [];   /* build 57: removed (the yard had to carry matching dummy lights) */
   /* a blurred image of a bright workshop, used for reflections on paint, chrome and glass */
   try {
     const env = new T.Scene();
@@ -5606,6 +5606,105 @@ const Car3D = (() => {
      Light from real photographed HDR environments (a warehouse indoors, a park outdoors), and surfaces painted on canvases to
      look like the real thing: worn concrete, painted blockwork, steel cladding, powder-coated steel, oily stains. */
   const ENVS = { in: null, out: null };
+  /* build 57: static batching. Originals move to layer 5 (not drawn, still hit by every raycaster), and per material a
+     merged copy is drawn on their old layers. */
+  const L57 = 1 << 5;
+  { const P = T.Raycaster.prototype, io = P.intersectObject, ios = P.intersectObjects;
+    P.intersectObject = function (o, r, t) { const m = this.layers.mask; this.layers.mask = m | L57; try { return io.call(this, o, r, t); } finally { this.layers.mask = m; } };
+    P.intersectObjects = function (o, r, t) { const m = this.layers.mask; this.layers.mask = m | L57; try { return ios.call(this, o, r, t); } finally { this.layers.mask = m; } }; }
+  function batcher57(root, scene0) {
+    /* merged meshes are baked in the root's own space and drawn in a group that follows it */
+    const host = new T.Group(); host.matrixAutoUpdate = false; host.userData.batch57 = true; scene0.add(host);
+    const B = { root, host, items: [], groups: new Map(), dyn: new Set(), n: -1, rebuilds: 0, on: true, ms: 0 };
+    const inv = new T.Matrix4(), rel = new T.Matrix4();
+    const relOf = o => { o.updateWorldMatrix(true, false); return rel.multiplyMatrices(inv, o.matrixWorld); };
+    const eff = o => { for (let p = o; p; p = p.parent) { if (!p.visible) return false; if (p === root) return !!root.parent; } return false; };
+    const ok = o => o.isMesh && !o.isInstancedMesh && !o.isSkinnedMesh && !Array.isArray(o.material) && o.material && !o.material.transparent && !Object.prototype.hasOwnProperty.call(o, 'onBeforeRender');   /* see-through things keep their own draw order */
+    const okGeo = g => g && g.isBufferGeometry && g.attributes.position && g.attributes.normal && !g.morphAttributes.position && g.drawRange.count === Infinity;   /* a single material draws all of a geometry, whatever its groups */
+    const keyOf = it => { const o = it.o, g = o.geometry; return [o.material.uuid, it.mask, o.castShadow ? 1 : 0, o.receiveShadow ? 1 : 0, o.renderOrder, g.attributes.uv ? 1 : 0, g.attributes.color ? 1 : 0].join('|'); };
+    const release = it => { it.o.layers.mask = it.mask; };
+    const bake = (key, list) => {
+      const old = B.groups.get(key); if (old) { host.remove(old); old.geometry.dispose(); B.groups.delete(key); }
+      const vis = list.filter(it => eff(it.o)); if (!vis.length) return;
+      const o0 = vis[0].o, hasUv = !!o0.geometry.attributes.uv, hasCol = !!o0.geometry.attributes.color;
+      let n = 0; for (const it of vis) { const g = it.o.geometry; n += g.index ? g.index.count : g.attributes.position.count; }
+      const P = new Float32Array(n * 3), N = new Float32Array(n * 3), U = hasUv ? new Float32Array(n * 2) : null, C = hasCol ? new Float32Array(n * 3) : null;
+      const v = new T.Vector3(), nm = new T.Matrix3(); let w = 0;
+      for (const it of vis) {
+        const o = it.o, g = o.geometry, pa = g.attributes.position, na = g.attributes.normal, ua = g.attributes.uv, ca = g.attributes.color, ix = g.index, cnt = ix ? ix.count : pa.count;
+        const mw = relOf(o); nm.getNormalMatrix(mw); const flip = mw.determinant() < 0;
+        for (let k = 0; k < cnt; k++) {
+          const kk = flip ? (k % 3 === 1 ? k + 1 : k % 3 === 2 ? k - 1 : k) : k, i = ix ? ix.getX(kk) : kk;
+          v.fromBufferAttribute(pa, i).applyMatrix4(mw); P[w * 3] = v.x; P[w * 3 + 1] = v.y; P[w * 3 + 2] = v.z;
+          v.fromBufferAttribute(na, i).applyMatrix3(nm).normalize(); N[w * 3] = v.x; N[w * 3 + 1] = v.y; N[w * 3 + 2] = v.z;
+          if (U) { U[w * 2] = ua.getX(i); U[w * 2 + 1] = ua.getY(i); }
+          if (C) { C[w * 3] = ca.getX(i); C[w * 3 + 1] = ca.getY(i); C[w * 3 + 2] = ca.getZ(i); }
+          w++;
+        }
+      }
+      const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(P, 3)); g.setAttribute('normal', new T.BufferAttribute(N, 3));
+      if (U) g.setAttribute('uv', new T.BufferAttribute(U, 2)); if (C) g.setAttribute('color', new T.BufferAttribute(C, 3));
+      g.computeBoundingSphere();
+      const m = new T.Mesh(g, o0.material); m.castShadow = o0.castShadow; m.receiveShadow = o0.receiveShadow; m.renderOrder = o0.renderOrder; m.layers.mask = vis[0].mask;
+      m.matrixAutoUpdate = false; m.userData.batch57 = true; host.add(m); B.groups.set(key, m); B.rebuilds++;
+    };
+    /* sync: find the meshes under the root now; new ones join their material's batch, gone ones leave it */
+    B.by = new Map(); B.scans = 0;
+    const sync = full => {
+      const t0 = performance.now(); B.scans++;
+      const seen = new Set(), dirty = new Set(); let n = 0;
+      root.traverse(o => { if (o.isMesh) { n++; seen.add(o); } });
+      for (const it of B.items) if (!seen.has(it.o)) { it.gone = true; dirty.add(it.key); }
+      const have = new Set(B.items.map(it => it.o)), fresh = [];
+      for (const o of seen) { if (have.has(o) || B.dyn.has(o) || o.layers.mask === L57 || !ok(o) || !okGeo(o.geometry)) continue; const it = { o, mask: o.layers.mask, mat: o.material, vis: eff(o), mw: relOf(o).elements.slice(), ch: 0 }; it.key = keyOf(it); fresh.push(it); }
+      for (const it of fresh) { if (!B.by.has(it.key)) B.by.set(it.key, []); B.by.get(it.key).push(it); dirty.add(it.key); }
+      for (const k of dirty) {
+        const list = (B.by.get(k) || []).filter(it => !it.gone);
+        if (list.length < 2) { list.forEach(release); B.by.delete(k); const old = B.groups.get(k); if (old) { host.remove(old); old.geometry.dispose(); B.groups.delete(k); } continue; }
+        for (const it of list) it.o.layers.mask = L57; B.by.set(k, list); bake(k, list);
+      }
+      B.items = [].concat(...B.by.values()); B.n = n; B.ms = Math.round(performance.now() - t0);
+    };
+    const scan = () => sync(true);
+    B.max = 0; B.slow = 0;
+    B.tick = () => { const t0 = performance.now(); tick0(); const ms = performance.now() - t0; if (ms > B.max) B.max = ms; if (ms > 8) B.slow++; const A = ALL57[root === roomG ? 'room' : 'car']; A.ticks++; if (ms > A.max) A.max = Math.round(ms); if (ms > 8) A.slow++; if (ms > 30) A.over30++; };
+    const tick0 = () => {
+      if (!B.on || !root.parent) { host.visible = false; return; }
+      root.updateWorldMatrix(true, false); inv.copy(root.matrixWorld).invert(); host.matrix.copy(root.matrixWorld); host.matrixWorldNeedsUpdate = true; host.visible = true;
+      let n = 0; root.traverse(o => { if (o.isMesh) n++; });
+      if (n !== B.n) { sync(false); return; }
+      const dirty = new Set();
+      for (const it of B.items) {
+        const o = it.o, vis = eff(o); let moved = false;
+        if (vis) { const e = relOf(o).elements; for (let i = 0; i < 16; i++) if (Math.abs(e[i] - it.mw[i]) > 1e-5) { moved = true; break; } }
+        if (moved || o.material !== it.mat || o.layers.mask !== L57) {
+          /* moving, repainted or re-layered by the game: draw it on its own from now on */
+          if (o.layers.mask !== L57) it.mask = o.layers.mask;
+          B.dyn.add(o); release(it); dirty.add(it.key); it.gone = true; continue;
+        }
+        if (vis !== it.vis) { it.vis = vis; dirty.add(it.key); if (++it.ch > 6) { B.dyn.add(o); release(it); it.gone = true; } }
+      }
+      if (dirty.size) {
+        for (const k of dirty) {
+          const list = (B.by.get(k) || []).filter(it => !it.gone);
+          if (list.length < 2) { list.forEach(release); B.by.delete(k); const old = B.groups.get(k); if (old) { host.remove(old); old.geometry.dispose(); B.groups.delete(k); } continue; }
+          B.by.set(k, list); bake(k, list);
+        }
+        B.items = [].concat(...B.by.values());
+      }
+    };
+    B.off = () => { B.on = false; for (const it of B.items) release(it); for (const m of B.groups.values()) { host.remove(m); m.geometry.dispose(); } B.groups.clear(); B.items = []; B.n = -1; if (host.parent) host.parent.remove(host); };
+    return B;
+  }
+  let RB57 = null, CB57 = null; const ALL57 = { room: { ticks: 0, max: 0, slow: 0, over30: 0 }, car: { ticks: 0, max: 0, slow: 0, over30: 0 } };
+  const batchRoom57 = () => {
+    if (window.__nob57) { if (RB57) RB57.off(); if (CB57) CB57.off(); RB57 = CB57 = null; return; }
+    if (roomG) { if (!RB57 || RB57.root !== roomG) { if (RB57) RB57.off(); RB57 = batcher57(roomG, scene); } RB57.tick(); }
+    if (car) { if (!CB57 || CB57.root !== car) { if (CB57) CB57.off(); CB57 = batcher57(car, scene); } CB57.tick(); } else if (CB57) { CB57.off(); CB57 = null; }
+  };
+  const st57 = B => B ? { items: B.items.length, batches: B.groups.size, dyn: B.dyn.size, rebuilds: B.rebuilds, scans: B.scans, lastMs: B.ms, maxMs: Math.round(B.max), slow: B.slow } : null;
+  window.__batch57 = () => ({ room: st57(RB57), car: st57(CB57), all: ALL57 });
+  window.__pick57 = () => { const grid = () => { const r = canvas.getBoundingClientRect(), out = []; for (let i = 1; i < 30; i++) for (let j = 1; j < 30; j++) { const h = pick(r.left + r.width * i / 30, r.top + r.height * j / 30); out.push(h.part || (h.door ? 'door' : '')); } return out; }; const a = grid(); const merged = !!(CB57 && CB57.items.length); if (RB57) RB57.off(); if (CB57) CB57.off(); RB57 = CB57 = null; const b = grid(); kick(); let same = 0; for (let i = 0; i < a.length; i++) if (a[i] === b[i]) same++; return { merged, n: a.length, same, parts: a.filter(Boolean).length }; };
   /* build 51: reflection probes. sc: the scene, (x, y, z): where the cube is taken from, hide: what to leave out of it,
      ibl: the lighting to use while taking it (the photo, so a probe never lights the next one). The capture is
      tone-mapped and stored like the screen (sRGB), so no shader needs building for it; the blurred result is kept in
@@ -10987,7 +11086,7 @@ if ( uFx > 0.5 ) {
     const pa22 = paintTick22(now);
     if (bayLayer22(camera.position.y) || sceneMv22 || wk || dyn || shadowDirty) { renderer.shadowMap.needsUpdate = true; shadowDirty = false; }
     if (canvas.isConnected && canvas.clientWidth) {
-      POST.thr = 0.8; renderer.toneMappingExposure = expoWs52;
+      POST.thr = 0.8; renderer.toneMappingExposure = expoWs52; batchRoom57();
       if (PR51.ws && !booth) {
         PR51.ws = false; const c = car && car.position, rt = probe51(scene, c ? c.x - 0.1 : 0, 1.25, c ? c.z : 0, [car], ENVS.in);
         if (rt) { if (PR51.wsRT) PR51.wsRT.dispose(); PR51.wsRT = rt; scene.environment = rt.texture; }
@@ -11237,7 +11336,7 @@ if ( uFx > 0.5 ) {
     if (f.pT > 0.25) { f.pT = 0; const h = fpHit(0, 0), p = h && h.d < 4.2 ? FP_SAY[h.kind] : null; if (p !== f.prompt) { f.prompt = p; if (api.onFpPrompt) api.onFpPrompt(p); } }
     stepWorkers(now);
     camera.layers.enable(2); ray.layers.enableAll(); occl.layers.enableAll(); bayShown22 = null;
-    if (canvas.isConnected && canvas.clientWidth) { renderer.shadowMap.needsUpdate = true; POST.thr = 0.8; renderer.toneMappingExposure = expoWs52; renderer.render(scene, camera); adaptDpr(dt); }
+    if (canvas.isConnected && canvas.clientWidth) { renderer.shadowMap.needsUpdate = true; POST.thr = 0.8; renderer.toneMappingExposure = expoWs52; batchRoom57(); renderer.render(scene, camera); adaptDpr(dt); }
     raf = requestAnimationFrame(frame);
   }
   const FPP = { id: null, x: 0, y: 0, t: 0, moved: false, side: null, lx: null, ly: null };
@@ -13611,7 +13710,8 @@ if ( uFx > 0.5 ) {
     let next = dprNow;
     const lo51 = Math.min(1, DPR_MAX);
     if (dprAvg > 1 / 40 && dprNow > lo51) next = Math.max(lo51, dprNow - 0.25);
-    else if (dprAvg > 1 / 40 && PREF34.gfx !== 'save') { try { if (POST.auto) POST.auto = false; } catch (e) { /* no glow pass */ } }
+    else if (dprAvg > 1 / 40 && PREF34.gfx !== 'save' && POST.auto !== false) { try { POST.auto = false; } catch (e) { /* no glow pass */ } }
+    else if (dprAvg > 1 / 30 && dprNow > 0.85) next = 0.85;
     else if (dprAvg < 1 / 55 && dprNow < PREF34.cap) next = Math.min(PREF34.cap, dprNow + 0.25);
     if (next > PREF34.cap) next = PREF34.cap;
     if (next !== dprNow) { dprNow = next; renderer.setPixelRatio(dprNow); const w = stage.clientWidth, h = stage.clientHeight; if (w && h) { renderer.setSize(w, h, false); redraw49(); } }
@@ -19814,7 +19914,7 @@ function renderGarage() {
     });
     h += '</ul></div>';
   }
-  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 56</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
+  h += '</div><div data-sub="settings"><div class="garage-foot"><button class="btn" data-a="intro">How to play</button><button class="btn" data-a="savemove">Move your save</button><button class="btn" data-a="rename">Name your garage</button>' + (canSellUp() ? '<button class="btn" data-a="sellup">Sell up and start again</button>' : '') + settingsHtml34() + '<button class="btn" data-b="fx24">Lighting effects: ' + (S.fx24 === false ? 'Off' : set34().gfx === 'save' ? 'Off (battery saver)' : 'On') + '</button><span class="build-tag">Build 57</span><button class="btn ghost" data-a="reset">Start a new garage</button></div></div>';
   $('#view-garage').innerHTML = h; applySubs('garage');
 }
 
@@ -20308,7 +20408,7 @@ document.addEventListener('keydown', e => {
 })();
 
 /* ---------- boot ---------- */
-const BUILD = 56;
+const BUILD = 57;
 /* On itch.io phones the page is locked to one way round. The itch build wraps the game in a small
    shell page that can turn it a quarter turn, so players can hold the phone either way. */
 const SHELL = (() => { try { return window.parent !== window && window.parent.BonnetShell ? window.parent.BonnetShell : null; } catch (e) { return null; } })();
@@ -26051,6 +26151,15 @@ function showWhatsNew56(had55) {
     </ul>
     <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
 }
+/* build 57: what's new */
+function showWhatsNew57(had56) {
+  showModal(`<div><span class="label">Build 57</span><h2 class="sheet-title">What’s new</h2></div>
+    <ul class="news">
+      <li><b>Smoother.</b> The workshop now draws the car and the room in about half the work it took before, and the yard is back to its old speed. Phones that struggle step down more gracefully.</li>
+      ${had56 ? '' : '<li><b>Proper lights.</b> Tail lights in sections (red, amber, clear reversing light), projector headlights, and no more spike under the bumper corners.</li>'}
+    </ul>
+    <button class="btn primary wide" data-a="close-modal">Let’s go</button>`);
+}
 function start(data) {
   const snap = data && data.S;
   S = snap || load();
@@ -26058,8 +26167,8 @@ function start(data) {
   ensureState(); ensure22();
   render();
   if (S.gname && Car3D.ok && Car3D.redrawText) setTimeout(() => Car3D.redrawText(), 300);
-  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; S.seen56 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
-  else if (!S.seen56) { const had55 = !!S.seen55; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; S.seen56 = true; save(); setTimeout(() => showWhatsNew56(had55), 900); }
+  if (!S.seen23) { S.seen20 = true; S.seen21 = true; S.seen22 = true; S.seen23 = true; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; S.seen56 = true; S.seen57 = true; save(); setTimeout(() => showWhatsNew23(), 900); }
+  else if (!S.seen57) { const had56 = !!S.seen56; S.seen24 = true; S.seen25 = true; S.seen26 = true; S.seen27 = true; S.seen28 = true; S.seen29 = true; S.seen30 = true; S.seen31 = true; S.seen32 = true; S.seen33 = true; S.seen34 = true; S.seen35 = true; S.seen36 = true; S.seen37 = true; S.seen38 = true; S.seen39 = true; S.seen40 = true; S.seen41 = true; S.seen42 = true; S.seen43 = true; S.seen44 = true; S.seen45 = true; S.seen46 = true; S.seen47 = true; S.seen48 = true; S.seen49 = true; S.seen50 = true; S.seen51 = true; S.seen52 = true; S.seen53 = true; S.seen54 = true; S.seen55 = true; S.seen56 = true; S.seen57 = true; save(); setTimeout(() => showWhatsNew57(had56), 900); }
   else if (!S.seen22) { S.seen20 = true; S.seen21 = true; S.seen22 = true; save(); setTimeout(() => showWhatsNew22(), 900); }
   else if (!S.seen21) { S.seen20 = true; S.seen21 = true; save(); setTimeout(() => showWhatsNew21(), 900); }
   else if (!S.seen20) { S.seen20 = true; save(); setTimeout(() => toast('Build 20: a new realistic look, mechanics to hire, contracts, an MOT bay, loans, levels up to 10, and you set your own rates.'), 1200); }
